@@ -1,7 +1,7 @@
-# Account Form — Minimal Validation Refactor
+﻿# Account Form — Minimal Validation Refactor
 
 **Date:** 2026-04-18
-**Scope:** `nextcrm-app` — CRM Accounts module
+**Scope:** `orvixcrm` — CRM Accounts module
 **Status:** Design approved
 
 ## Problem

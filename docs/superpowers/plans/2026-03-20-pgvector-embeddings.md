@@ -1,4 +1,4 @@
-# PGVector Embeddings — Similarity Recommendations for CRM
+﻿# PGVector Embeddings — Similarity Recommendations for CRM
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -62,7 +62,7 @@ prisma/migrations/20260320000000_add_pgvector_embeddings/migration.sql
 - [ ] **Step 1: Install Inngest**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 pnpm add inngest
 ```
 
@@ -246,7 +246,7 @@ Create `inngest/client.ts`:
 ```typescript
 import { Inngest } from "inngest";
 
-export const inngest = new Inngest({ id: "nextcrm" });
+export const inngest = new Inngest({ id: "OrvixCRM" });
 ```
 
 - [ ] **Step 2: Create the Inngest API route**

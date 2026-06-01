@@ -1,13 +1,13 @@
-# Invoices Module — Design Spec
+﻿# Invoices Module — Design Spec
 
 - **Date:** 2026-04-15
-- **Project:** nextcrm-app
+- **Project:** orvixcrm
 - **Target branch:** `dev`
 - **Status:** Draft for review
 
 ## 1. Purpose
 
-Add a first-class **Invoices** module to NextCRM. Users create invoices linked to a CRM Account, build line items from CRM Products (or free-text), the system generates a PDF, stores it in MinIO/S3, and exposes search, list, payment tracking, and email delivery. The module is **global-ready** (multi-currency, tenant-configurable VAT, configurable numbering series) — not Czech-specific.
+Add a first-class **Invoices** module to OrvixCRM. Users create invoices linked to a CRM Account, build line items from CRM Products (or free-text), the system generates a PDF, stores it in MinIO/S3, and exposes search, list, payment tracking, and email delivery. The module is **global-ready** (multi-currency, tenant-configurable VAT, configurable numbering series) — not Czech-specific.
 
 ## 2. Scope
 

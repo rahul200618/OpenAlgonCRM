@@ -1,8 +1,8 @@
-# Docker Implementation Plan
+﻿# Docker Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Enable users to run `docker-compose up` and get a fully working NextCRM instance with app, Postgres, Inngest, and MinIO.
+**Goal:** Enable users to run `docker-compose up` and get a fully working OrvixCRM instance with app, Postgres, Inngest, and MinIO.
 
 **Architecture:** Multi-stage Dockerfile with standalone Next.js output. Single docker-compose.yml orchestrates 4 services on an internal network. Entrypoint script handles migrations, seeding, and MinIO bucket creation automatically.
 
@@ -142,7 +142,7 @@ git commit -m "feat: enable Next.js standalone output for Docker"
 #!/bin/sh
 set -e
 
-echo "==> NextCRM Docker Entrypoint"
+echo "==> OrvixCRM Docker Entrypoint"
 
 # --- 1. Wait for Postgres ---
 echo "==> Waiting for PostgreSQL..."
@@ -212,7 +212,7 @@ else
 fi
 
 # --- 6. Start the application ---
-echo "==> Starting NextCRM..."
+echo "==> Starting OrvixCRM..."
 exec node server.js
 ```
 
@@ -331,14 +331,14 @@ ENTRYPOINT ["./docker-entrypoint.sh"]
 - [ ] **Step 2: Verify the Dockerfile builds**
 
 ```bash
-docker build -t nextcrm:test .
+docker build -t OrvixCRM:test .
 ```
 
 Expected: Build completes successfully. If Prisma COPY paths don't resolve, inspect the build stage to find exact paths:
 
 ```bash
-docker build --target build -t nextcrm:build-debug .
-docker run --rm nextcrm:build-debug ls -la node_modules/.pnpm/ | grep prisma
+docker build --target build -t OrvixCRM:build-debug .
+docker run --rm OrvixCRM:build-debug ls -la node_modules/.pnpm/ | grep prisma
 ```
 
 Adjust the COPY paths in the Dockerfile if the pnpm store paths differ.
@@ -347,7 +347,7 @@ Adjust the COPY paths in the Dockerfile if the pnpm store paths differ.
 
 ```bash
 git add Dockerfile
-git commit -m "feat: add multi-stage Dockerfile for NextCRM"
+git commit -m "feat: add multi-stage Dockerfile for OrvixCRM"
 ```
 
 ---
@@ -366,15 +366,15 @@ services:
     image: postgres:18-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: nextcrm
-      POSTGRES_PASSWORD: nextcrm
-      POSTGRES_DB: nextcrm
+      POSTGRES_USER: OrvixCRM
+      POSTGRES_PASSWORD: OrvixCRM
+      POSTGRES_DB: OrvixCRM
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - nextcrm
+      - OrvixCRM
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nextcrm"]
+      test: ["CMD-SHELL", "pg_isready -U OrvixCRM"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -393,7 +393,7 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - nextcrm
+      - OrvixCRM
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s
@@ -410,7 +410,7 @@ services:
     restart: unless-stopped
     command: inngest dev -u http://app:3000/api/inngest
     networks:
-      - nextcrm
+      - OrvixCRM
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8288/health"]
       interval: 5s
@@ -420,7 +420,7 @@ services:
     # ports:
     #   - "8288:8288"
 
-  # --- NextCRM Application ---
+  # --- OrvixCRM Application ---
   app:
     build:
       context: .
@@ -430,10 +430,10 @@ services:
       - "3000:3000"
     environment:
       # Database
-      DATABASE_URL: postgresql://nextcrm:nextcrm@postgres:5432/nextcrm
+      DATABASE_URL: postgresql://OrvixCRM:OrvixCRM@postgres:5432/OrvixCRM
       DB_HOST: postgres
       DB_PORT: "5432"
-      DB_USER: nextcrm
+      DB_USER: OrvixCRM
 
       # Auth
       BETTER_AUTH_URL: http://localhost:3000
@@ -443,21 +443,21 @@ services:
       NEXT_PUBLIC_MINIO_ENDPOINT: http://minio:9000
       MINIO_ENDPOINT: http://minio:9000
       MINIO_PORT: "9000"
-      MINIO_BUCKET: nextcrm
+      MINIO_BUCKET: OrvixCRM
       MINIO_USE_SSL: "false"
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin123
 
       # Inngest
       INNGEST_DEV: "1"
-      INNGEST_ID: nextcrm
-      INNGEST_APP_NAME: NextCRM
+      INNGEST_ID: OrvixCRM
+      INNGEST_APP_NAME: OrvixCRM
       INNGEST_EVENT_KEY: local
       INNGEST_SIGNING_KEY: ""
       INNGEST_BASE_URL: http://inngest:8288
 
       # App
-      NEXT_PUBLIC_APP_NAME: NextCRM
+      NEXT_PUBLIC_APP_NAME: OrvixCRM
       NEXT_PUBLIC_APP_URL: http://localhost:3000
 
       # Optional — override via .env file or environment:
@@ -474,7 +474,7 @@ services:
       inngest:
         condition: service_healthy
     networks:
-      - nextcrm
+      - OrvixCRM
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 10s
@@ -487,7 +487,7 @@ volumes:
   minio_data:
 
 networks:
-  nextcrm:
+  OrvixCRM:
     driver: bridge
 ```
 
@@ -516,7 +516,7 @@ git commit -m "feat: add docker-compose.yml with all services"
 
 ```bash
 # ===========================================
-# NextCRM Docker Environment Configuration
+# OrvixCRM Docker Environment Configuration
 # ===========================================
 # Copy this file to .env to customize your deployment.
 # docker-compose.yml already sets sensible defaults for all
@@ -530,7 +530,7 @@ git commit -m "feat: add docker-compose.yml with all services"
 
 # --- Database (default: bundled Postgres) ---
 # Override to use an external database:
-# DATABASE_URL=postgresql://user:pass@your-host:5432/nextcrm
+# DATABASE_URL=postgresql://user:pass@your-host:5432/OrvixCRM
 
 # --- Auth ---
 # Auto-generated on first start if not set.
@@ -610,11 +610,11 @@ Expected output sequence:
 3. `==> Generated BETTER_AUTH_SECRET`
 4. `==> Running database migrations...`
 5. `==> Migrations complete.`
-6. `==> Ensuring MinIO bucket 'nextcrm' exists...`
-7. `==> Bucket 'nextcrm' created.`
+6. `==> Ensuring MinIO bucket 'OrvixCRM' exists...`
+7. `==> Bucket 'OrvixCRM' created.`
 8. `==> No users found, seeding database...`
 9. `==> Seeding complete.`
-10. `==> Starting NextCRM...`
+10. `==> Starting OrvixCRM...`
 
 - [ ] **Step 2: Verify health checks**
 
@@ -675,7 +675,7 @@ git commit -m "fix: Docker setup adjustments from e2e verification"
 
 ```bash
 docker-compose down -v
-docker rmi nextcrm-app-app 2>/dev/null || true
+docker rmi orvixcrm-app 2>/dev/null || true
 docker-compose up --build -d
 ```
 

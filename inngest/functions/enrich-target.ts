@@ -1,4 +1,4 @@
-import { inngest } from "@/inngest/client";
+﻿import { inngest } from "@/inngest/client";
 import { prismadb } from "@/lib/prisma";
 import { isFieldEmpty } from "@/lib/enrichment/utils/field-utils";
 import { getApiKey } from "@/lib/api-keys";
@@ -113,7 +113,7 @@ export const enrichTarget = inngest.createFunction(
       const script = getAgentScript();
 
       const sandbox = await Sandbox.create(
-        process.env.E2B_ENRICHMENT_TEMPLATE ?? "nextcrm-enrichment",
+        process.env.E2B_ENRICHMENT_TEMPLATE ?? "OrvixCRM-enrichment",
         {
           timeoutMs: SANDBOX_TIMEOUT_MS,
           apiKey: process.env.E2B_API_KEY,

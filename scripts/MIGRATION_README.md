@@ -1,8 +1,8 @@
-# MongoDB to PostgreSQL Migration Scripts
+﻿# MongoDB to PostgreSQL Migration Scripts
 
 ## Overview
 
-This directory contains the migration tooling for migrating NextCRM from MongoDB to PostgreSQL. The migration supports:
+This directory contains the migration tooling for migrating OrvixCRM from MongoDB to PostgreSQL. The migration supports:
 
 - **Progress Tracking**: Real-time console output with progress bars and ETA
 - **Pause/Resume**: Graceful interruption handling with checkpoint system
@@ -195,7 +195,7 @@ Validates:
 
 ```bash
 # .env
-DATABASE_URL="postgresql://username:password@localhost:5432/nextcrm"
+DATABASE_URL="postgresql://username:password@localhost:5432/OrvixCRM"
 ```
 
 ### 3. Generate Prisma Client

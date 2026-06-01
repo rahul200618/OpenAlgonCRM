@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Migration Orchestrator
  * Main migration loop that coordinates the entire migration process
  */
@@ -48,8 +48,8 @@ export class MigrationOrchestrator {
     uuidMapper: UuidMapper
   ) {
     this.mongoClient = mongoClient;
-    // Get the database name from the connection string or default to 'nextcrm-demo'
-    const dbName = this.extractDbName(mongoClient) || 'nextcrm-demo';
+    // Get the database name from the connection string or default to 'OrvixCRM-demo'
+    const dbName = this.extractDbName(mongoClient) || 'OrvixCRM-demo';
     this.mongoDb = mongoClient.db(dbName);
     this.pgClient = pgClient;
     this.checkpointManager = checkpointManager;

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Body,
   Button,
   Container,
@@ -32,8 +32,8 @@ export const InviteUserEmail = ({
 }: VercelInviteUserEmailProps) => {
   const previewText =
     userLanguage === "en"
-      ? `You have been invited by ${invitedByUsername} to NextCRM app`
-      : `Byl jste pozván uživatelem ${invitedByUsername} do aplikace NextCRM`;
+      ? `You have been invited by ${invitedByUsername} to OrvixCRM app`
+      : `Byl jste pozván uživatelem ${invitedByUsername} do aplikace OrvixCRM`;
 
   return (
     <Html>

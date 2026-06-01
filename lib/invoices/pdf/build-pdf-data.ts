@@ -1,4 +1,4 @@
-import { Decimal } from "decimal.js";
+﻿import { Decimal } from "decimal.js";
 import { computeInvoiceTotals } from "@/lib/invoices/totals";
 import type {
   InvoicePdfData,
@@ -70,7 +70,7 @@ function buildSupplier(settings: SettingsForPdf): PdfParty {
     name:
       settings?.companyName ??
       process.env.NEXT_PUBLIC_APP_NAME ??
-      "NextCRM",
+      "OrvixCRM",
     street: settings?.companyAddress ?? undefined,
     city: settings?.companyCity ?? undefined,
     zip: settings?.companyZip ?? undefined,

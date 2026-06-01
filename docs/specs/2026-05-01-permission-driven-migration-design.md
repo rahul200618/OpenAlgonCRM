@@ -1,14 +1,14 @@
-# Permission-Driven Authorization Migration Design Spec
+﻿# Permission-Driven Authorization Migration Design Spec
 
 - **Date:** 2026-05-01
-- **Project:** nextcrm-app
+- **Project:** orvixcrm
 - **Target branch:** `dev`
 - **Status:** Draft for review
 - **Related audit:** `docs/2026-05-01-bola-idor-security-audit.md`
 
 ## 1. Purpose
 
-Migrate NextCRM from ad hoc authentication checks to a permission-driven authorization model with three roles:
+Migrate OrvixCRM from ad hoc authentication checks to a permission-driven authorization model with three roles:
 
 1. **user**
 2. **manager**

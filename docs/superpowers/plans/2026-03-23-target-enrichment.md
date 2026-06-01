@@ -1,8 +1,8 @@
-# Target Enrichment via Firecrawl — Implementation Plan
+﻿# Target Enrichment via Firecrawl — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Let NextCRM users enrich `crm_Targets` records with company data, position, websites, phones, and social URLs using the fire-enrich multi-agent engine — both one-at-a-time with a live progress drawer, and in bulk via Inngest background jobs.
+**Goal:** Let OrvixCRM users enrich `crm_Targets` records with company data, position, websites, phones, and social URLs using the fire-enrich multi-agent engine — both one-at-a-time with a live progress drawer, and in bulk via Inngest background jobs.
 
 **Architecture:** Identical to `feature/contact-enrichment`. The existing `lib/enrichment/` library is reused unchanged. A streaming SSE route handles single-target enrichment with real-time agent progress; a separate bulk route fans out to Inngest jobs. The drawer shows a diff preview before saving; bulk auto-applies to empty fields only.
 

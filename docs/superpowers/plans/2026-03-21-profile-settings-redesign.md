@@ -1,4 +1,4 @@
-# Profile Settings Page Redesign Implementation Plan
+﻿# Profile Settings Page Redesign Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -463,7 +463,7 @@ export default ProfilePage;
 - [ ] **Step 2: Start dev server and verify the page loads**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 pnpm dev
 ```
 

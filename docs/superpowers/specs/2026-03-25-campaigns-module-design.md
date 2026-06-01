@@ -1,4 +1,4 @@
-# Campaigns Module — Design Spec
+﻿# Campaigns Module — Design Spec
 **Date:** 2026-03-25
 **Status:** Approved
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-A new top-level **Campaigns** module for NextCRM that enables users to create, schedule, and track email marketing campaigns. Targets and Target Lists are moved here from the CRM module. Campaign templates are created with AI generation (using existing LLM keys) and refined in a TipTap WYSIWYG editor. Campaigns are sent via Resend, scheduled via Inngest, and tracked with delivery + engagement analytics (opens, clicks, bounces).
+A new top-level **Campaigns** module for OrvixCRM that enables users to create, schedule, and track email marketing campaigns. Targets and Target Lists are moved here from the CRM module. Campaign templates are created with AI generation (using existing LLM keys) and refined in a TipTap WYSIWYG editor. Campaigns are sent via Resend, scheduled via Inngest, and tracked with delivery + engagement analytics (opens, clicks, bounces).
 
 ---
 

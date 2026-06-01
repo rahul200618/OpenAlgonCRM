@@ -1,8 +1,8 @@
-export default async function getGithubRepoStars(): Promise<number> {
+﻿export default async function getGithubRepoStars(): Promise<number> {
   try {
     const response = await fetch(
       process.env.NEXT_PUBLIC_GITHUB_REPO_API ||
-        "https://api.github.com/repos/pdovhomilja/nextcrm-app",
+        "https://api.github.com/repos/rahul200618/orvixcrm",
       {
         headers: {
           Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,

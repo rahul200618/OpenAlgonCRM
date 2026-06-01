@@ -1,4 +1,4 @@
-# Sales Flow Playwright Tests Implementation Plan
+﻿# Sales Flow Playwright Tests Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -632,7 +632,7 @@ test.describe.serial("Sales Flow", () => {
 Make sure the dev server is running first (`pnpm dev` in the project directory), then:
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 pnpm exec playwright test tests/e2e/sales-flow.spec.ts --project=chromium --reporter=list
 ```
 

@@ -1,4 +1,4 @@
-# Migration Validation Script
+﻿# Migration Validation Script
 
 This document describes the migration validation script that verifies data integrity after migrating from MongoDB to PostgreSQL.
 
@@ -339,7 +339,7 @@ NODE_OPTIONS="--max-old-space-size=4096" pnpm validate:migration
 1. **Update DATABASE_URL** to PostgreSQL:
    ```bash
    # In .env or environment configuration
-   DATABASE_URL="postgresql://user:password@localhost:5432/nextcrm"
+   DATABASE_URL="postgresql://user:password@localhost:5432/OrvixCRM"
    ```
 
 2. **Generate Prisma Client** for PostgreSQL:

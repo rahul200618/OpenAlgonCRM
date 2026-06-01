@@ -1,4 +1,4 @@
-# CRM Audit Log & Soft Delete Implementation Plan
+﻿# CRM Audit Log & Soft Delete Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -123,7 +123,7 @@ Also add indexes to each:
 - [ ] **Step 3: Run migration**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 npx prisma migrate dev --name add_audit_log_and_soft_delete
 ```
 
@@ -211,7 +211,7 @@ pnpm add -D jest ts-jest @types/jest
 - [ ] **Step 3: Run test to confirm it fails**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 pnpm test lib/__tests__/audit-log.test.ts
 ```
 
@@ -569,7 +569,7 @@ pnpm dev
 2. Delete it — confirm it disappears from the list
 3. Check the DB directly to confirm `deletedAt` is set and the row still exists:
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 npx prisma studio
 ```
 Find the account in `crm_Accounts` — it should have `deletedAt` populated.
@@ -852,7 +852,7 @@ export function AuditTimeline({ entityType, entityId, initialData, isAdmin, onRe
 - [ ] **Step 3: Install `date-fns` if not present**
 
 ```bash
-grep "date-fns" /Users/pdovhomilja/development/Next.js/nextcrm-app/package.json || pnpm add date-fns
+grep "date-fns" /Users/rahul200618/development/orvixcrm/package.json || pnpm add date-fns
 ```
 
 - [ ] **Step 4: Commit**
@@ -1133,7 +1133,7 @@ git commit -m "feat: add admin audit log page with global filterable table"
 - [ ] **Step 1: Run TypeScript compiler check**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 pnpm build
 ```
 

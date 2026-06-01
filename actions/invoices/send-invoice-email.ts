@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { prismadb } from "@/lib/prisma";
 import { getUser } from "@/actions/get-user";
@@ -58,7 +58,7 @@ export async function sendInvoiceEmail(input: SendInvoiceEmailInput) {
   const pdfBuffer = Buffer.concat(chunks);
 
   const resend = await resendHelper();
-  const fromEmail = process.env.EMAIL_FROM ?? `invoices@${process.env.NEXT_PUBLIC_APP_DOMAIN ?? "nextcrm.app"}`;
+  const fromEmail = process.env.EMAIL_FROM ?? `invoices@${process.env.NEXT_PUBLIC_APP_DOMAIN ?? "OrvixCRM.app"}`;
 
   const subject =
     input.subject ?? `Invoice ${invoice.number ?? invoice.id} — ${invoice.account.name}`;

@@ -1,4 +1,4 @@
-# Contact Enrichment via Firecrawl — Design Spec
+﻿# Contact Enrichment via Firecrawl — Design Spec
 
 **Date:** 2026-03-23
 **Status:** Approved
@@ -8,18 +8,18 @@
 
 ## Overview
 
-Integrate the fire-enrich multi-agent enrichment engine into NextCRM so users can automatically populate contact fields (company info, LinkedIn, industry, funding stage, tech stack, etc.) using Firecrawl + GPT-4o. Supports both single-contact interactive enrichment and bulk background enrichment.
+Integrate the fire-enrich multi-agent enrichment engine into OrvixCRM so users can automatically populate contact fields (company info, LinkedIn, industry, funding stage, tech stack, etc.) using Firecrawl + GPT-4o. Supports both single-contact interactive enrichment and bulk background enrichment.
 
 ---
 
 ## Architecture
 
-### Approach: Copy fire-enrich `lib/` into nextcrm
+### Approach: Copy fire-enrich `lib/` into OrvixCRM
 
-The fire-enrich library (`lib/enrichment/`) is copied directly into nextcrm. No external service dependency. The multi-agent orchestration runs inside the same Next.js process.
+The fire-enrich library (`lib/enrichment/`) is copied directly into OrvixCRM. No external service dependency. The multi-agent orchestration runs inside the same Next.js process.
 
 ```
-nextcrm-app/
+orvixcrm/
 ├── lib/
 │   └── enrichment/                      ← copied from fire-enrich/lib/
 │       ├── agent-architecture/
@@ -291,7 +291,7 @@ Table of all `crm_Contact_Enrichment` records:
 ## Dependencies to Add
 
 ```json
-// Already in fire-enrich, need to verify presence in nextcrm:
+// Already in fire-enrich, need to verify presence in OrvixCRM:
 "@mendable/firecrawl-js": "^1.x",
 "openai": "^4.x",   // likely already present
 "zod": "^3.x"       // likely already present

@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 import { getSession } from "@/lib/auth-server";
 
 import { prismadb } from "@/lib/prisma";
@@ -187,7 +187,7 @@ export async function sendEmail(input: SendInput) {
     data: {
       emailAccountId: input.accountId,
       userId,
-      rfcMessageId: info.messageId ?? `local-${crypto.randomUUID()}@nextcrm`,
+      rfcMessageId: info.messageId ?? `local-${crypto.randomUUID()}@OrvixCRM`,
       folder: EmailFolder.SENT,
       subject: input.subject,
       fromEmail: account.username,

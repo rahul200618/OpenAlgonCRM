@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+﻿#!/usr/bin/env ts-node
 /**
  * Main MongoDB to PostgreSQL Migration Script
  * Entry point for the migration process
@@ -33,7 +33,7 @@ const ERROR_LOG_FILE = path.join(process.cwd(), 'migration-errors.log');
 
 async function main() {
   console.log('═══════════════════════════════════════════════════════════');
-  console.log('   NextCRM MongoDB → PostgreSQL Migration');
+  console.log('   OrvixCRM MongoDB → PostgreSQL Migration');
   console.log('═══════════════════════════════════════════════════════════\n');
 
   // Initialize MongoDB client

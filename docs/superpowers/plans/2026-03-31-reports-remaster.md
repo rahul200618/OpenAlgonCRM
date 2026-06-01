@@ -1,4 +1,4 @@
-# Reports Module Remaster — Implementation Plan
+﻿# Reports Module Remaster — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -4745,7 +4745,7 @@ export default function ScheduledReport({
           <Hr />
           <Text>Your scheduled report is attached to this email.</Text>
           <Text style={{ color: "#999", fontSize: "12px" }}>
-            This is an automated report from NextCRM.
+            This is an automated report from OrvixCRM.
           </Text>
         </Container>
       </Body>

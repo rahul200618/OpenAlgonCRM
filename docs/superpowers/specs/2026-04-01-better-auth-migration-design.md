@@ -1,4 +1,4 @@
-# Better-Auth Migration Design Spec
+﻿# Better-Auth Migration Design Spec
 
 **Date:** 2026-04-01
 **Status:** Approved
@@ -14,7 +14,7 @@ Replace next-auth with better-auth across the entire application. Auth methods c
 - Database sessions with instant revocation
 - Simple RBAC: `admin`, `member`, `viewer`
 - PENDING user approval flow preserved (admin must activate new users in production)
-- Demo instance (`demo.nextcrm.io`) auto-activates new users
+- Demo instance (`demo.OrvixCRM.io`) auto-activates new users
 - Safe migration for multiple production instances with separate databases
 - Short maintenance window acceptable per instance
 - Existing users must re-verify email on first post-migration login
@@ -103,7 +103,7 @@ No password fields. No password reset dialog.
 |---|---|---|
 | First user ever | `ACTIVE` | `admin` |
 | Self-signup (production) | `PENDING` | `member` |
-| Self-signup (demo: `NEXT_PUBLIC_APP_URL === "https://demo.nextcrm.io"`) | `ACTIVE` | `member` |
+| Self-signup (demo: `NEXT_PUBLIC_APP_URL === "https://demo.orvixcrm.com"`) | `ACTIVE` | `member` |
 | Admin invitation | `ACTIVE` | `member` |
 
 ### PENDING user flow (unchanged)

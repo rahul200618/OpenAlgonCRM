@@ -1,7 +1,7 @@
-# PostgreSQL Migration - Developer Guide
+﻿# PostgreSQL Migration - Developer Guide
 
 **Last Updated**: November 5, 2025
-**Target Audience**: Developers working with NextCRM codebase
+**Target Audience**: Developers working with OrvixCRM codebase
 **Purpose**: Reference guide for working with the new PostgreSQL schema
 
 ---

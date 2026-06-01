@@ -1,8 +1,8 @@
-# Invoices Module Implementation Plan
+﻿# Invoices Module Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a full Invoices module in nextcrm-app: create, issue, store PDFs in MinIO, link to CRM Accounts/Products, multi-currency, configurable VAT, search, payments, send-by-email.
+**Goal:** Build a full Invoices module in orvixcrm: create, issue, store PDFs in MinIO, link to CRM Accounts/Products, multi-currency, configurable VAT, search, payments, send-by-email.
 
 **Architecture:** Pure-function domain layer in `lib/invoices/` (TDD-friendly), Prisma models, server actions in `actions/invoices/`, thin Next.js API routes, App Router pages under `app/[locale]/(routes)/invoices/`, admin pages under `app/[locale]/(routes)/admin/invoices/`. PDF rendered with `@react-pdf/renderer`, stored in MinIO via existing `lib/minio.ts`.
 
@@ -970,7 +970,7 @@ git commit -m "feat(invoices): add search filter + tsquery builder"
 // lib/invoices/storage.ts
 import { minioClient } from "@/lib/minio";
 
-const BUCKET = process.env.MINIO_BUCKET ?? "nextcrm";
+const BUCKET = process.env.MINIO_BUCKET ?? "OrvixCRM";
 
 function invoiceKey(invoiceId: string) {
   return `invoices/${invoiceId}.pdf`;

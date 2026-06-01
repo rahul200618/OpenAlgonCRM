@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 import { TbBrandNextjs, TbBrandTypescript } from "react-icons/tb";
 import { BiLogoMongodb, BiLogoTailwindCss } from "react-icons/bi";
 import { SiPrisma, SiReact, SiOpenai } from "react-icons/si";
@@ -22,13 +22,13 @@ export async function GET(request: Request) {
     const hasTitle = searchParams.has("title");
     const title = hasTitle
       ? searchParams.get("title")?.slice(0, 200)
-      : "NextCRM";
+      : "OrvixCRM";
 
     const hasDescription = searchParams.has("description");
 
     const description = hasDescription
       ? searchParams.get("description")?.slice(0, 200)
-      : "NextCRM is an open source CRM build on top of NextJS. Technology stack: NextJS with Typescrtipt, MongoDB, TailwindCSS, React, Prisma, shadCN, resend.com, react.email and more. ";
+      : "OrvixCRM is an open source CRM build on top of NextJS. Technology stack: NextJS with Typescrtipt, MongoDB, TailwindCSS, React, Prisma, shadCN, resend.com, react.email and more. ";
 
     return new ImageResponse(
       (
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
               <SiOpenai size={50} color={"white"} />
             </span>
 
-            <p tw="text-neutral-300 pb-10">https://demo.nextcrm.io</p>
+            <p tw="text-neutral-300 pb-10">https://demo.orvixcrm.com</p>
           </div>
         </div>
       ),

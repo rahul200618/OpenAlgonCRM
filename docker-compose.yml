@@ -1,18 +1,18 @@
-services:
+﻿services:
   # --- PostgreSQL Database (with pgvector extension for embeddings) ---
   postgres:
     image: pgvector/pgvector:pg17
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-nextcrm}
+      POSTGRES_USER: ${POSTGRES_USER:-OrvixCRM}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      POSTGRES_DB: ${POSTGRES_DB:-nextcrm}
+      POSTGRES_DB: ${POSTGRES_DB:-OrvixCRM}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - nextcrm
+      - OrvixCRM
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nextcrm}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-OrvixCRM}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -26,12 +26,12 @@ services:
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-nextcrm}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-OrvixCRM}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-changeme}
     volumes:
       - minio_data:/data
     networks:
-      - nextcrm
+      - OrvixCRM
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s
@@ -48,7 +48,7 @@ services:
     restart: unless-stopped
     command: inngest dev -u http://app:3000/api/inngest
     networks:
-      - nextcrm
+      - OrvixCRM
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8288/health"]
       interval: 5s
@@ -58,7 +58,7 @@ services:
     # ports:
     #   - "8288:8288"
 
-  # --- NextCRM Application ---
+  # --- OrvixCRM Application ---
   app:
     build:
       context: .
@@ -69,12 +69,12 @@ services:
     environment:
       # Database — values come from the same env vars as the postgres
       # service above so a single override changes both sides.
-      DATABASE_URL: postgresql://${POSTGRES_USER:-nextcrm}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-nextcrm}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-OrvixCRM}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-OrvixCRM}
       DB_HOST: postgres
       DB_PORT: "5432"
-      DB_USER: ${POSTGRES_USER:-nextcrm}
+      DB_USER: ${POSTGRES_USER:-OrvixCRM}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      DB_NAME: ${POSTGRES_DB:-nextcrm}
+      DB_NAME: ${POSTGRES_DB:-OrvixCRM}
 
       # Auth
       BETTER_AUTH_URL: http://localhost:3000
@@ -84,21 +84,21 @@ services:
       NEXT_PUBLIC_MINIO_ENDPOINT: http://minio:9000
       MINIO_ENDPOINT: http://minio:9000
       MINIO_PORT: "9000"
-      MINIO_BUCKET: nextcrm
+      MINIO_BUCKET: OrvixCRM
       MINIO_USE_SSL: "false"
-      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-nextcrm}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-OrvixCRM}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-changeme}
 
       # Inngest
       INNGEST_DEV: "1"
-      INNGEST_ID: nextcrm
-      INNGEST_APP_NAME: NextCRM
+      INNGEST_ID: OrvixCRM
+      INNGEST_APP_NAME: OrvixCRM
       INNGEST_EVENT_KEY: local
       INNGEST_SIGNING_KEY: ""
       INNGEST_BASE_URL: http://inngest:8288
 
       # App
-      NEXT_PUBLIC_APP_NAME: NextCRM
+      NEXT_PUBLIC_APP_NAME: OrvixCRM
       NEXT_PUBLIC_APP_URL: http://localhost:3000
 
       # Initial admin account (created on first run by the seed script).
@@ -129,7 +129,7 @@ services:
       inngest:
         condition: service_healthy
     networks:
-      - nextcrm
+      - OrvixCRM
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 10s
@@ -142,5 +142,5 @@ volumes:
   minio_data:
 
 networks:
-  nextcrm:
+  OrvixCRM:
     driver: bridge

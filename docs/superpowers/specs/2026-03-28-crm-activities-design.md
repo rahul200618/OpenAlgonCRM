@@ -1,4 +1,4 @@
-# CRM Activities (Communication History) — Design Spec
+﻿# CRM Activities (Communication History) — Design Spec
 
 **Date:** 2026-03-28
 **Status:** Approved
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Add a complete activity log to the NextCRM sales module. Sales reps can log and schedule Calls, Meetings, Notes, and Emails against any CRM record. Each activity can be linked to multiple CRM entities simultaneously. Activities appear inline on every entity detail page and support both past logging and future scheduling.
+Add a complete activity log to the OrvixCRM sales module. Sales reps can log and schedule Calls, Meetings, Notes, and Emails against any CRM record. Each activity can be linked to multiple CRM entities simultaneously. Activities appear inline on every entity detail page and support both past logging and future scheduling.
 
 ---
 

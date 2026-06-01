@@ -1,6 +1,6 @@
-# AGENTS.md
+﻿# AGENTS.md
 
-This file is the authoritative guide for AI agents (Claude Code and other LLM agents) working in the `nextcrm-app` project. It covers context management, available superpowers/skills, current repo status, and available MCP servers.
+This file is the authoritative guide for AI agents (Claude Code and other LLM agents) working in the `orvixcrm` project. It covers context management, available superpowers/skills, current repo status, and available MCP servers.
 
 ---
 

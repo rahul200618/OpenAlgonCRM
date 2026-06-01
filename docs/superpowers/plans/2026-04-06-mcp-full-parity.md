@@ -1,4 +1,4 @@
-# MCP Server Full Parity Implementation Plan
+﻿# MCP Server Full Parity Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -106,7 +106,7 @@ export function externalError(msg: string): never {
 
 - [ ] **Step 2: Verify TypeScript compiles**
 
-Run: `cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/nextcrm-app && pnpm exec tsc --noEmit lib/mcp/helpers.ts 2>&1 | head -20`
+Run: `cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm && pnpm exec tsc --noEmit lib/mcp/helpers.ts 2>&1 | head -20`
 
 If there are path/tsconfig issues, just verify there are no syntax errors by checking that the file parses: `pnpm exec tsc --noEmit --skipLibCheck 2>&1 | grep helpers`
 

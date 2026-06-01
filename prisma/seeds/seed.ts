@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+﻿import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import dotenv from "dotenv";
@@ -121,7 +121,7 @@ async function main() {
   console.log("Lead Types seeded");
 
   // Test User for E2E Testing
-  const testUserEmail = process.env.TEST_USER_EMAIL || "test@nextcrm.app";
+  const testUserEmail = process.env.TEST_USER_EMAIL || "test@OrvixCRM.app";
   await prisma.users.upsert({
     where: { email: testUserEmail },
     update: {

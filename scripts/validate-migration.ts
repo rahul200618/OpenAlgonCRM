@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Migration Validation Script
  * Validates MongoDB to PostgreSQL migration with 4-layer approach:
  * 1. Row Count Validation
@@ -48,7 +48,7 @@ async function runValidation(): Promise<void> {
   const startTime = new Date();
   console.log('\n');
   console.log('================================================================');
-  console.log('   NextCRM MongoDB → PostgreSQL Migration Validation');
+  console.log('   OrvixCRM MongoDB → PostgreSQL Migration Validation');
   console.log('================================================================');
   console.log('\n');
 

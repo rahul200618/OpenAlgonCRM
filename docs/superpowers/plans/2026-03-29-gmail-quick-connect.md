@@ -1,4 +1,4 @@
-# Gmail Quick Connect Implementation Plan
+﻿# Gmail Quick Connect Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -97,7 +97,7 @@ async function searchFolderSafe(
 - [ ] **Step 4: Verify the fix compiles**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app && pnpm tsc --noEmit 2>&1 | head -30
+cd /Users/rahul200618/development/orvixcrm && pnpm tsc --noEmit 2>&1 | head -30
 ```
 
 Expected: no errors in `sync-account.ts`
@@ -177,7 +177,7 @@ export async function listImapFolders(
 - [ ] **Step 2: Verify the action compiles**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app && pnpm tsc --noEmit 2>&1 | head -30
+cd /Users/rahul200618/development/orvixcrm && pnpm tsc --noEmit 2>&1 | head -30
 ```
 
 Expected: no new errors

@@ -1,4 +1,4 @@
-# Enrichment Fixes Implementation Plan
+﻿# Enrichment Fixes Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -121,7 +121,7 @@ export const FIELD_MAP: Record<string, string> = {
 
 - [ ] **Step 2: Verify TypeScript compiles cleanly**
 
-Run: `cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/nextcrm-app && npx tsc --noEmit 2>&1 | head -30`
+Run: `cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm && npx tsc --noEmit 2>&1 | head -30`
 
 Expected: no errors from the new file (it may show unrelated pre-existing errors; that's fine).
 

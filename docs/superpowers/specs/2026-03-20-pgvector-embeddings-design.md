@@ -1,8 +1,8 @@
-# PGVector Embeddings — Similarity Recommendations for CRM
+﻿# PGVector Embeddings — Similarity Recommendations for CRM
 
 **Date:** 2026-03-20
 **Status:** Approved
-**Project:** nextcrm-app
+**Project:** orvixcrm
 
 ---
 

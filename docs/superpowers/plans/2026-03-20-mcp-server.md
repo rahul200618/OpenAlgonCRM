@@ -1,8 +1,8 @@
-# NextCRM MCP Server Implementation Plan
+﻿# OrvixCRM MCP Server Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add an MCP server to NextCRM so AI agents can list, search, get, create, and update Accounts, Leads, Opportunities, Contacts, and Targets using Bearer API tokens.
+**Goal:** Add an MCP server to OrvixCRM so AI agents can list, search, get, create, and update Accounts, Leads, Opportunities, Contacts, and Targets using Bearer API tokens.
 
 **Architecture:** Single `/api/mcp/[transport]/route.ts` endpoint using `@vercel/mcp-adapter`. Token auth via SHA-256-hashed `nxtc__` tokens stored in a new `ApiToken` Prisma model. Token management UI added to the existing profile page.
 
@@ -19,7 +19,7 @@
 - **User association on CRM records:**
   - `crm_Accounts`, `crm_Contacts`, `crm_Leads`, `crm_Opportunities` → filter/set via `assigned_to` field
   - `crm_Targets` → uses `created_by` field (no `assigned_to` on this model — the spec's decisions log incorrectly lists `assigned_to` for all models; the plan is correct)
-- **Existing MCP reference:** `/Users/pdovhomilja/development/Next.js/taskhq.app/app/api/mcp/[transport]/route.ts`
+- **Existing MCP reference:** `/Users/rahul200618/development/Next.js/taskhq.app/app/api/mcp/[transport]/route.ts`
 
 ---
 
@@ -47,7 +47,7 @@
 - [ ] **Step 1: Create and switch to feature branch**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 git checkout -b feature/mcp-server
 ```
 
@@ -65,7 +65,7 @@ Expected: `feature/mcp-server`
 - [ ] **Step 1: Install @vercel/mcp-adapter**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 pnpm add @vercel/mcp-adapter
 ```
 
@@ -119,7 +119,7 @@ apiTokens   ApiToken[]
 - [ ] **Step 2: Run migration**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 pnpm prisma migrate dev --name add-api-tokens
 ```
 Expected: Migration created and applied successfully. Prisma client regenerated.
@@ -261,7 +261,7 @@ describe("validateApiToken", () => {
 - [ ] **Step 2: Run tests to confirm they fail**
 
 ```bash
-cd /Users/pdovhomilja/development/Next.js/nextcrm-app
+cd /Users/rahul200618/development/orvixcrm
 pnpm test __tests__/lib/api-tokens.test.ts
 ```
 Expected: FAIL — `Cannot find module '@/lib/api-tokens'`
@@ -1531,7 +1531,7 @@ Expected: All tests pass.
 
 ```bash
 git add .
-git commit -m "feat: complete MCP server implementation for NextCRM CRM modules"
+git commit -m "feat: complete MCP server implementation for OrvixCRM CRM modules"
 ```
 
 ---
@@ -1543,7 +1543,7 @@ Once deployed, users connect Claude Desktop with:
 ```json
 {
   "mcpServers": {
-    "nextcrm": {
+    "OrvixCRM": {
       "url": "https://your-domain.com/api/mcp/sse",
       "headers": {
         "Authorization": "Bearer nxtc__your_token_here"

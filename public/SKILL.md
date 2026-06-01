@@ -1,11 +1,11 @@
----
-name: nextcrm
-description: Connect to NextCRM MCP server to manage CRM data — accounts, contacts, leads, opportunities, targets, products, contracts, activities, documents, target lists, enrichment, email accounts, campaigns, projects, and reports.
+﻿---
+name: OrvixCRM
+description: Connect to OrvixCRM MCP server to manage CRM data — accounts, contacts, leads, opportunities, targets, products, contracts, activities, documents, target lists, enrichment, email accounts, campaigns, projects, and reports.
 ---
 
-# NextCRM MCP Server Skill
+# OrvixCRM MCP Server Skill
 
-Use the NextCRM MCP server to read and write CRM data. This skill documents all available tools and how to use them.
+Use the OrvixCRM MCP server to read and write CRM data. This skill documents all available tools and how to use them.
 
 ## Connection Setup
 
@@ -18,9 +18,9 @@ Single POST endpoint. Simpler, the current MCP spec default.
 ```json
 {
   "mcpServers": {
-    "nextcrm": {
+    "OrvixCRM": {
       "type": "http",
-      "url": "https://YOUR_NEXTCRM_URL/api/mcp/mcp",
+      "url": "https://YOUR_OrvixCRM_URL/api/mcp/mcp",
       "headers": { "Authorization": "Bearer YOUR_API_TOKEN" }
     }
   }
@@ -34,9 +34,9 @@ Two endpoints: a GET SSE stream and a POST message channel. The client opens `/a
 ```json
 {
   "mcpServers": {
-    "nextcrm": {
+    "OrvixCRM": {
       "type": "sse",
-      "url": "https://YOUR_NEXTCRM_URL/api/mcp/sse",
+      "url": "https://YOUR_OrvixCRM_URL/api/mcp/sse",
       "headers": { "Authorization": "Bearer YOUR_API_TOKEN" }
     }
   }
@@ -47,7 +47,7 @@ You only configure the `/sse` URL — the client discovers the message endpoint 
 
 ### Notes
 
-- Replace `YOUR_NEXTCRM_URL` with your NextCRM instance URL (e.g. `http://localhost:3000` for local dev)
+- Replace `YOUR_OrvixCRM_URL` with your OrvixCRM instance URL (e.g. `http://localhost:3000` for local dev)
 - Replace `YOUR_API_TOKEN` with a token generated from Profile > Developer > API Tokens
 - Token prefix: `nxtc__`
 - Some clients omit the `type` field and infer the transport from the URL — both forms above include it explicitly for clarity

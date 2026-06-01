@@ -1,4 +1,4 @@
-# Validation Script Quick Start Guide
+﻿# Validation Script Quick Start Guide
 
 ## Quick Run
 
@@ -20,13 +20,13 @@ Set one of these configurations:
 
 **Option 1: Separate URLs**
 ```bash
-DATABASE_URL_MONGODB="mongodb://user:pass@localhost:27017/nextcrm"
-DATABASE_URL_POSTGRES="postgresql://user:pass@localhost:5432/nextcrm"
+DATABASE_URL_MONGODB="mongodb://user:pass@localhost:27017/OrvixCRM"
+DATABASE_URL_POSTGRES="postgresql://user:pass@localhost:5432/OrvixCRM"
 ```
 
 **Option 2: Single URL** (if already switched to PostgreSQL)
 ```bash
-DATABASE_URL="postgresql://user:pass@localhost:5432/nextcrm"
+DATABASE_URL="postgresql://user:pass@localhost:5432/OrvixCRM"
 # Keep old MongoDB URL accessible for validation
 ```
 
@@ -57,7 +57,7 @@ DATABASE_URL="postgresql://user:pass@localhost:5432/nextcrm"
 ### If PASS
 ```
 ================================================================
-         NextCRM Migration Validation Report
+         OrvixCRM Migration Validation Report
 ================================================================
 
 Overall Status: PASS
@@ -73,7 +73,7 @@ Overall Status: PASS
 ### If FAIL
 ```
 ================================================================
-         NextCRM Migration Validation Report
+         OrvixCRM Migration Validation Report
 ================================================================
 
 Overall Status: FAIL
@@ -126,7 +126,7 @@ Overall Status: FAIL
 1. **Update DATABASE_URL:**
    ```bash
    # In .env
-   DATABASE_URL="postgresql://user:pass@localhost:5432/nextcrm"
+   DATABASE_URL="postgresql://user:pass@localhost:5432/OrvixCRM"
    ```
 
 2. **Regenerate Prisma Client:**

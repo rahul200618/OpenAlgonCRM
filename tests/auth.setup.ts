@@ -1,9 +1,9 @@
-import { test as setup, expect } from "@playwright/test";
+﻿import { test as setup, expect } from "@playwright/test";
 import path from "path";
 import { Pool } from "pg";
 
 const authFile = path.join(__dirname, "../playwright/.auth/user.json");
-const TEST_USER_EMAIL = process.env.TEST_USER_EMAIL || "test@nextcrm.app";
+const TEST_USER_EMAIL = process.env.TEST_USER_EMAIL || "test@OrvixCRM.app";
 
 setup("authenticate", async ({ page, context }) => {
   // Use context.request so cookies are shared with the browser page

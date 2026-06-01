@@ -1,4 +1,4 @@
-import { test, expect, Page } from "@playwright/test";
+﻿import { test, expect, Page } from "@playwright/test";
 
 // Module-level state is safe here because test.describe.serial guarantees
 // all tests run in the same worker in order.
@@ -118,7 +118,7 @@ test.describe.serial("CRM Account Tasks", () => {
 
     // Assigned user: UserSearchCombobox (Popover + Command). Search "a" to
     // match any user whose name contains an "a" — test DB must have at least
-    // one such user (the seeded test@nextcrm.app user satisfies this).
+    // one such user (the seeded test@OrvixCRM.app user satisfies this).
     await selectUserInCombobox(page, "Assigned to", "a");
 
     // Priority: shadcn Select — pick the first SelectItem

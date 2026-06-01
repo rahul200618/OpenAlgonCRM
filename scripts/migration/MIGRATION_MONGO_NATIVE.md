@@ -1,4 +1,4 @@
-# MongoDB Native Driver Migration Update
+﻿# MongoDB Native Driver Migration Update
 
 ## Summary
 
@@ -15,7 +15,7 @@ Updated the migration script to use MongoDB native driver (`mongodb` package) in
 ### 2. Migration Orchestrator (`scripts/migration/orchestrator.ts`)
 - **Changed**: Constructor now accepts `MongoClient` instead of `PrismaClient`
 - **Added**: `mongoDb: Db` private property for database access
-- **Added**: `extractDbName()` method to extract database name from connection (defaults to 'nextcrm-demo')
+- **Added**: `extractDbName()` method to extract database name from connection (defaults to 'OrvixCRM-demo')
 - **Added**: `getMongoCollection()` method to access MongoDB collections
 - **Updated**: `getMongoRecordCount()` to use native driver's `countDocuments()`
 - **Updated**: `fetchMongoRecords()` to use native driver's `find().skip().limit().toArray()`
@@ -85,7 +85,7 @@ pnpm migrate:mongo-to-postgres
 Expected output:
 ```
 ═══════════════════════════════════════════════════════════
-   NextCRM MongoDB → PostgreSQL Migration
+   OrvixCRM MongoDB → PostgreSQL Migration
 ═══════════════════════════════════════════════════════════
 
 🔌 Connecting to databases...
