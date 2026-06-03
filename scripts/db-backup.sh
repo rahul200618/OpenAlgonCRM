@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Database Backup Script for NextCRM
+# Database Backup Script for OpenAlgon CRM
 # This script creates timestamped PostgreSQL backups
 
 set -e  # Exit on error
@@ -16,7 +16,7 @@ fi
 # Configuration
 BACKUP_DIR="$PROJECT_DIR/backups"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-BACKUP_FILE="$BACKUP_DIR/nextcrm_backup_$TIMESTAMP.sql"
+BACKUP_FILE="$BACKUP_DIR/openalgoncrm_backup_$TIMESTAMP.sql"
 KEEP_DAYS=30  # Keep backups for 30 days
 
 # Colors for output

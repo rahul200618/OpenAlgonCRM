@@ -8,7 +8,7 @@
 
 ## Overview
 
-Add a full email client experience to OrvixCRM. Users connect one or more IMAP mailboxes via `/profile`, then read, compose, reply, forward, delete, and search emails at `/emails`. Emails are synced into PostgreSQL via Inngest (scheduled + on-demand), embedded with OpenAI vectors for semantic search, and auto-linked to CRM records.
+Add a full email client experience to OPENALGON CRM. Users connect one or more IMAP mailboxes via `/profile`, then read, compose, reply, forward, delete, and search emails at `/emails`. Emails are synced into PostgreSQL via Inngest (scheduled + on-demand), embedded with OpenAI vectors for semantic search, and auto-linked to CRM records.
 
 ---
 

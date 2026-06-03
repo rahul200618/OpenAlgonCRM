@@ -100,7 +100,7 @@ model ApiKeys {
 - [ ] **Step 2: Run `prisma generate` to check for errors**
 
 ```bash
-cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm
+cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm
 pnpm prisma generate
 ```
 Expected: No errors. If you see "Unknown field 'openAi_key'" or similar, you missed a reference in the `Users` model — grep for `openAi_key` and remove all instances.
@@ -301,7 +301,7 @@ describe("getApiKey — tier 4: null", () => {
 - [ ] **Step 2: Run tests — verify they fail**
 
 ```bash
-cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm
+cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm
 pnpm jest __tests__/lib/api-keys.test.ts --no-coverage
 ```
 Expected: FAIL — "Cannot find module '@/lib/api-keys'"

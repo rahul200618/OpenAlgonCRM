@@ -1,5 +1,5 @@
 /**
- * OrvixCRM — Webhook endpoint for Meta Lead Ads
+ * OPENALGON CRM — Webhook endpoint for Meta Lead Ads
  *
  * Meta sends two types of requests:
  * 1. GET — webhook verification (hub.challenge)
@@ -11,9 +11,10 @@
  * - Subscribe to: leadgen
  */
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prismadb as prisma } from "@/lib/prisma";
 import { assignLead } from "@/lib/assignment-engine";
 import crypto from "crypto";
+import { findOrCreateLeadWithDuplicateCheck } from "@/lib/webhook-duplicate-check";
 
 // GET — Webhook verification (Meta hub.challenge handshake)
 export async function GET(request: NextRequest) {
@@ -81,23 +82,21 @@ export async function POST(request: NextRequest) {
         });
 
         // Create the lead
-        const lead = await prisma.crm_Leads.create({
-          data: {
-            v: 0,
-            lastName: leadData.field_data?.find((f: any) => f.name === "last_name")?.values?.[0] ?? "Unknown",
-            firstName: leadData.field_data?.find((f: any) => f.name === "first_name")?.values?.[0] ?? "",
-            email: leadData.field_data?.find((f: any) => f.name === "email")?.values?.[0],
-            phone: leadData.field_data?.find((f: any) => f.name === "phone_number")?.values?.[0],
-            channel: "meta",
-            lead_source_id: source.id,
-          },
+        const { lead, isDuplicate } = await findOrCreateLeadWithDuplicateCheck({
+          lastName: leadData.field_data?.find((f: any) => f.name === "last_name")?.values?.[0] ?? "Unknown",
+          firstName: leadData.field_data?.find((f: any) => f.name === "first_name")?.values?.[0] ?? "",
+          email: leadData.field_data?.find((f: any) => f.name === "email")?.values?.[0],
+          phone: leadData.field_data?.find((f: any) => f.name === "phone_number")?.values?.[0],
+          channel: "meta",
+          lead_source_id: source.id,
         });
 
-        // Auto-assign via round-robin
-        try {
-          await assignLead(lead.id, "round_robin");
-        } catch (assignErr) {
-          console.warn("Lead created but assignment failed:", assignErr);
+        if (!isDuplicate) {
+          try {
+            await assignLead(lead.id, "round_robin");
+          } catch (assignErr) {
+            console.warn("Lead created but assignment failed:", assignErr);
+          }
         }
 
         // Update log with lead ID

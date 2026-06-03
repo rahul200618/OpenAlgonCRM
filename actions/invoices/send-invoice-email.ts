@@ -58,7 +58,7 @@ export async function sendInvoiceEmail(input: SendInvoiceEmailInput) {
   const pdfBuffer = Buffer.concat(chunks);
 
   const resend = await resendHelper();
-  const fromEmail = process.env.EMAIL_FROM ?? `invoices@${process.env.NEXT_PUBLIC_APP_DOMAIN ?? "OrvixCRM.app"}`;
+  const fromEmail = process.env.EMAIL_FROM ?? `invoices@${process.env.NEXT_PUBLIC_APP_DOMAIN ?? "OPENALGON CRM.app"}`;
 
   const subject =
     input.subject ?? `Invoice ${invoice.number ?? invoice.id} — ${invoice.account.name}`;

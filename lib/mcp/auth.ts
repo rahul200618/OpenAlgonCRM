@@ -18,7 +18,7 @@ export async function getMcpUser(): Promise<McpUser> {
     return { id: userId };
   }
 
-  // Development-only fallback: better-auth session cookie
+  // Development-only fallback session cookie
   // Not used in production — session cannot substitute for token revocation
   if (process.env.NODE_ENV === "development") {
     const session = await getSession();

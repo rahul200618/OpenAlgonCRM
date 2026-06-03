@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a full Invoices module in orvixcrm: create, issue, store PDFs in MinIO, link to CRM Accounts/Products, multi-currency, configurable VAT, search, payments, send-by-email.
+**Goal:** Build a full Invoices module in openalgoncrm: create, issue, store PDFs in Cloudflare R2, link to CRM Accounts/Products, multi-currency, configurable VAT, search, payments, send-by-email.
 
-**Architecture:** Pure-function domain layer in `lib/invoices/` (TDD-friendly), Prisma models, server actions in `actions/invoices/`, thin Next.js API routes, App Router pages under `app/[locale]/(routes)/invoices/`, admin pages under `app/[locale]/(routes)/admin/invoices/`. PDF rendered with `@react-pdf/renderer`, stored in MinIO via existing `lib/minio.ts`.
+**Architecture:** Pure-function domain layer in `lib/invoices/` (TDD-friendly), Prisma models, server actions in `actions/invoices/`, thin Next.js API routes, App Router pages under `app/[locale]/(routes)/invoices/`, admin pages under `app/[locale]/(routes)/admin/invoices/`. PDF rendered with `@react-pdf/renderer`, stored in Cloudflare R2 via existing `lib/storage.ts`.
 
-**Tech Stack:** Next.js 15 App Router, Prisma + Postgres, `@react-pdf/renderer`, MinIO, Resend, Zod, next-intl, shadcn/ui, Jest + Playwright.
+**Tech Stack:** Next.js 15 App Router, Prisma + Postgres, `@react-pdf/renderer`, Cloudflare R2, Resend, Zod, next-intl, shadcn/ui, Jest + Playwright.
 
 **Spec:** `docs/superpowers/specs/2026-04-15-invoices-module-design.md`
 
@@ -32,7 +32,7 @@ lib/invoices/
 ├── permissions.test.ts
 ├── search.ts               # ts_query builder
 ├── search.test.ts
-├── storage.ts              # MinIO wrapper for invoice PDFs
+├── storage.ts              # Cloudflare R2 wrapper for invoice PDFs
 ├── pdf/render.ts           # @react-pdf/renderer entrypoint
 ├── pdf/templates/default-invoice.tsx
 └── pdf/i18n.ts             # PDF string bundles EN/CZ
@@ -112,7 +112,7 @@ prisma/seeds/invoices.ts  # Default seed: currencies, default series, default ta
 - `prisma/schema.prisma` — add 9 new models + 2 enums
 - `components/menu/sidebar.tsx` (or wherever sidebar nav array lives — confirm in Task 0)
 - `messages/en.json`, `messages/cz.json`
-- `lib/minio.ts` — only if it lacks helpers we need (review in Task 9)
+- `lib/storage.ts` — only if it lacks helpers we need (review in Task 9)
 - `prisma/seed.ts` — call new seed function
 
 ---
@@ -133,12 +133,12 @@ grep -rn "documents\|/crm" components/ app/ --include="*.tsx" | grep -iE "side|n
 - [ ] **Step 2:** Open the matched file, identify the array of nav items, note its shape (label key, href, icon).
 - [ ] **Step 3:** Record the file path in a scratch note for Task 14.1.
 
-### Task 0.2: Verify MinIO helpers
+### Task 0.2: Verify Cloudflare R2 helpers
 
 **Files:**
-- Inspect: `lib/minio.ts`
+- Inspect: `lib/storage.ts`
 
-- [ ] **Step 1:** Read `lib/minio.ts`. Confirm it exports a configured MinIO client. Note function names available (`putObject`, `getObject`, `presignedUrl`, etc.).
+- [ ] **Step 1:** Read `lib/storage.ts`. Confirm it exports a configured Cloudflare R2 client. Note function names available (`putObject`, `getObject`, `presignedUrl`, etc.).
 - [ ] **Step 2:** If a `presignedGetObject` helper is missing, plan to add one in Task 9.
 
 ### Task 0.3: Add to git
@@ -962,15 +962,15 @@ git commit -m "feat(invoices): add search filter + tsquery builder"
 **Files:**
 - Create: `lib/invoices/storage.ts`
 
-- [ ] **Step 1:** Read `lib/minio.ts` (recorded in Task 0.2). If it exposes a default `Client`, use it. Otherwise use the same env vars.
+- [ ] **Step 1:** Read `lib/storage.ts` (recorded in Task 0.2). If it exposes a default `Client`, use it. Otherwise use the same env vars.
 
 - [ ] **Step 2: Implement**
 
 ```typescript
 // lib/invoices/storage.ts
-import { minioClient } from "@/lib/minio";
+import { storageClient } from "@/lib/storage";
 
-const BUCKET = process.env.MINIO_BUCKET ?? "OrvixCRM";
+const BUCKET = process.env.R2_BUCKET ?? "OPENALGON CRM";
 
 function invoiceKey(invoiceId: string) {
   return `invoices/${invoiceId}.pdf`;
@@ -978,18 +978,18 @@ function invoiceKey(invoiceId: string) {
 
 export async function uploadInvoicePdf(invoiceId: string, pdf: Buffer): Promise<string> {
   const key = invoiceKey(invoiceId);
-  await minioClient.putObject(BUCKET, key, pdf, pdf.length, {
+  await storageClient.putObject(BUCKET, key, pdf, pdf.length, {
     "Content-Type": "application/pdf",
   });
   return key;
 }
 
 export async function getInvoicePdfStream(key: string) {
-  return minioClient.getObject(BUCKET, key);
+  return storageClient.getObject(BUCKET, key);
 }
 
 export async function getInvoicePdfPresignedUrl(key: string, expirySeconds = 300): Promise<string> {
-  return minioClient.presignedGetObject(BUCKET, key, expirySeconds);
+  return storageClient.presignedGetObject(BUCKET, key, expirySeconds);
 }
 
 export async function uploadInvoiceAttachment(
@@ -999,18 +999,18 @@ export async function uploadInvoiceAttachment(
   mime: string,
 ): Promise<string> {
   const key = `invoices/${invoiceId}/attachments/${attachmentId}`;
-  await minioClient.putObject(BUCKET, key, buf, buf.length, { "Content-Type": mime });
+  await storageClient.putObject(BUCKET, key, buf, buf.length, { "Content-Type": mime });
   return key;
 }
 ```
 
-- [ ] **Step 3:** If `lib/minio.ts` does not export `minioClient`, add an export there for it (without changing existing behavior).
+- [ ] **Step 3:** If `lib/storage.ts` does not export `storageClient`, add an export there for it (without changing existing behavior).
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add lib/invoices/storage.ts lib/minio.ts && \
-git commit -m "feat(invoices): MinIO storage wrapper for invoice PDFs"
+git add lib/invoices/storage.ts lib/storage.ts && \
+git commit -m "feat(invoices): Cloudflare R2 storage wrapper for invoice PDFs"
 ```
 
 ### Task 3.2: PDF i18n bundle
@@ -2600,7 +2600,7 @@ gh pr create --base dev --title "feat(invoices): full Invoices module" --body "$
 ## Summary
 - Adds Invoices module with create/edit/issue/cancel/send/download/payments
 - Multi-currency with FX snapshot, configurable VAT, configurable numbering series
-- PDF rendering via @react-pdf/renderer to MinIO
+- PDF rendering via @react-pdf/renderer to Cloudflare R2
 - Admin pages for tax rates, series, currencies, settings
 - Full-text search via Postgres tsvector
 

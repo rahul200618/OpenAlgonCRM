@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { importTargets } from "@/actions/crm/targets/import-targets";
-import { suggestMapping } from "@/actions/crm/targets/suggest-mapping";
+
 import Papa from "papaparse";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -107,33 +107,22 @@ const ImportTargetsModal = () => {
     });
   };
 
-  const fetchSuggestedMapping = useCallback(async (headers: string[]) => {
-    setIsSuggesting(true);
+  const fetchSuggestedMapping = useCallback((headers: string[]) => {
     setStep("mapping");
-    try {
-      const res = await suggestMapping(headers);
-      const suggested: Record<string, string | null> = res.mapping ?? {};
-      // Convert from { csvHeader -> targetField } to { targetField -> csvHeader }
-      const newMapping: Record<string, string> = {};
-      for (const field of TARGET_FIELDS) {
-        newMapping[field.key] = SKIP_VALUE;
-      }
-      for (const [csvHeader, targetField] of Object.entries(suggested)) {
-        if (targetField && newMapping[targetField] === SKIP_VALUE) {
-          newMapping[targetField] = csvHeader;
-        }
-      }
-      setMapping(newMapping);
-    } catch {
-      // Set all to skip on error
-      const newMapping: Record<string, string> = {};
-      for (const field of TARGET_FIELDS) {
-        newMapping[field.key] = SKIP_VALUE;
-      }
-      setMapping(newMapping);
-    } finally {
-      setIsSuggesting(false);
+    const newMapping: Record<string, string> = {};
+    for (const field of TARGET_FIELDS) {
+      newMapping[field.key] = SKIP_VALUE;
     }
+    // Simple naive matching based on exact match ignoring case
+    for (const header of headers) {
+      const match = TARGET_FIELDS.find(
+        (f) => f.key.toLowerCase() === header.toLowerCase() || f.label.toLowerCase() === header.toLowerCase()
+      );
+      if (match && newMapping[match.key] === SKIP_VALUE) {
+        newMapping[match.key] = header;
+      }
+    }
+    setMapping(newMapping);
   }, []);
 
   const computePreview = () => {
@@ -245,12 +234,7 @@ const ImportTargetsModal = () => {
         {/* Step 2: Map Columns */}
         {step === "mapping" && (
           <div className="space-y-3 py-2">
-            {isSuggesting ? (
-              <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                <span>AI is suggesting column mappings…</span>
-              </div>
-            ) : (
+
               <div className="space-y-1">
                 <div className="grid grid-cols-2 gap-2 text-xs font-medium text-muted-foreground px-1 pb-1">
                   <span>CRM Field</span>
@@ -288,7 +272,6 @@ const ImportTargetsModal = () => {
                   <span className="text-destructive">*</span> last_name or company is required per row.
                 </p>
               </div>
-            )}
           </div>
         )}
 

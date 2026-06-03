@@ -365,7 +365,7 @@ export async function unifiedSearch(
 - [ ] **Step 2: Verify TypeScript compiles**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 npx tsc --noEmit 2>&1 | grep unified-search
 ```
 Expected: no output (no errors)
@@ -440,7 +440,7 @@ export function ResultCard({ result }: { result: SearchResult }) {
 - [ ] **Step 2: Verify TypeScript compiles**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 npx tsc --noEmit 2>&1 | grep result-card
 ```
 Expected: no output
@@ -515,7 +515,7 @@ export function EntityResultSection({ label, results }: EntityResultSectionProps
 - [ ] **Step 2: Verify TypeScript compiles**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 npx tsc --noEmit 2>&1 | grep entity-result
 ```
 Expected: no output
@@ -644,7 +644,7 @@ export default function SearchResult() {
 - [ ] **Step 2: Verify TypeScript compiles**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 npx tsc --noEmit 2>&1 | grep -E "SearchResult|unified"
 ```
 Expected: no output
@@ -700,14 +700,14 @@ export default function ResultPage() {
 - [ ] **Step 3: Delete old action files**
 
 ```bash
-rm /Users/rahul200618/development/orvixcrm/actions/fulltext/search.ts
-rm /Users/rahul200618/development/orvixcrm/actions/fulltext/get-search-results.ts
+rm /Users/rahul200618/development/openalgoncrm/actions/fulltext/search.ts
+rm /Users/rahul200618/development/openalgoncrm/actions/fulltext/get-search-results.ts
 ```
 
 - [ ] **Step 4: Verify TypeScript compiles cleanly**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 npx tsc --noEmit 2>&1 | head -30
 ```
 Expected: no new errors
@@ -728,7 +728,7 @@ git commit -m "feat: retire old fulltext actions, redirect /search sub-route to 
 - [ ] **Step 1: Start dev server**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm dev
 ```
 

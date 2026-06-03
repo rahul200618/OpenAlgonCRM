@@ -20,12 +20,18 @@
  */
 const TEST_USER_ID_PLACEHOLDER = "00000000-0000-4000-a000-000000000001";
 
+jest.setTimeout(30000);
+
 const mockGetUser = jest.fn().mockResolvedValue({
   id: TEST_USER_ID_PLACEHOLDER,
   role: "admin",
   name: "Test User",
   email: "test@example.com",
   userLanguage: "en",
+});
+const mockRequireAuthenticated = jest.fn().mockResolvedValue({
+  id: TEST_USER_ID_PLACEHOLDER,
+  role: "admin",
 });
 
 jest.mock("@/actions/get-user", () => ({
@@ -41,6 +47,20 @@ jest.mock("@/lib/auth-server", () => ({
     },
   }),
 }));
+
+jest.mock("@/lib/authz", () => {
+  class AuthenticationError extends Error {}
+  class AuthorizationError extends Error {}
+
+  return {
+    AuthenticationError,
+    AuthorizationError,
+    requireAuthenticated: (...args: unknown[]) =>
+      mockRequireAuthenticated(...args),
+    assertCanWriteAccount: jest.fn().mockResolvedValue(undefined),
+    mapLegacyRole: (role: string) => role,
+  };
+});
 
 jest.mock("@/lib/invoices/fx", () => ({
   fetchFxRate: jest.fn().mockResolvedValue(
@@ -120,6 +140,10 @@ beforeAll(async () => {
       email: existingUser.email ?? "test@example.com",
       userLanguage: "en",
     });
+    mockRequireAuthenticated.mockResolvedValue({
+      id: existingUser.id,
+      role: "admin",
+    });
   }
 
   // Ensure a test account exists
@@ -130,6 +154,17 @@ beforeAll(async () => {
     });
   }
   testAccountId = account.id;
+
+  await prismadb.currency.upsert({
+    where: { code: "USD" },
+    update: { isEnabled: true },
+    create: {
+      code: "USD",
+      name: "US Dollar",
+      symbol: "$",
+      isEnabled: true,
+    },
+  });
 
   // Find an active tax rate (may not exist in test DB)
   const taxRate = await prismadb.invoice_TaxRates.findFirst({

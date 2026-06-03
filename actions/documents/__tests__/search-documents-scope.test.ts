@@ -2,7 +2,30 @@ jest.mock("react", () => ({
   ...jest.requireActual("react"),
   cache: <T extends (...a: unknown[]) => unknown>(fn: T) => fn,
 }));
-jest.mock("@/lib/auth-server", () => ({ getSession: jest.fn() }));
+
+const mockRequireAuthenticated = jest.fn();
+
+jest.mock("@/lib/authz", () => {
+  class AuthenticationError extends Error {}
+
+  return {
+    AuthenticationError,
+    requireAuthenticated: (...args: unknown[]) =>
+      mockRequireAuthenticated(...args),
+    documentReadScopeWhere: (user: { id: string; role: string }) =>
+      user.role === "user"
+        ? {
+            OR: [
+              { createdBy: user.id },
+              { owner_id: user.id },
+              { visibility: "PUBLIC" },
+            ],
+          }
+        : {},
+    filterAuthorizedDocumentIds: jest.fn(async (_user, ids: string[]) => ids),
+  };
+});
+
 jest.mock("@/lib/prisma", () => ({
   prismadb: {
     users: { findUnique: jest.fn() },
@@ -10,17 +33,12 @@ jest.mock("@/lib/prisma", () => ({
     $queryRaw: jest.fn(),
   },
 }));
-jest.mock("@/inngest/lib/embedding-utils", () => ({
-  generateEmbedding: jest.fn(async () => [0.1, 0.2]),
-  toVectorLiteral: jest.fn(() => "[0.1,0.2]"),
-}));
 
 import { prismadb } from "@/lib/prisma";
-import { getSession } from "@/lib/auth-server";
 import { searchDocuments } from "@/actions/documents/search-documents";
 
 const mockUser = (role: "user" | "manager" | "admin", id = "u1") => {
-  (getSession as jest.Mock).mockResolvedValue({ user: { id } });
+  mockRequireAuthenticated.mockResolvedValue({ id, role });
   (prismadb.users.findUnique as jest.Mock).mockResolvedValue({ id, role });
 };
 
@@ -28,7 +46,8 @@ describe("searchDocuments scope", () => {
   beforeEach(() => jest.clearAllMocks());
 
   it("unauthenticated returns [] and does not query", async () => {
-    (getSession as jest.Mock).mockResolvedValue(null);
+    const { AuthenticationError } = jest.requireMock("@/lib/authz");
+    mockRequireAuthenticated.mockRejectedValue(new AuthenticationError());
     const res = await searchDocuments("foo");
     expect(res).toEqual([]);
     expect(prismadb.documents.findMany).not.toHaveBeenCalled();
@@ -44,10 +63,12 @@ describe("searchDocuments scope", () => {
     expect(call.where.deletedAt).toBeNull();
     expect(Array.isArray(call.where.OR)).toBe(true);
     expect(call.where.AND).toBeDefined();
-    // search OR must be inside AND so it doesn't replace scope OR
+
     const andClauses = call.where.AND as Array<{ OR?: unknown[] }>;
-    const searchClause = andClauses.find((c) =>
-      Array.isArray(c.OR) && c.OR.some((x: any) => x.document_name),
+    const searchClause = andClauses.find(
+      (c) =>
+        Array.isArray(c.OR) &&
+        c.OR.some((x: any) => x.document_name)
     );
     expect(searchClause).toBeDefined();
   });
@@ -63,36 +84,13 @@ describe("searchDocuments scope", () => {
     expect(call.where.OR).toBeUndefined();
   });
 
-  it("post-filters vector results via authorized id set", async () => {
+  it("does not run semantic search while vector search is disabled", async () => {
     mockUser("user", "u1");
-    // keyword: empty
-    (prismadb.documents.findMany as jest.Mock).mockResolvedValueOnce([]);
-    // raw vector: 5 ids
-    (prismadb.$queryRaw as jest.Mock).mockResolvedValue([
-      { id: "v1", similarity: 0.9 },
-      { id: "v2", similarity: 0.85 },
-      { id: "v3", similarity: 0.83 },
-      { id: "v4", similarity: 0.81 },
-      { id: "v5", similarity: 0.75 },
-    ]);
-    // filterAuthorizedDocumentIds is implemented via prismadb.documents.findMany — return only v1, v3
-    (prismadb.documents.findMany as jest.Mock).mockResolvedValue([
-      { id: "v1" },
-      { id: "v3" },
-    ]);
-    // 2nd findMany call (extraDocs lookup by ids) returns those two
-    (prismadb.documents.findMany as jest.Mock).mockResolvedValueOnce([
-      { id: "v1", document_name: "v1", summary: null, document_system_type: null, accounts: [] },
-      { id: "v3", document_name: "v3", summary: null, document_system_type: null, accounts: [] },
-    ]);
+    (prismadb.documents.findMany as jest.Mock).mockResolvedValue([]);
 
     const res = await searchDocuments("foo");
-    const ids = res.map((r) => r.id);
-    expect(ids).toEqual(expect.arrayContaining(["v1", "v3"]));
-    expect(ids).not.toEqual(expect.arrayContaining(["v2", "v4", "v5"]));
-
-    // extraDocs query must use only the authorized ids
-    const extraCall = (prismadb.documents.findMany as jest.Mock).mock.calls[1][0];
-    expect(extraCall.where.id.in).toEqual(["v1", "v3"]);
+    expect(res).toEqual([]);
+    expect(prismadb.$queryRaw).not.toHaveBeenCalled();
+    expect(prismadb.documents.findMany).toHaveBeenCalledTimes(1);
   });
 });

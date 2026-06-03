@@ -9,9 +9,9 @@ jest.mock("@/lib/prisma", () => ({
     },
   },
 }));
-jest.mock("@/lib/minio", () => ({
-  minioClient: { send: jest.fn().mockResolvedValue(undefined) },
-  MINIO_BUCKET: "test-bucket",
+jest.mock("@/lib/storage", () => ({
+  storageClient: { send: jest.fn().mockResolvedValue(undefined) },
+  R2_BUCKET: "test-bucket",
 }));
 jest.mock("@aws-sdk/client-s3", () => ({
   DeleteObjectCommand: jest.fn().mockImplementation((args) => args),
@@ -42,7 +42,7 @@ describe("deleteDocument auth", () => {
     expect(prismadb.documents.delete).not.toHaveBeenCalled();
   });
 
-  it("user in-scope owner: deletes document and applies minio cleanup", async () => {
+  it("user in-scope owner: deletes document and applies cloudflare cleanup", async () => {
     mockUser("user", "u1");
     (prismadb.documents.findFirst as jest.Mock).mockResolvedValue({ id: "d1" });
     (prismadb.documents.findUnique as jest.Mock).mockResolvedValue({

@@ -8,7 +8,7 @@
 
 ## Overview
 
-Add a complete activity log to the OrvixCRM sales module. Sales reps can log and schedule Calls, Meetings, Notes, and Emails against any CRM record. Each activity can be linked to multiple CRM entities simultaneously. Activities appear inline on every entity detail page and support both past logging and future scheduling.
+Add a complete activity log to the OPENALGON CRM sales module. Sales reps can log and schedule Calls, Meetings, Notes, and Emails against any CRM record. Each activity can be linked to multiple CRM entities simultaneously. Activities appear inline on every entity detail page and support both past logging and future scheduling.
 
 ---
 

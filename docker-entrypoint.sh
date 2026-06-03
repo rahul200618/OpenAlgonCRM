@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "==> NextCRM Docker Entrypoint"
+echo "==> OpenAlgon CRM Docker Entrypoint"
 
 # --- 1. Wait for Postgres ---
 echo "==> Waiting for PostgreSQL..."
@@ -33,25 +33,25 @@ echo "==> Running database migrations..."
 prisma migrate deploy
 echo "==> Migrations complete."
 
-# --- 4. Create MinIO bucket (idempotent) ---
-if [ -n "$MINIO_ENDPOINT" ] && [ -n "$MINIO_ACCESS_KEY" ] && [ -n "$MINIO_SECRET_KEY" ] && [ -n "$MINIO_BUCKET" ]; then
-  echo "==> Ensuring MinIO bucket '$MINIO_BUCKET' exists..."
+# --- 4. Create Cloudflare R2 bucket (idempotent) ---
+if [ -n "$R2_ENDPOINT" ] && [ -n "$R2_ACCESS_KEY" ] && [ -n "$R2_SECRET_KEY" ] && [ -n "$R2_BUCKET" ]; then
+  echo "==> Ensuring Cloudflare R2 bucket '$R2_BUCKET' exists..."
   # Strip protocol for host:port extraction
-  MINIO_HOST=$(echo "$MINIO_ENDPOINT" | sed 's|https\?://||')
+  MINIO_HOST=$(echo "$R2_ENDPOINT" | sed 's|https\?://||')
 
   # Create bucket via S3 API — returns 200 if created, 409 if exists (both are fine)
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-    -X PUT "http://${MINIO_HOST}/${MINIO_BUCKET}" \
+    -X PUT "http://${MINIO_HOST}/${R2_BUCKET}" \
     -H "Host: ${MINIO_HOST}" \
-    -u "${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}" \
+    -u "${R2_ACCESS_KEY}:${R2_SECRET_KEY}" \
     2>/dev/null || echo "000")
 
   if [ "$STATUS" = "200" ]; then
-    echo "==> Bucket '$MINIO_BUCKET' created."
+    echo "==> Bucket '$R2_BUCKET' created."
   elif [ "$STATUS" = "409" ]; then
-    echo "==> Bucket '$MINIO_BUCKET' already exists."
+    echo "==> Bucket '$R2_BUCKET' already exists."
   else
-    echo "WARN: Could not create MinIO bucket (HTTP $STATUS). File storage may not work until bucket is created manually."
+    echo "WARN: Could not create Cloudflare R2 bucket (HTTP $STATUS). File storage may not work until bucket is created manually."
   fi
 fi
 
@@ -75,5 +75,5 @@ else
 fi
 
 # --- 6. Start the application ---
-echo "==> Starting NextCRM..."
+echo "==> Starting OpenAlgon CRM..."
 exec node server.js

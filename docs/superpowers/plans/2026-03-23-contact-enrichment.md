@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Let OrvixCRM users enrich contact records with company data (industry, LinkedIn, funding stage, tech stack, etc.) using the fire-enrich multi-agent engine powered by Firecrawl + GPT-4o — both one-at-a-time with a live progress drawer, and in bulk via Inngest background jobs.
+**Goal:** Let OPENALGON CRM users enrich contact records with company data (industry, LinkedIn, funding stage, tech stack, etc.) using the fire-enrich multi-agent engine powered by Firecrawl + GPT-4o — both one-at-a-time with a live progress drawer, and in bulk via Inngest background jobs.
 
 **Architecture:** Copy fire-enrich's `lib/` into `lib/enrichment/`. A streaming SSE route handles single-contact enrichment with real-time agent progress; a separate bulk route fans out to Inngest jobs. The drawer shows a diff preview before saving; bulk auto-applies to empty fields only.
 
@@ -57,7 +57,7 @@
 - [ ] **Step 1: Install @mendable/firecrawl-js**
 
 ```bash
-cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm
+cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm
 pnpm add @mendable/firecrawl-js@^1.25.1
 ```
 
@@ -98,7 +98,7 @@ git commit -m "chore: add @mendable/firecrawl-js dependency for contact enrichme
 
 ```bash
 cp -r /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/fire-enrich/lib/ \
-  /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm/lib/enrichment/
+  /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm/lib/enrichment/
 ```
 
 - [ ] **Step 2: Check and fix import aliases**
@@ -106,7 +106,7 @@ cp -r /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/fire-enrich/
 Fire-enrich uses relative imports within `lib/`, so this is usually a no-op. Verify:
 
 ```bash
-cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm
+cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm
 grep -r "from '@/lib/" lib/enrichment/ --include="*.ts"
 ```
 

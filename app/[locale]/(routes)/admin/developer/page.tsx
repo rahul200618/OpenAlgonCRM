@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { requireUser, isAdmin } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { prismadb as prisma } from "@/lib/prisma";
 import { FeatureFlagsDashboard } from "./components/FeatureFlagsDashboard";
 
 export const dynamic = "force-dynamic";
@@ -106,7 +106,7 @@ export default async function DeveloperPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Developer Dashboard</h1>
         <p className="text-muted-foreground mt-2">
-          Control which modules and features are visible in OrvixCRM. Changes take effect on next page load.
+          Control which modules and features are visible in OPENALGON CRM. Changes take effect on next page load.
         </p>
       </div>
       <FeatureFlagsDashboard flags={flags} />

@@ -1,7 +1,7 @@
-﻿{
+{
   "RootLayout": {
-    "title": "OrvixCRM",
-    "description": "Willkommen bei OrvixCRM CRM mit Prisma und Next.js 13"
+    "title": "OPENALGON CRM",
+    "description": "Willkommen bei OPENALGON CRM CRM mit Prisma und Next.js 13"
   },
   "ModuleMenu": {
     "dashboard": "Dashboard",
@@ -27,7 +27,7 @@
   "DashboardPage": {
     "containerTitle": "Dashboard",
     "totalRevenue": "Gesamtumsatz",
-    "containerDescription": "Willkommen bei OrvixCRM, hier können Sie alle wichtigen Informationen über Ihr Unternehmen sehen.",
+    "containerDescription": "Willkommen bei OPENALGON CRM, hier können Sie alle wichtigen Informationen über Ihr Unternehmen sehen.",
     "expectedRevenue": "Erwarteter Umsatz",
     "activeUsers": "Aktive Benutzer",
     "accounts": "Unternehmen",

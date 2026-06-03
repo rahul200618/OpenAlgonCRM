@@ -109,7 +109,7 @@ Find the `name` FormField (around line 94) and update the FormLabel to include a
 Run from project root:
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && pnpm tsc --noEmit
+cd /Users/rahul200618/development/openalgoncrm && pnpm tsc --noEmit
 ```
 
 Expected: No new type errors introduced by the change. If `t("websiteInvalid")` triggers a missing-message-key warning, proceed to Step 4; otherwise skip.
@@ -119,7 +119,7 @@ Expected: No new type errors introduced by the change. If `t("websiteInvalid")` 
 Check if the translation key exists:
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && grep -n "websiteInvalid" messages/*.json
+cd /Users/rahul200618/development/openalgoncrm && grep -n "websiteInvalid" messages/*.json
 ```
 
 If not present, add it to both `messages/en.json` and `messages/cs.json` inside the `CrmAccountForm` namespace. Example:
@@ -150,7 +150,7 @@ Expected: Email field shows the validation error; submit does not proceed. Clear
 - [ ] **Step 7: Commit**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && git add app/[locale]/\(routes\)/crm/accounts/components/NewAccountForm.tsx messages/ && git commit -m "refactor(crm): relax NewAccountForm validation to require only name"
+cd /Users/rahul200618/development/openalgoncrm && git add app/[locale]/\(routes\)/crm/accounts/components/NewAccountForm.tsx messages/ && git commit -m "refactor(crm): relax NewAccountForm validation to require only name"
 ```
 
 ---
@@ -163,7 +163,7 @@ cd /Users/rahul200618/development/orvixcrm && git add app/[locale]/\(routes\)/cr
 - [ ] **Step 1: Read current schema**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && grep -n "formSchema\|z.object\|z.string" "app/[locale]/(routes)/crm/accounts/components/UpdateAccountForm.tsx" | head -40
+cd /Users/rahul200618/development/openalgoncrm && grep -n "formSchema\|z.object\|z.string" "app/[locale]/(routes)/crm/accounts/components/UpdateAccountForm.tsx" | head -40
 ```
 
 Note the exact line range of the `formSchema = z.object({ ... })` block.
@@ -215,7 +215,7 @@ Find the `name` FormField in UpdateAccountForm and update the FormLabel:
 - [ ] **Step 4: Type-check**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && pnpm tsc --noEmit
+cd /Users/rahul200618/development/openalgoncrm && pnpm tsc --noEmit
 ```
 
 Expected: No new type errors. If the `updateAccount` action argument type conflicts with `null` values, handle by coercing `null` to `undefined` at submit time:
@@ -247,7 +247,7 @@ Expected: Email validation error shown; save blocked. Clear email → submit suc
 - [ ] **Step 7: Commit**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && git add "app/[locale]/(routes)/crm/accounts/components/UpdateAccountForm.tsx" && git commit -m "refactor(crm): relax UpdateAccountForm validation to require only name"
+cd /Users/rahul200618/development/openalgoncrm && git add "app/[locale]/(routes)/crm/accounts/components/UpdateAccountForm.tsx" && git commit -m "refactor(crm): relax UpdateAccountForm validation to require only name"
 ```
 
 ---
@@ -261,7 +261,7 @@ cd /Users/rahul200618/development/orvixcrm && git add "app/[locale]/(routes)/crm
 Check the existing server actions still dispatch the enrichment event:
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && grep -n "crm/account.saved" actions/crm/accounts/
+cd /Users/rahul200618/development/openalgoncrm && grep -n "crm/account.saved" actions/crm/accounts/
 ```
 
 Expected output includes both `create-account.ts` and `update-account.ts` sending `crm/account.saved`.
@@ -285,7 +285,7 @@ Task 3 is verification only — nothing to commit.
 - [ ] **Step 1: Run build to catch any remaining type/lint issues**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && pnpm lint && pnpm tsc --noEmit
+cd /Users/rahul200618/development/openalgoncrm && pnpm lint && pnpm tsc --noEmit
 ```
 
 Expected: No new errors compared to the pre-change state. Any pre-existing warnings unrelated to these files can be ignored.
@@ -293,7 +293,7 @@ Expected: No new errors compared to the pre-change state. Any pre-existing warni
 - [ ] **Step 2: Review diff**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && git log --oneline dev..HEAD && git diff dev..HEAD --stat
+cd /Users/rahul200618/development/openalgoncrm && git log --oneline dev..HEAD && git diff dev..HEAD --stat
 ```
 
 Expected: Two or three commits touching only the two form files (and optionally `messages/*.json`).
@@ -301,7 +301,7 @@ Expected: Two or three commits touching only the two form files (and optionally 
 - [ ] **Step 3: Push and open PR against `dev`**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm && git push -u origin HEAD
+cd /Users/rahul200618/development/openalgoncrm && git push -u origin HEAD
 ```
 
 Then create PR using `gh pr create --base dev --title "refactor(crm): minimal validation on account create/edit forms" --body "..."`. Per user preference, PR target is `dev`, not `main`.

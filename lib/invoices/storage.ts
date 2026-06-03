@@ -1,6 +1,6 @@
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { minioClient, MINIO_BUCKET } from "@/lib/minio";
+import { storageClient, R2_BUCKET } from "@/lib/storage";
 
 function invoiceKey(invoiceId: string) {
   return `invoices/${invoiceId}.pdf`;
@@ -8,9 +8,9 @@ function invoiceKey(invoiceId: string) {
 
 export async function uploadInvoicePdf(invoiceId: string, pdf: Buffer): Promise<string> {
   const key = invoiceKey(invoiceId);
-  await minioClient.send(
+  await storageClient.send(
     new PutObjectCommand({
-      Bucket: MINIO_BUCKET,
+      Bucket: R2_BUCKET,
       Key: key,
       Body: pdf,
       ContentType: "application/pdf",
@@ -20,8 +20,8 @@ export async function uploadInvoicePdf(invoiceId: string, pdf: Buffer): Promise<
 }
 
 export async function getInvoicePdfStream(key: string) {
-  const res = await minioClient.send(
-    new GetObjectCommand({ Bucket: MINIO_BUCKET, Key: key }),
+  const res = await storageClient.send(
+    new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }),
   );
   return res.Body;
 }
@@ -31,8 +31,8 @@ export async function getInvoicePdfPresignedUrl(
   expirySeconds = 300,
 ): Promise<string> {
   return getSignedUrl(
-    minioClient,
-    new GetObjectCommand({ Bucket: MINIO_BUCKET, Key: key }),
+    storageClient,
+    new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }),
     { expiresIn: expirySeconds },
   );
 }
@@ -44,9 +44,9 @@ export async function uploadInvoiceAttachment(
   mime: string,
 ): Promise<string> {
   const key = `invoices/${invoiceId}/attachments/${attachmentId}`;
-  await minioClient.send(
+  await storageClient.send(
     new PutObjectCommand({
-      Bucket: MINIO_BUCKET,
+      Bucket: R2_BUCKET,
       Key: key,
       Body: buf,
       ContentType: mime,

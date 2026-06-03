@@ -1,5 +1,5 @@
 /**
- * OrvixCRM — Webhook endpoint for Website Forms
+ * OPENALGON CRM — Webhook endpoint for Website Forms
  *
  * Generic POST endpoint for any website contact/lead form.
  * Accepts flexible JSON payload and maps common field names.
@@ -14,8 +14,9 @@
  * Authorization: Bearer <secret> header.
  */
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prismadb as prisma } from "@/lib/prisma";
 import { assignLead } from "@/lib/assignment-engine";
+import { findOrCreateLeadWithDuplicateCheck } from "@/lib/webhook-duplicate-check";
 
 export async function POST(request: NextRequest) {
   // Optional bearer auth
@@ -64,24 +65,23 @@ export async function POST(request: NextRequest) {
       update: {},
     });
 
-    const lead = await prisma.crm_Leads.create({
-      data: {
-        v: 0,
-        lastName,
-        firstName,
-        email,
-        phone,
-        company,
-        description: message,
-        channel: "website",
-        lead_source_id: source.id,
-      },
+    const { lead, isDuplicate } = await findOrCreateLeadWithDuplicateCheck({
+      lastName,
+      firstName,
+      email,
+      phone,
+      company,
+      description: message,
+      channel: "website",
+      lead_source_id: source.id,
     });
 
-    try {
-      await assignLead(lead.id, "round_robin");
-    } catch (assignErr) {
-      console.warn("Lead created but assignment failed:", assignErr);
+    if (!isDuplicate) {
+      try {
+        await assignLead(lead.id, "round_robin");
+      } catch (assignErr) {
+        console.warn("Lead created but assignment failed:", assignErr);
+      }
     }
 
     await prisma.webhookLog.update({

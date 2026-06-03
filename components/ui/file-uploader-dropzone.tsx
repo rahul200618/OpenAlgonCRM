@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { MinioUploader } from "@/components/ui/minio-uploader";
+import { MinioUploader } from "@/components/ui/cloudflare-uploader";
 
 type UploaderEndpoint =
   | "pdfUploader"

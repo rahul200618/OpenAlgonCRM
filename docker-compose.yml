@@ -1,18 +1,18 @@
-﻿services:
+services:
   # --- PostgreSQL Database (with pgvector extension for embeddings) ---
   postgres:
     image: pgvector/pgvector:pg17
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-OrvixCRM}
+      POSTGRES_USER: ${POSTGRES_USER:-OPENALGON CRM}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      POSTGRES_DB: ${POSTGRES_DB:-OrvixCRM}
+      POSTGRES_DB: ${POSTGRES_DB:-OPENALGON CRM}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - OrvixCRM
+      - OPENALGON CRM
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-OrvixCRM}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-OPENALGON CRM}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -20,24 +20,24 @@
     # ports:
     #   - "5432:5432"
 
-  # --- MinIO Object Storage ---
-  minio:
-    image: minio/minio:latest
+  # --- Cloudflare R2 Object Storage ---
+  cloudflare:
+    image: cloudflare/cloudflare:latest
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-OrvixCRM}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-OPENALGON CRM}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-changeme}
     volumes:
-      - minio_data:/data
+      - cloudflare_data:/data
     networks:
-      - OrvixCRM
+      - OPENALGON CRM
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/cloudflare/health/live"]
       interval: 5s
       timeout: 5s
       retries: 5
-    # Uncomment to expose MinIO to host:
+    # Uncomment to expose Cloudflare R2 to host:
     # ports:
     #   - "9000:9000"
     #   - "9001:9001"
@@ -48,7 +48,7 @@
     restart: unless-stopped
     command: inngest dev -u http://app:3000/api/inngest
     networks:
-      - OrvixCRM
+      - OPENALGON CRM
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8288/health"]
       interval: 5s
@@ -58,7 +58,7 @@
     # ports:
     #   - "8288:8288"
 
-  # --- OrvixCRM Application ---
+  # --- OPENALGON CRM Application ---
   app:
     build:
       context: .
@@ -69,36 +69,36 @@
     environment:
       # Database — values come from the same env vars as the postgres
       # service above so a single override changes both sides.
-      DATABASE_URL: postgresql://${POSTGRES_USER:-OrvixCRM}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-OrvixCRM}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-OPENALGON CRM}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-OPENALGON CRM}
       DB_HOST: postgres
       DB_PORT: "5432"
-      DB_USER: ${POSTGRES_USER:-OrvixCRM}
+      DB_USER: ${POSTGRES_USER:-OPENALGON CRM}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      DB_NAME: ${POSTGRES_DB:-OrvixCRM}
+      DB_NAME: ${POSTGRES_DB:-OPENALGON CRM}
 
       # Auth
       BETTER_AUTH_URL: http://localhost:3000
       # BETTER_AUTH_SECRET is auto-generated if not set
 
-      # MinIO — values come from the same env vars as the minio service.
-      NEXT_PUBLIC_MINIO_ENDPOINT: http://minio:9000
-      MINIO_ENDPOINT: http://minio:9000
+      # Cloudflare R2 — values come from the same env vars as the cloudflare service.
+      NEXT_PUBLIC_R2_ENDPOINT: http://cloudflare:9000
+      R2_ENDPOINT: http://cloudflare:9000
       MINIO_PORT: "9000"
-      MINIO_BUCKET: OrvixCRM
+      R2_BUCKET: OPENALGON CRM
       MINIO_USE_SSL: "false"
-      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-OrvixCRM}
-      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-changeme}
+      R2_ACCESS_KEY: ${MINIO_ROOT_USER:-OPENALGON CRM}
+      R2_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-changeme}
 
       # Inngest
       INNGEST_DEV: "1"
-      INNGEST_ID: OrvixCRM
-      INNGEST_APP_NAME: OrvixCRM
+      INNGEST_ID: OPENALGON CRM
+      INNGEST_APP_NAME: OPENALGON CRM
       INNGEST_EVENT_KEY: local
       INNGEST_SIGNING_KEY: ""
       INNGEST_BASE_URL: http://inngest:8288
 
       # App
-      NEXT_PUBLIC_APP_NAME: OrvixCRM
+      NEXT_PUBLIC_APP_NAME: OPENALGON CRM
       NEXT_PUBLIC_APP_URL: http://localhost:3000
 
       # Initial admin account (created on first run by the seed script).
@@ -115,21 +115,21 @@
       # values cause crashes. Users override these via .env to enable
       # the corresponding features. The app runs fine with placeholders;
       # individual features just won't work until real keys are provided.
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-placeholder-replace-to-enable-ai}
+
       RESEND_API_KEY: ${RESEND_API_KEY:-re_placeholder_replace_to_enable_email}
       GOOGLE_ID: ${GOOGLE_ID:-}
       GOOGLE_SECRET: ${GOOGLE_SECRET:-}
-      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-}
+
       E2B_API_KEY: ${E2B_API_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
-      minio:
+      cloudflare:
         condition: service_healthy
       inngest:
         condition: service_healthy
     networks:
-      - OrvixCRM
+      - OPENALGON CRM
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 10s
@@ -139,8 +139,8 @@
 
 volumes:
   postgres_data:
-  minio_data:
+  cloudflare_data:
 
 networks:
-  OrvixCRM:
+  OPENALGON CRM:
     driver: bridge

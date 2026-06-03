@@ -21,13 +21,15 @@ import getDocumentsMenuItem from "./menu-items/Documents";
 import getInvoicesMenuItem from "./menu-items/Invoices";
 import getAdministrationMenuItem from "./menu-items/Administration";
 import getCampaignsMenuItem from "./menu-items/Campaigns";
+import getFollowupsMenuItem from "./menu-items/Followups";
+import { getAnalyticsMenuItem } from "./menu-items/Analytics";
 
 /**
  * AppSidebar Component - Task Groups 1.2, 2.2-2.7, 3.1, 5.3, 5.4
  *
- * Core sidebar component for NextCRM application layout.
+ * Core sidebar component for OpenAlgon CRM application layout.
  * Implements shadcn/ui sidebar pattern with:
- * - Logo and "N" branding symbol with rotation animation
+ * - Logo and "O" branding symbol with rotation animation
  * - Build version display in footer (when expanded)
  * - Navigation with Dashboard and module items
  * - Nav-user section in footer for user profile and actions
@@ -65,7 +67,7 @@ interface User {
   id: string;
   name?: string | null;
   email?: string | null;
-  image?: string | null;
+  avatar?: string | null;
   role?: string | null;
   userStatus?: string;
   userLanguage?: string;
@@ -79,11 +81,13 @@ interface Session {
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   dict: any;
   session: Session;
+  featureFlags?: Record<string, boolean>;
 }
 
 export function AppSidebar({
   dict,
   session,
+  featureFlags = {},
   ...props
 }: AppSidebarProps) {
   const { state } = useSidebar();
@@ -91,22 +95,47 @@ export function AppSidebar({
 
   const navItems = [
     getDashboardMenuItem({ title: dict?.dashboard || "Dashboard" }),
+    getAnalyticsMenuItem({ title: "Analytics" }),
     getCrmMenuItem({ localizations: dict.crm }),
-    getCampaignsMenuItem({
-      localizations: {
-        title: "Campaigns",
-        campaigns: "All Campaigns",
-        templates: "Templates",
-        targets: "Targets",
-        targetLists: "Target Lists",
-      },
-    }),
-    getProjectsMenuItem({ title: dict?.projects || "Projects" }),
-    getEmailsMenuItem({ title: dict?.emails || "Emails" }),
-    getReportsMenuItem({ title: dict?.reports || "Reports" }),
-    getDocumentsMenuItem({ title: dict?.documents || "Documents" }),
-    getInvoicesMenuItem({ title: dict?.invoices || "Invoices" }),
   ];
+
+  if (featureFlags.module_followups !== false) {
+    navItems.push(getFollowupsMenuItem({ title: dict?.followups || "Follow-ups" }));
+  }
+
+  if (featureFlags.module_campaigns !== false) {
+    navItems.push(
+      getCampaignsMenuItem({
+        localizations: {
+          title: "Campaigns",
+          campaigns: "All Campaigns",
+          templates: "Templates",
+          targets: "Targets",
+          targetLists: "Target Lists",
+        },
+      })
+    );
+  }
+
+  if (featureFlags.module_projects !== false) {
+    navItems.push(getProjectsMenuItem({ title: dict?.projects || "Projects" }));
+  }
+
+  if (featureFlags.module_emails !== false) {
+    navItems.push(getEmailsMenuItem({ title: dict?.emails || "Emails" }));
+  }
+
+  if (featureFlags.module_reports !== false) {
+    navItems.push(getReportsMenuItem({ title: dict?.reports || "Reports" }));
+  }
+
+  if (featureFlags.module_documents !== false) {
+    navItems.push(getDocumentsMenuItem({ title: dict?.documents || "Documents" }));
+  }
+
+  if (featureFlags.module_invoices !== false) {
+    navItems.push(getInvoicesMenuItem({ title: dict?.invoices || "Invoices" }));
+  }
 
   // Administration: admin users only
   if (session?.user?.role === "admin") {
@@ -120,38 +149,37 @@ export function AppSidebar({
     id: session.user.id,
     name: session.user.name,
     email: session.user.email,
-    avatar: session.user.image,
+    avatar: session.user.avatar,
   };
 
   return (
     <Sidebar collapsible="icon" {...props}>
       {/* Header with Logo and Branding */}
-      <SidebarHeader>
+        <SidebarHeader>
         <div
           className={cn(
-            "flex items-center py-1",
-            isExpanded ? "gap-x-4" : "justify-center",
+            "flex items-center py-2",
+            isExpanded ? "gap-x-3 px-1" : "justify-center",
           )}
         >
-          {/* "N" Branding Symbol with rotation animation */}
+          {/* Clean logo mark — indigo square with "O" */}
           <div
             className={cn(
-              "flex-shrink-0 border rounded-full px-4 py-2 transition-transform duration-500",
-              isExpanded && "rotate-[360deg]",
+              "flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground font-bold text-sm select-none",
             )}
           >
-            N
+            O
           </div>
 
-          {/* App Name - visible when expanded, hidden when collapsed */}
-          <h1
+          {/* App name — visible when expanded */}
+          <span
             className={cn(
-              "origin-left font-medium text-xl transition-all overflow-hidden whitespace-nowrap",
+              "origin-left font-semibold text-base tracking-tight transition-all overflow-hidden whitespace-nowrap text-foreground",
               !isExpanded ? "w-0 opacity-0" : "w-auto opacity-100",
             )}
           >
-            {process.env.NEXT_PUBLIC_APP_NAME || "NextCRM"}
-          </h1>
+            {process.env.NEXT_PUBLIC_APP_NAME || "OpenAlgon CRM"}
+          </span>
         </div>
       </SidebarHeader>
 

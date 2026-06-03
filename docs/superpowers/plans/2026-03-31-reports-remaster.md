@@ -4745,7 +4745,7 @@ export default function ScheduledReport({
           <Hr />
           <Text>Your scheduled report is attached to this email.</Text>
           <Text style={{ color: "#999", fontSize: "12px" }}>
-            This is an automated report from OrvixCRM.
+            This is an automated report from OPENALGON CRM.
           </Text>
         </Container>
       </Body>

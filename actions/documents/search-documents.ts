@@ -6,10 +6,7 @@ import {
   AuthenticationError,
 } from "@/lib/authz";
 import { prismadb } from "@/lib/prisma";
-import {
-  generateEmbedding,
-  toVectorLiteral,
-} from "@/inngest/lib/embedding-utils";
+
 
 export interface DocumentSearchResult {
   id: string;
@@ -37,6 +34,7 @@ export async function searchDocuments(
     where: {
       parent_document_id: null,
       ...documentReadScopeWhere(user),
+      deletedAt: null,
       AND: [
         {
           OR: [
@@ -58,31 +56,6 @@ export async function searchDocuments(
 
   // Semantic search via raw pgvector. Apply post-filter for authz.
   let semResults: { id: string; similarity: number }[] = [];
-  try {
-    const embedding = await generateEmbedding(query.trim());
-    const vec = toVectorLiteral(embedding);
-
-    const rawResults = await prismadb.$queryRaw<
-      { id: string; similarity: number }[]
-    >`
-      SELECT d.id, 1 - (e.embedding <=> ${vec}::vector) AS similarity
-      FROM "Documents" d
-      LEFT JOIN "crm_Embeddings_Documents" e ON e.document_id = d.id
-      WHERE e.embedding IS NOT NULL AND d."parent_document_id" IS NULL
-        AND 1 - (e.embedding <=> ${vec}::vector) > 0.7
-      ORDER BY e.embedding <=> ${vec}::vector
-      LIMIT 5`;
-
-    const allowedIds = new Set(
-      await filterAuthorizedDocumentIds(
-        user,
-        rawResults.map((r) => r.id),
-      ),
-    );
-    semResults = rawResults.filter((r) => allowedIds.has(r.id));
-  } catch {
-    // Fall back to keyword-only
-  }
 
   // Merge: keyword results first, then semantic-only results
   const kwIds = new Set(kwResults.map((r) => r.id));
@@ -91,7 +64,7 @@ export async function searchDocuments(
   let extraDocs: typeof kwResults = [];
   if (semOnlyIds.length > 0) {
     extraDocs = await prismadb.documents.findMany({
-      where: { id: { in: semOnlyIds }, parent_document_id: null },
+      where: { id: { in: semOnlyIds }, parent_document_id: null, deletedAt: null },
       select: {
         id: true,
         document_name: true,

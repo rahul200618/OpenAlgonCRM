@@ -3,10 +3,7 @@ import { Decimal } from "@prisma/client/runtime/client";
 type Rate = { fromCurrency: string; toCurrency: string; rate: Decimal };
 
 const currencyLocaleMap: Record<string, string> = {
-  EUR: "fr-FR",
-  USD: "en-US",
-  CZK: "cs-CZ",
-  GBP: "en-GB",
+  INR: "en-IN",
 };
 
 export type { Rate };

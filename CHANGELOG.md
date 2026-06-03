@@ -3,7 +3,7 @@
 ## [0.1.0] - 2026-06-01
 
 ### Added
-- Initial OrvixCRM release
+- Initial OPENALGON CRM release
 - Multi-channel lead capture (Website, Meta Lead Ads, Google Lead Forms, WhatsApp, API, CSV)
 - Automated lead assignment engine (Round Robin, Weighted, Team-based, Manual)
 - Full lead lifecycle tracking

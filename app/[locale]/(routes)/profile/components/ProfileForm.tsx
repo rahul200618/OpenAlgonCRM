@@ -32,12 +32,23 @@ interface ProfileFormProps {
   data: any;
 }
 
+type ProfileFormValues = z.infer<typeof FormSchema>;
+
 const FormSchema = z.object({
   id: z.string(),
   name: z.string().min(3).max(50),
   username: z.string().min(2).max(50),
   account_name: z.string().min(2).max(50),
 });
+
+function toFormDefaults(data: any): ProfileFormValues {
+  return {
+    id: data?.id ?? "",
+    name: data?.name ?? "",
+    username: data?.username ?? "",
+    account_name: data?.account_name ?? "",
+  };
+}
 
 export function ProfileForm({ data }: ProfileFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -46,15 +57,9 @@ export function ProfileForm({ data }: ProfileFormProps) {
   const router = useRouter();
 
 
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<ProfileFormValues>({
     resolver: zodResolver(FormSchema),
-    defaultValues: data
-      ? { ...data }
-      : {
-          name: "",
-          username: "",
-          account_name: "",
-        },
+    defaultValues: toFormDefaults(data),
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {

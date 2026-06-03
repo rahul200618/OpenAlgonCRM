@@ -26,7 +26,7 @@ import {
 import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
 
-import { signOut } from "@/lib/auth-client";
+import { signOut } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 
 export function CommandComponent() {

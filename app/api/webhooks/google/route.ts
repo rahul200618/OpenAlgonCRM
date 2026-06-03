@@ -1,5 +1,5 @@
 /**
- * OrvixCRM — Webhook endpoint for Google Lead Form Extensions
+ * OPENALGON CRM — Webhook endpoint for Google Lead Form Extensions
  *
  * Google sends lead data via webhook when a user submits a Google Ads Lead Form.
  * Configure in Google Ads: Tools → Lead Forms → Webhook integration
@@ -8,8 +8,9 @@
  * - GOOGLE_WEBHOOK_SECRET — used to verify X-Google-Signature header
  */
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prismadb as prisma } from "@/lib/prisma";
 import { assignLead } from "@/lib/assignment-engine";
+import { findOrCreateLeadWithDuplicateCheck } from "@/lib/webhook-duplicate-check";
 
 export async function POST(request: NextRequest) {
   let body: any;
@@ -46,22 +47,21 @@ export async function POST(request: NextRequest) {
       update: {},
     });
 
-    const lead = await prisma.crm_Leads.create({
-      data: {
-        v: 0,
-        lastName: getName("LAST_NAME") || getName("FULL_NAME") || "Unknown",
-        firstName: getName("FIRST_NAME"),
-        email: getName("EMAIL"),
-        phone: getName("PHONE_NUMBER"),
-        channel: "google",
-        lead_source_id: source.id,
-      },
+    const { lead, isDuplicate } = await findOrCreateLeadWithDuplicateCheck({
+      lastName: getName("LAST_NAME") || getName("FULL_NAME") || "Unknown",
+      firstName: getName("FIRST_NAME"),
+      email: getName("EMAIL"),
+      phone: getName("PHONE_NUMBER"),
+      channel: "google",
+      lead_source_id: source.id,
     });
 
-    try {
-      await assignLead(lead.id, "round_robin");
-    } catch (assignErr) {
-      console.warn("Lead created but assignment failed:", assignErr);
+    if (!isDuplicate) {
+      try {
+        await assignLead(lead.id, "round_robin");
+      } catch (assignErr) {
+        console.warn("Lead created but assignment failed:", assignErr);
+      }
     }
 
     await prisma.webhookLog.update({

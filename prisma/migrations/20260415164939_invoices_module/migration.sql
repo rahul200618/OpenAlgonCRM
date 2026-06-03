@@ -4,6 +4,9 @@ CREATE TYPE "Invoice_Status" AS ENUM ('DRAFT', 'ISSUED', 'SENT', 'PARTIALLY_PAID
 -- CreateEnum
 CREATE TYPE "Invoice_Type" AS ENUM ('INVOICE', 'CREDIT_NOTE', 'PROFORMA');
 
+-- Drop the existing Invoices table from 0_init
+DROP TABLE IF EXISTS "Invoices" CASCADE;
+
 -- CreateTable
 CREATE TABLE "Invoices" (
     "id" UUID NOT NULL,

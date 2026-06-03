@@ -1,9 +1,6 @@
 "use server";
 import { prismadb } from "@/lib/prisma";
-import {
-  generateEmbedding,
-  toVectorLiteral,
-} from "@/inngest/lib/embedding-utils";
+
 import { requireAuthenticated, AuthenticationError } from "@/lib/authz";
 import { getReportScope } from "@/lib/authz/scopes/report-scope";
 
@@ -59,14 +56,7 @@ export async function unifiedSearch(
 
   const scope = getReportScope(user);
 
-  // Generate embedding — fall back to keyword-only on failure (silent)
-  let queryVec: string | null = null;
-  try {
-    const embedding = await generateEmbedding(query.trim());
-    queryVec = toVectorLiteral(embedding);
-  } catch (e) {
-    console.warn("[UNIFIED_SEARCH] embedding failed, falling back to keyword-only", e);
-  }
+  const queryVec: string | null = null;
 
   const noSemantic = Promise.resolve([] as { id: string; similarity: number }[]);
 

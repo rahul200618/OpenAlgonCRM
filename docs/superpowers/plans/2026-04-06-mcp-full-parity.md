@@ -6,7 +6,7 @@
 
 **Architecture:** Hybrid approach — flat tool files per domain in `lib/mcp/tools/` with shared helpers in `lib/mcp/helpers.ts`. No service-layer extraction. Barrel export via `lib/mcp/tools/index.ts`. Route handler simplified to single `allTools` import.
 
-**Tech Stack:** TypeScript, Zod, Prisma ORM, `mcp-handler` + `@modelcontextprotocol/sdk`, AWS S3 (MinIO), Inngest (async jobs)
+**Tech Stack:** TypeScript, Zod, Prisma ORM, `mcp-handler` + `@modelcontextprotocol/sdk`, AWS S3 (Cloudflare R2), Inngest (async jobs)
 
 **Spec:** `docs/superpowers/specs/2026-04-06-mcp-full-parity-design.md`
 
@@ -106,7 +106,7 @@ export function externalError(msg: string): never {
 
 - [ ] **Step 2: Verify TypeScript compiles**
 
-Run: `cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm && pnpm exec tsc --noEmit lib/mcp/helpers.ts 2>&1 | head -20`
+Run: `cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm && pnpm exec tsc --noEmit lib/mcp/helpers.ts 2>&1 | head -20`
 
 If there are path/tsconfig issues, just verify there are no syntax errors by checking that the file parses: `pnpm exec tsc --noEmit --skipLibCheck 2>&1 | grep helpers`
 
@@ -1571,14 +1571,14 @@ git commit -m "feat(mcp): add activities tools (5 tools, with entity links)"
 
 - [ ] **Step 1: Create `lib/mcp/tools/crm-documents.ts`**
 
-Documents have presigned URLs via MinIO/S3. Has `status` field. Junction tables for linking. Scoped to `created_by_user: userId`.
+Documents have presigned URLs via Cloudflare R2/S3. Has `status` field. Junction tables for linking. Scoped to `created_by_user: userId`.
 
 ```typescript
 import { z } from "zod";
 import { prismadb } from "@/lib/prisma";
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { minioClient, MINIO_BUCKET, MINIO_PUBLIC_URL } from "@/lib/minio";
+import { storageClient, R2_BUCKET, R2_PUBLIC_URL } from "@/lib/storage";
 import { randomUUID } from "crypto";
 import {
   paginationSchema,
@@ -1685,7 +1685,7 @@ export const crmDocumentTools = [
         ? args.document_name.split(".").pop()?.trim() || "bin"
         : "bin";
       const key = `documents/${randomUUID()}.${ext}`;
-      const fileUrl = `${MINIO_PUBLIC_URL}/${MINIO_BUCKET}/${key}`;
+      const fileUrl = `${R2_PUBLIC_URL}/${R2_BUCKET}/${key}`;
 
       const doc = await prismadb.documents.create({
         data: {
@@ -1702,11 +1702,11 @@ export const crmDocumentTools = [
       });
 
       const command = new PutObjectCommand({
-        Bucket: MINIO_BUCKET,
+        Bucket: R2_BUCKET,
         Key: key,
         ContentType: args.contentType,
       });
-      const presignedUrl = await getSignedUrl(minioClient, command, { expiresIn: 600 });
+      const presignedUrl = await getSignedUrl(storageClient, command, { expiresIn: 600 });
 
       return itemResponse({ ...doc, presignedUrl, expiresIn: 600 });
     },
@@ -1722,11 +1722,11 @@ export const crmDocumentTools = [
       if (!doc) notFound("Document");
       if (!doc.key) validationError("Document has no storage key");
       const command = new PutObjectCommand({
-        Bucket: MINIO_BUCKET,
+        Bucket: R2_BUCKET,
         Key: doc.key,
         ContentType: doc.document_file_mimeType,
       });
-      const presignedUrl = await getSignedUrl(minioClient, command, { expiresIn: 600 });
+      const presignedUrl = await getSignedUrl(storageClient, command, { expiresIn: 600 });
       return itemResponse({ id: doc.id, url: presignedUrl, expiresIn: 600 });
     },
   },
@@ -1741,10 +1741,10 @@ export const crmDocumentTools = [
       if (!doc) notFound("Document");
       if (!doc.key) validationError("Document has no storage key");
       const command = new GetObjectCommand({
-        Bucket: MINIO_BUCKET,
+        Bucket: R2_BUCKET,
         Key: doc.key,
       });
-      const presignedUrl = await getSignedUrl(minioClient, command, { expiresIn: 3600 });
+      const presignedUrl = await getSignedUrl(storageClient, command, { expiresIn: 3600 });
       return itemResponse({ id: doc.id, url: presignedUrl, expiresIn: 3600 });
     },
   },

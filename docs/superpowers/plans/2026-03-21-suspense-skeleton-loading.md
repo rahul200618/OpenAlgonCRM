@@ -139,7 +139,7 @@ export default AppShellSkeleton;
 
 - [ ] **Step 3: Verify TypeScript**
 
-Run from `orvixcrm/` directory:
+Run from `openalgoncrm/` directory:
 ```bash
 pnpm tsc --noEmit
 ```

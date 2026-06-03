@@ -121,7 +121,7 @@ git commit -m "feat(authz): add document read/write scope helpers (linked-entity
 **Files:** `create-document.ts`, `delete-document.ts`, `unlink-from-account.ts`, `retry-enrichment.ts`, `create-document-version.ts`.
 
 - `create-document.ts` — `requireAuthenticated`. If `accountId` provided, `assertCanWriteAccount(user, accountId)` before creating. `createdBy = user.id, assigned_user = user.id`.
-- `delete-document.ts` — `requireAuthenticated` + `assertCanWriteDocument` → existing hard delete + MinIO cleanup.
+- `delete-document.ts` — `requireAuthenticated` + `assertCanWriteDocument` → existing hard delete + Cloudflare R2 cleanup.
 - `unlink-from-account.ts` — `assertCanWriteDocument(user, document_id)` AND `assertCanWriteAccount(user, account_id)` (need both endpoints of the link).
 - `retry-enrichment.ts` — `assertCanWriteDocument`.
 - `create-document-version.ts` — `assertCanWriteDocument` on parent.

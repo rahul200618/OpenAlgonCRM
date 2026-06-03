@@ -5,13 +5,13 @@
 
 ## Goal
 
-Enable users to clone the OrvixCRM repo and run `docker-compose up` to get a fully working instance — app, database, background jobs, and file storage — with zero manual configuration. Optimized for self-hosting platforms like Coolify.
+Enable users to clone the OPENALGON CRM repo and run `docker-compose up` to get a fully working instance — app, database, background jobs, and file storage — with zero manual configuration. Optimized for self-hosting platforms like Coolify.
 
 ## User Experience
 
 ```bash
-git clone https://github.com/rahul200618/orvixcrm
-cd orvixcrm
+git clone https://github.com/rahul200618/openalgoncrm
+cd openalgoncrm
 docker-compose up
 # → app ready at http://localhost:3000
 ```
@@ -22,22 +22,22 @@ docker-compose up
 
 | Service | Image | Internal Port | Exposed Port | Purpose |
 |---------|-------|--------------|--------------|---------|
-| app | Built from `./Dockerfile` | 3000 | 3000 | OrvixCRM application |
+| app | Built from `./Dockerfile` | 3000 | 3000 | OPENALGON CRM application |
 | postgres | `postgres:18-alpine` | 5432 | none | Database |
 | inngest | `inngest/inngest:latest` | 8288 | none | Background jobs |
-| minio | `minio/minio:latest` | 9000, 9001 | none | Object storage (S3-compatible) |
+| cloudflare | `cloudflare/cloudflare:latest` | 9000, 9001 | none | Object storage (S3-compatible) |
 
 ### Networking
 
-- Single Docker network: `OrvixCRM`
+- Single Docker network: `OPENALGON CRM`
 - Only port 3000 exposed to host
-- All inter-service communication over internal DNS (e.g., `postgres:5432`, `minio:9000`, `inngest:8288`)
-- Users who need direct DB/MinIO access can uncomment port mappings in docker-compose.yml
+- All inter-service communication over internal DNS (e.g., `postgres:5432`, `cloudflare:9000`, `inngest:8288`)
+- Users who need direct DB/Cloudflare R2 access can uncomment port mappings in docker-compose.yml
 
 ### Volumes
 
 - `postgres_data` — persistent database storage
-- `minio_data` — persistent file storage
+- `cloudflare_data` — persistent file storage
 
 ## Dockerfile (Multi-stage)
 
@@ -79,7 +79,7 @@ Sequential startup flow:
 
 1. **Wait for Postgres** — loop with `pg_isready` until database accepts connections. Max 30 second timeout, then fail with clear error message.
 2. **Run migrations** — `npx prisma migrate deploy` to apply all pending migrations.
-3. **Create MinIO bucket** — ensure the `OrvixCRM` bucket exists using the MinIO S3 API via `curl` (PUT request to create bucket). No additional tools needed. Idempotent — skips if bucket already present (ignores 409 BucketAlreadyOwnedByYou).
+3. **Create Cloudflare R2 bucket** — ensure the `OPENALGON CRM` bucket exists using the Cloudflare R2 S3 API via `curl` (PUT request to create bucket). No additional tools needed. Idempotent — skips if bucket already present (ignores 409 BucketAlreadyOwnedByYou).
 4. **Conditional seed** — query database for existing users. If none found, run `npx prisma db seed` to create default admin account. Prevents re-seeding on container restarts.
 5. **Start app** — `exec node server.js` (exec replaces shell so signals propagate correctly for graceful shutdown).
 
@@ -89,22 +89,22 @@ Sequential startup flow:
 
 | Service | Credentials |
 |---------|------------|
-| Postgres | user: `OrvixCRM`, password: `OrvixCRM`, database: `OrvixCRM` |
-| MinIO | access key: `minioadmin`, secret key: `minioadmin123`, bucket: `OrvixCRM` |
+| Postgres | user: `OPENALGON CRM`, password: `OPENALGON CRM`, database: `OPENALGON CRM` |
+| Cloudflare R2 | access key: `cloudflareadmin`, secret key: `cloudflareadmin123`, bucket: `OPENALGON CRM` |
 
 ### Environment Wiring
 
 The app service receives pre-configured environment variables:
 
 ```yaml
-DATABASE_URL: postgresql://OrvixCRM:OrvixCRM@postgres:5432/OrvixCRM
-MINIO_ENDPOINT: http://minio:9000
-NEXT_PUBLIC_MINIO_ENDPOINT: http://minio:9000
+DATABASE_URL: postgresql://openalgoncrm:OPENALGON CRM@postgres:5432/openalgoncrm
+R2_ENDPOINT: http://cloudflare:9000
+NEXT_PUBLIC_R2_ENDPOINT: http://cloudflare:9000
 MINIO_PORT: "9000"
-MINIO_BUCKET: OrvixCRM
+R2_BUCKET: OPENALGON CRM
 MINIO_USE_SSL: "false"
-MINIO_ACCESS_KEY: minioadmin
-MINIO_SECRET_KEY: minioadmin123
+R2_ACCESS_KEY: cloudflareadmin
+R2_SECRET_KEY: cloudflareadmin123
 INNGEST_BASE_URL: http://inngest:8288
 INNGEST_EVENT_KEY: local
 BETTER_AUTH_URL: http://localhost:3000
@@ -116,15 +116,15 @@ BETTER_AUTH_URL: http://localhost:3000
 
 | Service | Check | Interval | Retries |
 |---------|-------|----------|---------|
-| postgres | `pg_isready -U OrvixCRM` | 5s | 5 |
-| minio | `curl -f http://localhost:9000/minio/health/live` | 5s | 5 |
+| postgres | `pg_isready -U OPENALGON CRM` | 5s | 5 |
+| cloudflare | `curl -f http://localhost:9000/cloudflare/health/live` | 5s | 5 |
 | inngest | `curl -f http://localhost:8288/health` | 5s | 5 |
 | app | `curl -f http://localhost:3000` | 10s | 5 |
 
 ### Dependency Ordering
 
 ```
-app → depends_on → postgres (healthy), minio (healthy), inngest (healthy)
+app → depends_on → postgres (healthy), cloudflare (healthy), inngest (healthy)
 ```
 
 ### Restart Policy
@@ -137,7 +137,7 @@ All services: `restart: unless-stopped`
 
 | File | Purpose |
 |------|---------|
-| `Dockerfile` | Multi-stage build for OrvixCRM |
+| `Dockerfile` | Multi-stage build for OPENALGON CRM |
 | `docker-compose.yml` | Full-stack service orchestration |
 | `docker-entrypoint.sh` | Startup script (migrations, seed, bucket creation) |
 | `.dockerignore` | Exclude node_modules, .next, .git, .env* from build context |
@@ -147,7 +147,7 @@ All services: `restart: unless-stopped`
 
 | File | Change |
 |------|--------|
-| `next.config.js` | Add `output: "standalone"`, add `minio` to image `remotePatterns` |
+| `next.config.js` | Add `output: "standalone"`, add `cloudflare` to image `remotePatterns` |
 
 ## .env.docker Structure
 
@@ -156,7 +156,7 @@ Variables grouped by category:
 ### Required (have defaults in docker-compose.yml)
 
 - `DATABASE_URL` — Postgres connection string
-- `MINIO_*` — MinIO connection details
+- `MINIO_*` — Cloudflare R2 connection details
 - `INNGEST_*` — Inngest connection details
 - `BETTER_AUTH_SECRET` — auto-generated if not set
 - `BETTER_AUTH_URL` — defaults to http://localhost:3000
@@ -193,7 +193,7 @@ docs
 
 ## Security Notes
 
-- Only port 3000 exposed to host — database, MinIO, and Inngest are not accessible from outside Docker network
+- Only port 3000 exposed to host — database, Cloudflare R2, and Inngest are not accessible from outside Docker network
 - App runs as non-root user in container
 - Default internal credentials are for local/self-hosted use only — users deploying publicly should override via environment variables
 - `.env` files excluded from Docker build context via `.dockerignore`

@@ -8,7 +8,7 @@
 
 ## Overview
 
-Add a complete audit trail to the OrvixCRM sales module. Every field change, creation, deletion, and relationship mutation on any CRM record is permanently recorded. Deleted records are soft-deleted (hidden from the app, recoverable by admins). History is visible inline on every record detail page and in a global admin audit log page.
+Add a complete audit trail to the OPENALGON CRM sales module. Every field change, creation, deletion, and relationship mutation on any CRM record is permanently recorded. Deleted records are soft-deleted (hidden from the app, recoverable by admins). History is visible inline on every record detail page and in a global admin audit log page.
 
 ---
 

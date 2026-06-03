@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { signOut } from "@/lib/auth-client"
+import { signOut } from "@/lib/supabase/client"
 import {
   ChevronsUpDown,
   LogOut,
@@ -9,6 +9,7 @@ import {
   User,
   LayoutDashboard,
   BadgeDollarSign,
+  Building2,
 } from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -133,6 +134,10 @@ export function NavUser({ user }: NavUserProps) {
             <DropdownMenuItem onClick={() => router.push("/profile")}>
               <Settings className="mr-2 h-4 w-4" />
               Profile Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/organization/settings")}>
+              <Building2 className="mr-2 h-4 w-4" />
+              Organization Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={async () => { await signOut(); window.location.href = "/sign-in"; }}>

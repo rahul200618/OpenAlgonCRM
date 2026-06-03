@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import { prismadb as prisma } from "@/lib/prisma";
 import { isAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
@@ -30,5 +30,5 @@ export async function getAllFeatureFlags(): Promise<Record<string, boolean>> {
   const flags = await prisma.featureFlag.findMany({
     select: { key: true, enabled: true },
   });
-  return Object.fromEntries(flags.map((f) => [f.key, f.enabled]));
+  return Object.fromEntries(flags.map((f: { key: string; enabled: boolean }) => [f.key, f.enabled]));
 }

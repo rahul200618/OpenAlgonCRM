@@ -6,7 +6,7 @@
 
 **Architecture:** Single bulk dropzone replaces 3 upload buttons. Inngest orchestrator function handles text extraction → embedding → summary → AI classification as sequential steps with individual retry; thumbnail generation runs as a separate parallel Inngest function. Vector search extends the existing `unifiedSearch` server action. Documents link to Accounts via existing junction table with upload-from-account-context support.
 
-**Tech Stack:** Next.js 16, React 19, Prisma 7.5, pgvector (1536-dim, text-embedding-3-small), Inngest (step functions), MinIO/S3, OpenAI API, pdf-parse, mammoth, sharp, pdfjs-dist, shadcn/ui, TanStack Table.
+**Tech Stack:** Next.js 16, React 19, Prisma 7.5, pgvector (1536-dim, text-embedding-3-small), Inngest (step functions), Cloudflare R2/S3, OpenAI API, pdf-parse, mammoth, sharp, pdfjs-dist, shadcn/ui, TanStack Table.
 
 ---
 
@@ -21,7 +21,7 @@
 | `actions/documents/create-document-version.ts` | Server action: create versioned document record |
 | `actions/documents/bulk-link-to-account.ts` | Server action: link multiple docs to an Account |
 | `actions/documents/bulk-change-type.ts` | Server action: change system type for multiple docs |
-| `actions/documents/bulk-delete-documents.ts` | Server action: delete multiple docs from DB + MinIO |
+| `actions/documents/bulk-delete-documents.ts` | Server action: delete multiple docs from DB + Cloudflare R2 |
 | `actions/documents/retry-enrichment.ts` | Server action: re-emit Inngest event for failed docs |
 | `actions/documents/get-document-versions.ts` | Server action: return version history for a document |
 | `actions/documents/unlink-from-account.ts` | Server action: remove junction record |
@@ -593,7 +593,7 @@ import { getSession } from "@/lib/auth-server";
 import { prismadb } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { minioClient, MINIO_BUCKET } from "@/lib/minio";
+import { storageClient, R2_BUCKET } from "@/lib/storage";
 
 export async function bulkDeleteDocuments(documentIds: string[]) {
   const session = await getSession();
@@ -604,11 +604,11 @@ export async function bulkDeleteDocuments(documentIds: string[]) {
     select: { id: true, key: true },
   });
 
-  // Delete from MinIO
+  // Delete from Cloudflare R2
   await Promise.allSettled(
     documents.map((doc) =>
       doc.key
-        ? minioClient.send(new DeleteObjectCommand({ Bucket: MINIO_BUCKET, Key: doc.key }))
+        ? storageClient.send(new DeleteObjectCommand({ Bucket: R2_BUCKET, Key: doc.key }))
         : Promise.resolve()
     )
   );
@@ -754,7 +754,7 @@ import {
   computeContentHash,
 } from "@/inngest/lib/embedding-utils";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
-import { minioClient, MINIO_BUCKET } from "@/lib/minio";
+import { storageClient, R2_BUCKET } from "@/lib/storage";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -764,8 +764,8 @@ const CHUNK_OVERLAP = 50;
 const MAX_SINGLE_EMBED_CHARS = 8000 * 4; // ~8000 tokens
 
 async function fetchFileBuffer(key: string): Promise<Buffer> {
-  const response = await minioClient.send(
-    new GetObjectCommand({ Bucket: MINIO_BUCKET, Key: key })
+  const response = await storageClient.send(
+    new GetObjectCommand({ Bucket: R2_BUCKET, Key: key })
   );
   const chunks: Uint8Array[] = [];
   for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
@@ -1007,15 +1007,15 @@ Create `inngest/functions/documents/generate-thumbnail.ts`:
 import { inngest } from "@/inngest/client";
 import { prismadb } from "@/lib/prisma";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import { minioClient, MINIO_BUCKET } from "@/lib/minio";
+import { storageClient, R2_BUCKET } from "@/lib/storage";
 import sharp from "sharp";
 
 const THUMB_WIDTH = 200;
 const THUMB_HEIGHT = 200;
 
 async function fetchFileBuffer(key: string): Promise<Buffer> {
-  const response = await minioClient.send(
-    new GetObjectCommand({ Bucket: MINIO_BUCKET, Key: key })
+  const response = await storageClient.send(
+    new GetObjectCommand({ Bucket: R2_BUCKET, Key: key })
   );
   const chunks: Uint8Array[] = [];
   for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
@@ -1055,16 +1055,16 @@ export const generateDocumentThumbnail = inngest.createFunction(
 
     const thumbnailKey = `thumbnails/${documentId}.png`;
 
-    await minioClient.send(
+    await storageClient.send(
       new PutObjectCommand({
-        Bucket: MINIO_BUCKET,
+        Bucket: R2_BUCKET,
         Key: thumbnailKey,
         Body: thumbnail,
         ContentType: "image/png",
       })
     );
 
-    const thumbnailUrl = `${process.env.NEXT_PUBLIC_MINIO_ENDPOINT}/${MINIO_BUCKET}/${thumbnailKey}`;
+    const thumbnailUrl = `${process.env.NEXT_PUBLIC_R2_ENDPOINT}/${R2_BUCKET}/${thumbnailKey}`;
 
     await prismadb.documents.update({
       where: { id: documentId },
@@ -1669,7 +1669,7 @@ export function BulkUploadModal({ accountId }: BulkUploadModalProps) {
 
       updateFile(index, { progress: 30 });
 
-      // Upload to MinIO
+      // Upload to Cloudflare R2
       await fetch(presignedUrl, {
         method: "PUT",
         body: item.file,

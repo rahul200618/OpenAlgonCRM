@@ -95,7 +95,7 @@ app/[locale]/(routes)/components/nav-main.tsx (or layout)  Add Campaigns to side
 - [ ] **Step 1: Create feature branch**
 
 ```bash
-cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm
+cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm
 git checkout -b feature/campaigns-module
 ```
 
@@ -402,7 +402,7 @@ git mv "app/[locale]/(routes)/crm/targets" "app/[locale]/(routes)/campaigns/targ
 git mv "app/[locale]/(routes)/crm/target-lists" "app/[locale]/(routes)/campaigns/target-lists"
 ```
 
-> Run from the project root: `/Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm`
+> Run from the project root: `/Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm`
 > Using `git mv` preserves file history for future `git blame`.
 
 - [ ] **Step 2: Fix any import paths in moved files**

@@ -23,18 +23,18 @@
   2. Add `invoices` key to each dictionary file under `dictionaries/`.
   3. Import and push into `navItems` in `app-sidebar.tsx`.
 
-## MinIO helpers
+## Cloudflare R2 helpers
 
-- **File**: `lib/minio.ts`
+- **File**: `lib/storage.ts`
 - **Exports** (already present, no changes needed):
-  - `minioClient` — configured `S3Client` from `@aws-sdk/client-s3` (MinIO via S3-compatible API; `forcePathStyle: true`).
-  - `MINIO_BUCKET` — bucket name from env.
-  - `MINIO_PUBLIC_URL` — public endpoint from `NEXT_PUBLIC_MINIO_ENDPOINT`.
+  - `storageClient` — configured `S3Client` from `@aws-sdk/client-s3` (Cloudflare R2 via S3-compatible API; `forcePathStyle: true`).
+  - `R2_BUCKET` — bucket name from env.
+  - `R2_PUBLIC_URL` — public endpoint from `NEXT_PUBLIC_R2_ENDPOINT`.
 - **Notes for later batches**:
-  - This is the AWS S3 SDK v3 client, not the `minio` npm package. Use `PutObjectCommand`, `GetObjectCommand`, `DeleteObjectCommand`, etc. from `@aws-sdk/client-s3`.
+  - This is the AWS S3 SDK v3 client, not the `cloudflare` npm package. Use `PutObjectCommand`, `GetObjectCommand`, `DeleteObjectCommand`, etc. from `@aws-sdk/client-s3`.
   - For presigned URLs use `@aws-sdk/s3-request-presigner` (`getSignedUrl`) — check package.json before importing; add if missing.
-  - There are no `putObject` / `presignedGetObject` convenience helpers yet — later batches should either add thin wrappers in `lib/minio.ts` or call the AWS SDK commands directly from the invoice storage helper.
-- **No changes made to `lib/minio.ts`** — `minioClient` is already exported under that exact name.
+  - There are no `putObject` / `presignedGetObject` convenience helpers yet — later batches should either add thin wrappers in `lib/storage.ts` or call the AWS SDK commands directly from the invoice storage helper.
+- **No changes made to `lib/storage.ts`** — `storageClient` is already exported under that exact name.
 
 ## Known trap: prisma migrate diff drops search index
 

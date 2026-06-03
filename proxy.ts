@@ -1,71 +1,41 @@
-import createMiddleware from "next-intl/middleware";
-import { routing } from "./i18n/routing";
-import { getSessionCookie } from "better-auth/cookies";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-// Admin-only API paths — cookie presence checked here, role checked server-side
-const ADMIN_ONLY_PATHS = [
-  "/api/user/activateAdmin",
-  "/api/user/deactivateAdmin",
-  "/api/user/activate",
-  "/api/user/deactivate",
-  "/api/user/inviteuser",
-  "/api/admin",
-];
+export async function proxy(request: NextRequest) {
+  // Run next-intl middleware to handle localization routing (handles /en hiding)
+  let response = intlMiddleware(request);
 
-export async function proxy(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-
-  // Inngest webhook — pass through, Inngest handles its own auth via signing key
-  if (path.startsWith("/api/inngest")) {
-    return NextResponse.next();
-  }
-
-  // better-auth API routes — pass through to better-auth handler
-  if (path.startsWith("/api/auth")) {
-    return NextResponse.next();
-  }
-
-  const sessionCookie = getSessionCookie(req);
-
-  // Admin-only routes — require session cookie (role checked server-side)
-  if (ADMIN_ONLY_PATHS.some((p) => path.startsWith(p))) {
-    if (!sessionCookie) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value));
+          // Apply cookies to the response object created by next-intl
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
     }
-    return NextResponse.next();
-  }
+  );
 
-  // Non-API routes — redirect to sign-in if no session cookie
-  if (!path.startsWith("/api")) {
-    if (!sessionCookie) {
-      // Allow auth pages (sign-in, register, pending, inactive)
-      const authPaths = ["/sign-in", "/register", "/pending", "/inactive"];
-      const isAuthPage = authPaths.some((p) => path.includes(p));
-      if (!isAuthPage) {
-        return NextResponse.redirect(new URL("/sign-in", req.nextUrl));
-      }
-    }
-  }
+  // refreshing the auth token
+  await supabase.auth.getUser();
 
-  // Non-API routes — delegate to next-intl
-  return intlMiddleware(req);
+  return response;
 }
 
 export const config = {
   matcher: [
-    // Admin-only API paths
-    "/api/user/activateAdmin/:path*",
-    "/api/user/deactivateAdmin/:path*",
-    "/api/user/activate/:path*",
-    "/api/user/deactivate/:path*",
-    "/api/user/inviteuser",
-    "/api/admin/:path*",
-    // better-auth API
-    "/api/auth/:path*",
-    // All non-API routes (existing intl matcher)
-    "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/webhooks|api/auth/callback|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

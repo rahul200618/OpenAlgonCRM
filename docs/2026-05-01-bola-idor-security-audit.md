@@ -8,14 +8,14 @@ No code changes were made as part of this audit.
 
 ## GitHub Advisory Verification
 
-`GHSA-mg5f-m89f-4gmc` is present in GitHub Security Advisories for `rahul200618/orvixcrm`.
+`GHSA-mg5f-m89f-4gmc` is present in GitHub Security Advisories for `rahul200618/openalgoncrm`.
 
 - Summary: BOLA/IDOR in `PATCH /api/crm/contacts/[id]` allowing cross-tenant CRM data tampering
 - State: triage
 - Severity: high
 - CVSS: 7.1, `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N`
 - CWE: `CWE-639`, Authorization Bypass Through User-Controlled Key
-- Affected package: `orvixcrm`
+- Affected package: `openalgoncrm`
 - Affected versions: `<= 0.10.1`
 - Reporter: `@xIllunight`
 - Published: not published at the time of review

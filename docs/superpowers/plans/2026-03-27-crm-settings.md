@@ -159,7 +159,7 @@ enum crm_Lead_Type {
 - [ ] **Step 5: Generate Prisma client to validate schema**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm prisma generate
 ```
 
@@ -184,7 +184,7 @@ git commit -m "feat: add crm_Contact_Types, crm_Lead_Sources, crm_Lead_Statuses,
 - [ ] **Step 1: Create empty migration file**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm prisma migrate dev --create-only --name crm_settings_db_backed
 ```
 
@@ -329,7 +329,7 @@ COMMIT;
 - [ ] **Step 3: Apply migration to local DB**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm prisma migrate deploy
 ```
 
@@ -417,7 +417,7 @@ const leadTypesData = [
 - [ ] **Step 3: Run seed to verify**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm prisma db seed
 ```
 
@@ -575,7 +575,7 @@ describe("deleteConfigValue", () => {
 - [ ] **Step 2: Run tests to confirm they fail**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm test __tests__/crm-settings-actions.test.ts
 ```
 
@@ -1062,7 +1062,7 @@ export function ConfigList({ configType, label, values }: Props) {
 - [ ] **Step 5: Verify TypeScript compiles**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm tsc --noEmit 2>&1 | head -30
 ```
 
@@ -1217,7 +1217,7 @@ const navItems = [
 - [ ] **Step 2: Verify in dev (quick manual check)**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm dev
 ```
 

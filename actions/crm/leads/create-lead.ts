@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import sendEmail from "@/lib/sendmail";
 import { inngest } from "@/inngest/client";
 import { writeAuditLog } from "@/lib/audit-log";
+import { assignLead } from "@/lib/assignment-engine";
 
 export const createLead = async (data: {
   first_name?: string;
@@ -61,14 +62,38 @@ export const createLead = async (data: {
         lead_type_id: lead_type_id || undefined,
         refered_by: refered_by || undefined,
         campaign: campaign || undefined,
-        assigned_to: assigned_to || userId,
         accountsIDs: accountIDs || undefined,
+        channel: "manual",
       },
     });
 
-    if (assigned_to && assigned_to !== userId) {
+    let finalAssignedTo = userId;
+    try {
+      if (assigned_to) {
+        const result = await assignLead(lead.id, "manual", {
+          targetUserId: assigned_to,
+          assignedById: userId,
+          organizationId: session.user.organization_id ?? undefined,
+        });
+        finalAssignedTo = result.assignedTo;
+      } else {
+        const result = await assignLead(lead.id, "round_robin", {
+          assignedById: userId,
+          organizationId: session.user.organization_id ?? undefined,
+        });
+        finalAssignedTo = result.assignedTo;
+      }
+    } catch (assignErr) {
+      console.warn("Lead assignment failed, falling back to creator:", assignErr);
+      await prismadb.crm_Leads.update({
+        where: { id: lead.id },
+        data: { assigned_to: userId },
+      });
+    }
+
+    if (finalAssignedTo && finalAssignedTo !== userId) {
       const notifyRecipient = await prismadb.users.findFirst({
-        where: { id: assigned_to },
+        where: { id: finalAssignedTo },
       });
 
       if (notifyRecipient) {

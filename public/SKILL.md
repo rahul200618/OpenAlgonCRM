@@ -1,11 +1,11 @@
 ﻿---
-name: OrvixCRM
-description: Connect to OrvixCRM MCP server to manage CRM data — accounts, contacts, leads, opportunities, targets, products, contracts, activities, documents, target lists, enrichment, email accounts, campaigns, projects, and reports.
+name: OPENALGON CRM
+description: Connect to OPENALGON CRM MCP server to manage CRM data — accounts, contacts, leads, opportunities, targets, products, contracts, activities, documents, target lists, enrichment, email accounts, campaigns, projects, and reports.
 ---
 
-# OrvixCRM MCP Server Skill
+# OPENALGON CRM MCP Server Skill
 
-Use the OrvixCRM MCP server to read and write CRM data. This skill documents all available tools and how to use them.
+Use the OPENALGON CRM MCP server to read and write CRM data. This skill documents all available tools and how to use them.
 
 ## Connection Setup
 
@@ -18,9 +18,9 @@ Single POST endpoint. Simpler, the current MCP spec default.
 ```json
 {
   "mcpServers": {
-    "OrvixCRM": {
+    "OPENALGON CRM": {
       "type": "http",
-      "url": "https://YOUR_OrvixCRM_URL/api/mcp/mcp",
+      "url": "https://YOUR_OPENALGON CRM_URL/api/mcp/mcp",
       "headers": { "Authorization": "Bearer YOUR_API_TOKEN" }
     }
   }
@@ -34,9 +34,9 @@ Two endpoints: a GET SSE stream and a POST message channel. The client opens `/a
 ```json
 {
   "mcpServers": {
-    "OrvixCRM": {
+    "OPENALGON CRM": {
       "type": "sse",
-      "url": "https://YOUR_OrvixCRM_URL/api/mcp/sse",
+      "url": "https://YOUR_OPENALGON CRM_URL/api/mcp/sse",
       "headers": { "Authorization": "Bearer YOUR_API_TOKEN" }
     }
   }
@@ -47,7 +47,7 @@ You only configure the `/sse` URL — the client discovers the message endpoint 
 
 ### Notes
 
-- Replace `YOUR_OrvixCRM_URL` with your OrvixCRM instance URL (e.g. `http://localhost:3000` for local dev)
+- Replace `YOUR_OPENALGON CRM_URL` with your OPENALGON CRM instance URL (e.g. `http://localhost:3000` for local dev)
 - Replace `YOUR_API_TOKEN` with a token generated from Profile > Developer > API Tokens
 - Token prefix: `nxtc__`
 - Some clients omit the `type` field and infer the transport from the URL — both forms above include it explicitly for clarity

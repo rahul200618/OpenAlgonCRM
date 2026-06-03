@@ -27,21 +27,21 @@ COPY . .
 # during build, which imports modules that check env vars at load time.
 # Real values are injected at runtime via docker-compose.
 ENV DATABASE_URL="postgresql://placeholder:placeholder@placeholder:5432/placeholder"
-ENV INNGEST_ID="nextcrm-build"
-ENV INNGEST_APP_NAME="NextCRM-Build"
+ENV INNGEST_ID="openalgoncrm-build"
+ENV INNGEST_APP_NAME="OPENALGON CRM-Build"
 ENV INNGEST_EVENT_KEY="build-placeholder"
 ENV INNGEST_SIGNING_KEY="build-placeholder"
 ENV BETTER_AUTH_SECRET="build-time-placeholder-secret-replace-at-runtime"
 ENV BETTER_AUTH_URL="http://localhost:3000"
-ENV MINIO_ENDPOINT="http://placeholder:9000"
+ENV R2_ENDPOINT="http://placeholder:9000"
 ENV MINIO_PORT="9000"
-ENV MINIO_BUCKET="placeholder"
+ENV R2_BUCKET="placeholder"
 ENV MINIO_USE_SSL="false"
-ENV MINIO_ACCESS_KEY="placeholder"
-ENV MINIO_SECRET_KEY="placeholder"
-ENV NEXT_PUBLIC_MINIO_ENDPOINT="http://placeholder:9000"
+ENV R2_ACCESS_KEY="placeholder"
+ENV R2_SECRET_KEY="placeholder"
+ENV NEXT_PUBLIC_R2_ENDPOINT="http://placeholder:9000"
 ENV EMAIL_ENCRYPTION_KEY="0000000000000000000000000000000000000000000000000000000000000000"
-ENV OPENAI_API_KEY="sk-placeholder-for-build"
+
 ENV RESEND_API_KEY="re_placeholder_for_build"
 ENV SKIP_ENV_VALIDATION=1
 
@@ -60,7 +60,7 @@ RUN apk add --no-cache curl postgresql-client
 # a pnpm-symlinked structure that npm install chokes on). We'll expose
 # these via PATH and NODE_PATH so prisma.config.ts can resolve `prisma/config`.
 WORKDIR /opt/tools
-RUN printf '{"name":"nextcrm-tools","version":"0.0.0","private":true}\n' > package.json && \
+RUN printf '{"name":"openalgoncrm-tools","version":"0.0.0","private":true}\n' > package.json && \
     npm install --no-audit --no-fund \
       prisma@7.6.0 \
       @prisma/client@7.6.0 \

@@ -1,4 +1,8 @@
-import { createAccessControl } from "better-auth/plugins/access";
+/**
+ * OPENALGON CRM — Permission Mapping
+ * 
+ * Custom simple access control without Better Auth dependency.
+ */
 
 const statements = {
   user: ["create", "read", "update", "delete", "changeRole", "activate", "deactivate"],
@@ -8,28 +12,32 @@ const statements = {
   settings: ["read", "update"],
 } as const;
 
-export const ac = createAccessControl(statements);
-
-export const admin = ac.newRole({
+export const admin = {
   user: ["create", "read", "update", "delete", "changeRole", "activate", "deactivate"],
   crm: ["create", "read", "update", "delete"],
   project: ["create", "read", "update", "delete"],
   report: ["read", "export"],
   settings: ["read", "update"],
-});
+};
 
-export const manager = ac.newRole({
+export const manager = {
   user: ["read"],
   crm: ["create", "read", "update", "delete"],
   project: ["create", "read", "update", "delete"],
   report: ["read", "export"],
   settings: ["read"],
-});
+};
 
-export const user = ac.newRole({
+export const user = {
   user: ["read"],
   crm: ["read"],
   project: ["read"],
   report: ["read"],
   settings: ["read"],
-});
+};
+
+// Access Control helper to prevent breakages if imported elsewhere
+export const ac = {
+  newRole: (permissions: any) => permissions,
+  statements,
+};

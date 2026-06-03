@@ -58,7 +58,7 @@ docker run -d --name mongodb-migration-test \
   mongo:7
 
 # Connection string
-DATABASE_URL_MONGODB="mongodb://admin:password@localhost:27017/OrvixCRM_test?authSource=admin"
+DATABASE_URL_MONGODB="mongodb://admin:password@localhost:27017/openalgoncrm_test?authSource=admin"
 ```
 
 ### 2. PostgreSQL Test Database
@@ -66,19 +66,19 @@ DATABASE_URL_MONGODB="mongodb://admin:password@localhost:27017/OrvixCRM_test?aut
 # Using Docker with pgvector
 docker run -d --name postgres-migration-test \
   -p 5432:5432 \
-  -e POSTGRES_USER=OrvixCRM \
+  -e POSTGRES_USER=OPENALGON CRM \
   -e POSTGRES_PASSWORD=password \
-  -e POSTGRES_DB=OrvixCRM_test \
+  -e POSTGRES_DB=OPENALGON CRM_test \
   pgvector/pgvector:pg16
 
 # Connection string
-DATABASE_URL_POSTGRES="postgresql://OrvixCRM:password@localhost:5432/OrvixCRM_test"
+DATABASE_URL_POSTGRES="postgresql://openalgoncrm:password@localhost:5432/openalgoncrm_test"
 ```
 
 ### 3. Run Prisma Migrations
 ```bash
 # Point to PostgreSQL test database
-export DATABASE_URL="postgresql://OrvixCRM:password@localhost:5432/OrvixCRM_test"
+export DATABASE_URL="postgresql://openalgoncrm:password@localhost:5432/openalgoncrm_test"
 
 # Run migrations
 npx prisma migrate deploy

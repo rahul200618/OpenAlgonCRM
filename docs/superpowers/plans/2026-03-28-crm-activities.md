@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a complete activity log (Calls, Meetings, Notes, Emails) to the OrvixCRM sales module, linked to all 5 CRM entities, with inline feeds on every entity detail page.
+**Goal:** Add a complete activity log (Calls, Meetings, Notes, Emails) to the OPENALGON CRM sales module, linked to all 5 CRM entities, with inline feeds on every entity detail page.
 
 **Architecture:** Single `crm_Activities` table + `crm_ActivityLinks` junction table. Mutations go through server actions using `prismadb.$transaction`. UI follows the established Sheet-form pattern (TasksView) and cursor-paginated feed pattern (AuditTimeline).
 
@@ -128,7 +128,7 @@ Find the `Users` model in `prisma/schema.prisma`. Add these two lines inside it 
 - [ ] **Step 3: Push schema and regenerate client**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 npx prisma db push
 npx prisma generate
 ```

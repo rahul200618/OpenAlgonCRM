@@ -1,7 +1,7 @@
-﻿{
+{
   "RootLayout": {
-    "title": "OrvixCRM",
-    "description": "OrvixCRM is an open source CRM build on top of NextJS."
+    "title": "OPENALGON CRM",
+    "description": "OPENALGON CRM is an open source CRM build on top of NextJS."
   },
   "ModuleMenu": {
     "dashboard": "Dashboard",
@@ -23,12 +23,13 @@
     "documents": "Documents",
     "invoices": "Invoices",
     "storage": "Storage",
+    "followups": "Follow-ups",
     "settings": "Administration"
   },
   "DashboardPage": {
     "containerTitle": "Dashboard",
     "totalRevenue": "Total revenue",
-    "containerDescription": "Welcome to OrvixCRM, here you can see all important information about your business.",
+    "containerDescription": "Welcome to OPENALGON CRM, here you can see all important information about your business.",
     "expectedRevenue": "Expected revenue",
     "activeUsers": "Active users",
     "accounts": "Companies",
@@ -638,8 +639,8 @@
     "table": {
       "number": "Number",
       "account": "Account",
-      "issueDate": "Issued",
-      "dueDate": "Due",
+      "issueDate": "Issue Date",
+      "dueDate": "Due Date",
       "total": "Total",
       "status": "Status",
       "type": "Type",
@@ -652,7 +653,7 @@
       "dueDate": "Due Date",
       "type": "Type",
       "lineItems": "Line Items",
-      "addLine": "Add Line",
+      "addLine": "Add Item",
       "product": "Product",
       "description": "Description",
       "quantity": "Quantity",
@@ -673,7 +674,7 @@
       "issue": "Issue",
       "cancel": "Cancel",
       "duplicate": "Duplicate",
-      "send": "Send by Email",
+      "send": "Send via Email",
       "downloadPdf": "Download PDF",
       "addPayment": "Add Payment",
       "edit": "Edit",
@@ -682,14 +683,14 @@
     "payment": {
       "amount": "Amount",
       "date": "Date",
-      "method": "Method",
+      "method": "Payment Method",
       "reference": "Reference",
       "note": "Note"
     }
   },
   "InvoicesAdminPage": {
     "title": "Invoice Settings",
-    "description": "Configure invoice defaults and options",
+    "description": "Configure billing defaults and options",
     "taxRates": {
       "title": "Tax Rates",
       "name": "Name",
@@ -718,7 +719,7 @@
       "defaultTaxRate": "Default Tax Rate",
       "defaultDueDays": "Default Due Days",
       "bankName": "Bank Name",
-      "bankAccount": "Bank Account",
+      "bankAccount": "Account Number",
       "iban": "IBAN",
       "swift": "SWIFT",
       "footerText": "Footer Text",

@@ -1,4 +1,4 @@
-# Contributing to OrvixCRM
+# Contributing to OPENALGON CRM
 
 We welcome contributions! Every contribution is appreciated.
 
@@ -6,7 +6,7 @@ We welcome contributions! Every contribution is appreciated.
 
 ### Reporting Issues
 
-- [Open an issue](https://github.com/rahul200618/orvixcrm/issues) if you find a bug or have a suggestion.
+- [Open an issue](https://github.com/rahul200618/openalgoncrm/issues) if you find a bug or have a suggestion.
 
 ### Pull Requests
 
@@ -19,8 +19,8 @@ We welcome contributions! Every contribution is appreciated.
 ### Development Setup
 
 ```sh
-git clone https://github.com/rahul200618/orvixcrm.git
-cd orvixcrm
+git clone https://github.com/rahul200618/openalgoncrm.git
+cd openalgoncrm
 pnpm install
 cp .env.example .env
 # Fill in your env vars

@@ -47,6 +47,11 @@ export function InviteForm() {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      language: "en",
+    },
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {

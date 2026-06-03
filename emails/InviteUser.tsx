@@ -32,8 +32,8 @@ export const InviteUserEmail = ({
 }: VercelInviteUserEmailProps) => {
   const previewText =
     userLanguage === "en"
-      ? `You have been invited by ${invitedByUsername} to OrvixCRM app`
-      : `Byl jste pozván uživatelem ${invitedByUsername} do aplikace OrvixCRM`;
+      ? `You have been invited by ${invitedByUsername} to OPENALGON CRM app`
+      : `Byl jste pozván uživatelem ${invitedByUsername} do aplikace OPENALGON CRM`;
 
   return (
     <Html>

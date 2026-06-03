@@ -7,10 +7,10 @@ import type { KPIData } from "@/actions/reports/types";
 import { useTranslations } from "next-intl";
 
 const currencyLocaleMap: Record<string, string> = {
-  EUR: "fr-FR", USD: "en-US", CZK: "cs-CZ", GBP: "en-GB",
+  INR: "en-IN",
 };
 
-function formatValue(value: number, label: string, currency: string = "USD"): string {
+function formatValue(value: number, label: string, currency: string = "INR"): string {
   if (label === "totalRevenue" || label === "pipelineValue") {
     const locale = currencyLocaleMap[currency] || "en-US";
     return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(value);

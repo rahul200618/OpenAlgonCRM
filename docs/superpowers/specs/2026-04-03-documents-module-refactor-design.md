@@ -30,7 +30,7 @@ New fields added to the existing model:
 | `content_text` | `Text` (nullable) | Extracted raw text from PDF/DOCX |
 | `summary` | `Text` (nullable) | AI-generated 2-3 sentence summary |
 | `content_hash` | `String` (nullable) | SHA-256 of file bytes for duplicate detection |
-| `thumbnail_url` | `String` (nullable) | MinIO URL of generated thumbnail |
+| `thumbnail_url` | `String` (nullable) | Cloudflare R2 URL of generated thumbnail |
 | `processing_status` | Enum: `PENDING`, `PROCESSING`, `READY`, `FAILED` | Enrichment pipeline status |
 | `processing_error` | `String` (nullable) | Error message if enrichment failed |
 | `version` | `Int` (default 1) | Document version number |
@@ -57,7 +57,7 @@ Values: `PENDING`, `PROCESSING`, `READY`, `FAILED`
 
 - Re-uploading creates a new `crm_Documents` record with `parent_document_id` pointing to the original and `version` incremented.
 - The original record's `document_file_url` is updated to point to the latest version so links always resolve to current.
-- Old version files remain in MinIO, accessible via version history.
+- Old version files remain in Cloudflare R2, accessible via version history.
 - New version re-triggers the enrichment pipeline.
 
 ## 2. Upload Flow
@@ -74,7 +74,7 @@ Replace the current 3 buttons (Upload PDF, Upload Images, Upload Other) with one
 2. Check for duplicates: `POST /api/documents/check-duplicate` with hash
 3. If duplicate found: show warning with "Upload anyway" or "Skip"
 4. Request presigned URL from existing `/api/upload/presigned-url`
-5. Upload directly to MinIO via presigned URL
+5. Upload directly to Cloudflare R2 via presigned URL
 6. Create document record via `createDocument` server action with `processing_status: PENDING`
 7. Instant MIME-based classification:
    - `application/pdf` → filename heuristics (invoice/receipt → RECEIPT, contract → CONTRACT, offer/quote → OFFER, else OTHER)
@@ -100,7 +100,7 @@ Triggered by: `document/uploaded`
 Step 1: extract-text
   - PDF → pdf-parse library
   - DOCX → mammoth library
-  - TXT → read directly from MinIO
+  - TXT → read directly from Cloudflare R2
   - Images → skip text extraction
   - Save content_text to DB
   - Set processing_status = PROCESSING
@@ -131,7 +131,7 @@ Triggered by: `document/uploaded`
   - PDF → render first page as PNG
   - Images → resize to thumbnail (200x200)
   - DOCX → generic document icon or simple preview
-  - Upload thumbnail to MinIO at thumbnails/{docId}.png
+  - Upload thumbnail to Cloudflare R2 at thumbnails/{docId}.png
   - Save thumbnail_url to document record
 ```
 
@@ -233,7 +233,7 @@ Note: No new API routes needed. The two originally proposed endpoints are implem
 | `createDocumentVersion` | New — creates versioned record, updates parent's URL, triggers enrichment |
 | `bulkLinkToAccount` | New — links multiple documents to an Account |
 | `bulkChangeType` | New — changes document_system_type for multiple documents |
-| `bulkDeleteDocuments` | New — deletes multiple documents from DB + MinIO |
+| `bulkDeleteDocuments` | New — deletes multiple documents from DB + Cloudflare R2 |
 | `retryEnrichment` | New — re-emits `document/uploaded` event for failed documents |
 | `getDocumentVersions` | New — returns version history for a document |
 | `unlinkFromAccount` | New — removes junction record without deleting document |
@@ -251,7 +251,7 @@ Note: No new API routes needed. The two originally proposed endpoints are implem
 
 ### Existing infrastructure used
 
-- **MinIO** — file storage (already configured)
+- **Cloudflare R2** — file storage (already configured)
 - **Inngest** — async job processing (already configured)
 - **pgvector** — vector embeddings (Supabase extension, may need enabling)
 - **Prisma** — ORM (raw SQL for vector operations)

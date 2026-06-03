@@ -1,5 +1,5 @@
 /**
- * OrvixCRM — Custom/Flexible Webhook Endpoint
+ * OPENALGON CRM — Custom/Flexible Webhook Endpoint
  *
  * Accepts any JSON payload. Field mapping is configured via
  * the CUSTOM_FIELD_MAP environment variable (JSON string) or
@@ -15,8 +15,9 @@
  * Auth: set CUSTOM_WEBHOOK_SECRET for bearer token protection.
  */
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prismadb as prisma } from "@/lib/prisma";
 import { assignLead } from "@/lib/assignment-engine";
+import { findOrCreateLeadWithDuplicateCheck } from "@/lib/webhook-duplicate-check";
 
 export async function POST(request: NextRequest) {
   const secret = process.env.CUSTOM_WEBHOOK_SECRET;
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
     const fullName = get("name") ?? "";
     const nameParts = fullName.split(" ");
     const firstName = get("first_name") ?? (nameParts.length > 1 ? nameParts[0] : "");
-    const lastName = get("last_name") ?? (nameParts.length > 1 ? nameParts.slice(1).join(" ") : fullName) || "Unknown";
+    const lastName = (get("last_name") ?? (nameParts.length > 1 ? nameParts.slice(1).join(" ") : fullName)) || "Unknown";
 
     const source = await prisma.crm_Lead_Sources.upsert({
       where: { name: "Custom Webhook" },
@@ -78,24 +79,23 @@ export async function POST(request: NextRequest) {
       update: {},
     });
 
-    const lead = await prisma.crm_Leads.create({
-      data: {
-        v: 0,
-        lastName,
-        firstName,
-        email: get("email"),
-        phone: get("phone"),
-        company: get("company"),
-        description: get("message"),
-        channel: "api",
-        lead_source_id: source.id,
-      },
+    const { lead, isDuplicate } = await findOrCreateLeadWithDuplicateCheck({
+      lastName,
+      firstName,
+      email: get("email"),
+      phone: get("phone"),
+      company: get("company"),
+      description: get("message"),
+      channel: "api",
+      lead_source_id: source.id,
     });
 
-    try {
-      await assignLead(lead.id, "round_robin");
-    } catch (assignErr) {
-      console.warn("Lead created but assignment failed:", assignErr);
+    if (!isDuplicate) {
+      try {
+        await assignLead(lead.id, "round_robin");
+      } catch (assignErr) {
+        console.warn("Lead created but assignment failed:", assignErr);
+      }
     }
 
     await prisma.webhookLog.update({

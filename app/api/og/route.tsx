@@ -1,7 +1,7 @@
-﻿import { ImageResponse } from "next/og";
+import { ImageResponse } from "next/og";
 import { TbBrandNextjs, TbBrandTypescript } from "react-icons/tb";
 import { BiLogoMongodb, BiLogoTailwindCss } from "react-icons/bi";
-import { SiPrisma, SiReact, SiOpenai } from "react-icons/si";
+import { SiPrisma, SiReact } from "react-icons/si";
 import fs from "fs";
 import path from "path";
 
@@ -22,13 +22,13 @@ export async function GET(request: Request) {
     const hasTitle = searchParams.has("title");
     const title = hasTitle
       ? searchParams.get("title")?.slice(0, 200)
-      : "OrvixCRM";
+      : "OPENALGON CRM";
 
     const hasDescription = searchParams.has("description");
 
     const description = hasDescription
       ? searchParams.get("description")?.slice(0, 200)
-      : "OrvixCRM is an open source CRM build on top of NextJS. Technology stack: NextJS with Typescrtipt, MongoDB, TailwindCSS, React, Prisma, shadCN, resend.com, react.email and more. ";
+      : "OPENALGON CRM is an open source CRM build on top of NextJS. Technology stack: NextJS with Typescrtipt, MongoDB, TailwindCSS, React, Prisma, shadCN, resend.com, react.email and more. ";
 
     return new ImageResponse(
       (
@@ -57,10 +57,10 @@ export async function GET(request: Request) {
               <SiPrisma size={50} color={"purple"} />
               <SiReact size={50} color={"blue"} />
               <BiLogoTailwindCss size={50} color={"blue"} />
-              <SiOpenai size={50} color={"white"} />
+
             </span>
 
-            <p tw="text-neutral-300 pb-10">https://demo.orvixcrm.com</p>
+            <p tw="text-neutral-300 pb-10">https://demo.openalgoncrm.com</p>
           </div>
         </div>
       ),

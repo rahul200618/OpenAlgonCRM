@@ -62,7 +62,7 @@ prisma/migrations/20260320000000_add_pgvector_embeddings/migration.sql
 - [ ] **Step 1: Install Inngest**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm add inngest
 ```
 
@@ -246,7 +246,7 @@ Create `inngest/client.ts`:
 ```typescript
 import { Inngest } from "inngest";
 
-export const inngest = new Inngest({ id: "OrvixCRM" });
+export const inngest = new Inngest({ id: "OPENALGON CRM" });
 ```
 
 - [ ] **Step 2: Create the Inngest API route**

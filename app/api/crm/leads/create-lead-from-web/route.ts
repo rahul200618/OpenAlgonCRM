@@ -1,4 +1,4 @@
-﻿import { prismadb } from "@/lib/prisma";
+import { prismadb } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -28,14 +28,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  if (!process.env.OrvixCRM_TOKEN) {
+  if (!process.env.OPENALGON_CRM_TOKEN) {
     return NextResponse.json(
-      { message: "OrvixCRM_TOKEN not defined in .env.local file" },
+      { message: "OPENALGON CRM_TOKEN not defined in .env.local file" },
       { status: 401 }
     );
   }
 
-  if (token.trim() !== process.env.OrvixCRM_TOKEN.trim()) {
+  if (token.trim() !== process.env.OPENALGON_CRM_TOKEN?.trim()) {
     console.log("Unauthorized");
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   } else {

@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { prismadb as prisma } from "@/lib/prisma";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -87,6 +88,7 @@ export default async function AppLayout({
     reports: dict("reports"),
     documents: dict("documents"),
     invoices: dict("invoices"),
+    followups: dict("followups"),
     settings: dict("settings"),
   };
 
@@ -101,14 +103,36 @@ export default async function AppLayout({
     : defaultCurrency;
   const currencyList = enabledCurrencies.map((c: { code: string; name: string; symbol: string }) => ({ code: c.code, name: c.name, symbol: c.symbol }));
 
+  let featureFlags: Record<string, boolean> = {};
+  try {
+    const flags = await prisma.featureFlag.findMany({
+      select: { key: true, enabled: true },
+    });
+    featureFlags = Object.fromEntries(flags.map((f: { key: string; enabled: boolean }) => [f.key, f.enabled]));
+  } catch (error) {
+    console.warn("[Layout] Failed to fetch feature flags from database, defaulting to all active.", error);
+    featureFlags = {
+      projects: true,
+      campaigns: true,
+      hr: true,
+      documents: true,
+      invoices: true,
+      crm: true,
+      emails: true,
+      reports: true,
+      followups: true,
+    };
+  }
+
   //console.log(typeof build, "build");
   return (
-    <AvatarProvider initialAvatar={user?.image}>
+    <AvatarProvider initialAvatar={user?.avatar}>
     <CurrencyProvider initialCurrency={displayCurrency} currencies={currencyList}>
     <SidebarProvider defaultOpen={sidebarOpen}>
       <AppSidebar
         dict={translations}
         session={session}
+        featureFlags={featureFlags}
       />
       <SidebarInset>
         <Header

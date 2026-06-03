@@ -19,14 +19,6 @@ const PROVIDER_META: Record<
   ApiKeyProvider,
   { label: string; description: string }
 > = {
-  OPENAI: {
-    label: "OpenAI",
-    description: "Used for GPT-4 enrichment and embeddings",
-  },
-  FIRECRAWL: {
-    label: "Firecrawl",
-    description: "Used for web scraping during enrichment",
-  },
   ANTHROPIC: {
     label: "Anthropic",
     description: "Claude models",

@@ -1,7 +1,7 @@
 ﻿# PostgreSQL Migration - Developer Guide
 
 **Last Updated**: November 5, 2025
-**Target Audience**: Developers working with OrvixCRM codebase
+**Target Audience**: Developers working with OPENALGON CRM codebase
 **Purpose**: Reference guide for working with the new PostgreSQL schema
 
 ---

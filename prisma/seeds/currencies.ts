@@ -1,18 +1,11 @@
 import { PrismaClient, ExchangeRateSource } from "@prisma/client";
 
 const currencies = [
-  { code: "EUR", name: "Euro", symbol: "€", isEnabled: true, isDefault: true },
-  { code: "USD", name: "US Dollar", symbol: "$", isEnabled: true, isDefault: false },
-  { code: "CZK", name: "Czech Koruna", symbol: "Kč", isEnabled: true, isDefault: false },
+  { code: "INR", name: "Indian Rupee", symbol: "₹", isEnabled: true, isDefault: true },
 ];
 
 const rates = [
-  { fromCurrency: "EUR", toCurrency: "USD", rate: 1.084, source: ExchangeRateSource.ECB },
-  { fromCurrency: "EUR", toCurrency: "CZK", rate: 25.315, source: ExchangeRateSource.ECB },
-  { fromCurrency: "USD", toCurrency: "EUR", rate: 0.92251, source: ExchangeRateSource.ECB },
-  { fromCurrency: "USD", toCurrency: "CZK", rate: 23.35, source: ExchangeRateSource.ECB },
-  { fromCurrency: "CZK", toCurrency: "EUR", rate: 0.0395, source: ExchangeRateSource.ECB },
-  { fromCurrency: "CZK", toCurrency: "USD", rate: 0.04283, source: ExchangeRateSource.ECB },
+  { fromCurrency: "INR", toCurrency: "INR", rate: 1.0, source: ExchangeRateSource.ECB },
 ];
 
 export async function seedCurrencies(prisma: PrismaClient) {
@@ -21,7 +14,7 @@ export async function seedCurrencies(prisma: PrismaClient) {
   for (const currency of currencies) {
     await prisma.currency.upsert({
       where: { code: currency.code },
-      update: { name: currency.name, symbol: currency.symbol },
+      update: { name: currency.name, symbol: currency.symbol, isEnabled: currency.isEnabled, isDefault: currency.isDefault },
       create: currency,
     });
   }
@@ -47,8 +40,8 @@ export async function seedCurrencies(prisma: PrismaClient) {
 
   await prisma.crm_SystemSettings.upsert({
     where: { key: "default_currency" },
-    update: {},
-    create: { key: "default_currency", value: "EUR" },
+    update: { value: "INR" },
+    create: { key: "default_currency", value: "INR" },
   });
 
   console.log("Currencies seeded.");

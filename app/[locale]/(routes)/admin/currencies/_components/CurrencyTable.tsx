@@ -98,9 +98,9 @@ export function CurrencyTable({ currencies }: { currencies: CurrencyValue[] }) {
             <DialogTitle>Add Currency</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <Input placeholder="Code (e.g. GBP)" value={newCode} onChange={(e) => setNewCode(e.target.value.toUpperCase())} maxLength={3} />
-            <Input placeholder="Name (e.g. British Pound)" value={newName} onChange={(e) => setNewName(e.target.value)} />
-            <Input placeholder="Symbol (e.g. £)" value={newSymbol} onChange={(e) => setNewSymbol(e.target.value)} maxLength={5} />
+            <Input placeholder="Code (e.g. INR)" value={newCode} onChange={(e) => setNewCode(e.target.value.toUpperCase())} maxLength={3} />
+            <Input placeholder="Name (e.g. Indian Rupee)" value={newName} onChange={(e) => setNewName(e.target.value)} />
+            <Input placeholder="Symbol (e.g. ₹)" value={newSymbol} onChange={(e) => setNewSymbol(e.target.value)} maxLength={5} />
             <Button onClick={handleCreate} disabled={!newCode || !newName || !newSymbol}>Add</Button>
           </div>
         </DialogContent>

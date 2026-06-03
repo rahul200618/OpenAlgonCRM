@@ -121,7 +121,7 @@ export const FIELD_MAP: Record<string, string> = {
 
 - [ ] **Step 2: Verify TypeScript compiles cleanly**
 
-Run: `cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/orvixcrm && npx tsc --noEmit 2>&1 | head -30`
+Run: `cd /Users/pavel-clawdbot/.openclaw/workspace-chopper/development/openalgoncrm && npx tsc --noEmit 2>&1 | head -30`
 
 Expected: no errors from the new file (it may show unrelated pre-existing errors; that's fine).
 

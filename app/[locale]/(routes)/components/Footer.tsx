@@ -15,22 +15,6 @@ const Footer = async () => {
           </h1>
         </Link>
       </div>
-      <div className="hidden md:flex space-x-2 pr-2">
-        powered by Next.js
-        <span className="bg-black dark:bg-white rounded-md text-white dark:text-black px-1 mx-1">
-          {nextVersion.substring(1, 7) || process.env.NEXT_PUBLIC_NEXT_VERSION}
-        </span>
-        +
-        <Link href={"https://ui.shadcn.com/"}>
-          <span className="rounded-md mr-2 hover:text-foreground transition-colors">
-            shadcnUI
-          </span>
-        </Link>{" "}
-        hosted by:
-        <span className="text-bold underline hover:text-foreground transition-colors">
-          <Link href="https://www.vercel.com">Vercel</Link>
-        </span>
-      </div>
     </footer>
   );
 };

@@ -463,7 +463,7 @@ export default ProfilePage;
 - [ ] **Step 2: Start dev server and verify the page loads**
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm dev
 ```
 

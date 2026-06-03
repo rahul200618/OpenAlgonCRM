@@ -1,4 +1,4 @@
-﻿# OrvixCRM MCP Server — Design Spec
+﻿# OPENALGON CRM MCP Server — Design Spec
 
 **Date:** 2026-03-20
 **Status:** Approved
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Add an MCP (Model Context Protocol) server to OrvixCRM so AI agents can operate on CRM data (Accounts, Leads, Opportunities, Contacts, Targets) via natural language. Users generate Bearer tokens in their profile page to authenticate MCP clients.
+Add an MCP (Model Context Protocol) server to OPENALGON CRM so AI agents can operate on CRM data (Accounts, Leads, Opportunities, Contacts, Targets) via natural language. Users generate Bearer tokens in their profile page to authenticate MCP clients.
 
 ---
 
@@ -17,7 +17,7 @@ Add an MCP (Model Context Protocol) server to OrvixCRM so AI agents can operate 
 Single Next.js API route using `@vercel/mcp-adapter`, supporting both SSE and HTTP transports.
 
 ```
-orvixcrm/
+openalgoncrm/
 ├── app/api/mcp/[transport]/route.ts       # Single MCP endpoint
 ├── lib/mcp/
 │   ├── auth.ts                             # Token validation + session fallback (dev only)

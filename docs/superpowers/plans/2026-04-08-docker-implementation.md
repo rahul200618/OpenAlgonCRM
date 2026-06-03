@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Enable users to run `docker-compose up` and get a fully working OrvixCRM instance with app, Postgres, Inngest, and MinIO.
+**Goal:** Enable users to run `docker-compose up` and get a fully working OPENALGON CRM instance with app, Postgres, Inngest, and Cloudflare R2.
 
-**Architecture:** Multi-stage Dockerfile with standalone Next.js output. Single docker-compose.yml orchestrates 4 services on an internal network. Entrypoint script handles migrations, seeding, and MinIO bucket creation automatically.
+**Architecture:** Multi-stage Dockerfile with standalone Next.js output. Single docker-compose.yml orchestrates 4 services on an internal network. Entrypoint script handles migrations, seeding, and Cloudflare R2 bucket creation automatically.
 
-**Tech Stack:** Docker, Docker Compose, Node 22 Alpine, Postgres 18, MinIO, Inngest Dev Server
+**Tech Stack:** Docker, Docker Compose, Node 22 Alpine, Postgres 18, Cloudflare R2, Inngest Dev Server
 
 **Spec:** `docs/superpowers/specs/2026-04-08-docker-implementation-design.md`
 
@@ -17,11 +17,11 @@
 | File | Responsibility |
 |------|---------------|
 | `Dockerfile` | Multi-stage build: deps → build → runner |
-| `docker-compose.yml` | Service orchestration (app, postgres, inngest, minio) |
+| `docker-compose.yml` | Service orchestration (app, postgres, inngest, cloudflare) |
 | `docker-entrypoint.sh` | Startup: wait for DB, migrate, seed, create bucket, start app |
 | `.dockerignore` | Exclude unnecessary files from build context |
 | `.env.docker` | Documented example of all configurable env vars |
-| `next.config.js` | Modified: add `output: "standalone"`, add `minio` hostname |
+| `next.config.js` | Modified: add `output: "standalone"`, add `cloudflare` hostname |
 
 ---
 
@@ -69,9 +69,9 @@ git commit -m "chore: add .dockerignore for Docker build context"
 
 Read the file to confirm current state before editing.
 
-- [ ] **Step 2: Add `output: "standalone"` and `minio` hostname**
+- [ ] **Step 2: Add `output: "standalone"` and `cloudflare` hostname**
 
-Edit `next.config.js` — add `output: "standalone"` to the `nextConfig` object and add `minio` to the `remotePatterns` array:
+Edit `next.config.js` — add `output: "standalone"` to the `nextConfig` object and add `cloudflare` to the `remotePatterns` array:
 
 ```javascript
 const withNextIntl = require("next-intl/plugin")(
@@ -87,8 +87,8 @@ const nextConfig = {
       { protocol: "https", hostname: "localhost" },
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
-      { protocol: "https", hostname: "minio-cwg0o4ss0scoccgwso8sk004.coolify.cz" },
-      { protocol: "http", hostname: "minio" },
+      { protocol: "https", hostname: "cloudflare-cwg0o4ss0scoccgwso8sk004.coolify.cz" },
+      { protocol: "http", hostname: "cloudflare" },
     ],
   },
   async redirects() {
@@ -112,7 +112,7 @@ module.exports = withNextIntl(nextConfig);
 
 The two changes are:
 1. `output: "standalone"` — produces self-contained build
-2. `{ protocol: "http", hostname: "minio" }` — allows Next.js Image to load from internal MinIO service
+2. `{ protocol: "http", hostname: "cloudflare" }` — allows Next.js Image to load from internal Cloudflare R2 service
 
 - [ ] **Step 3: Verify the app still builds locally**
 
@@ -142,7 +142,7 @@ git commit -m "feat: enable Next.js standalone output for Docker"
 #!/bin/sh
 set -e
 
-echo "==> OrvixCRM Docker Entrypoint"
+echo "==> OPENALGON CRM Docker Entrypoint"
 
 # --- 1. Wait for Postgres ---
 echo "==> Waiting for PostgreSQL..."
@@ -174,25 +174,25 @@ echo "==> Running database migrations..."
 npx prisma migrate deploy
 echo "==> Migrations complete."
 
-# --- 4. Create MinIO bucket (idempotent) ---
-if [ -n "$MINIO_ENDPOINT" ] && [ -n "$MINIO_ACCESS_KEY" ] && [ -n "$MINIO_SECRET_KEY" ] && [ -n "$MINIO_BUCKET" ]; then
-  echo "==> Ensuring MinIO bucket '$MINIO_BUCKET' exists..."
+# --- 4. Create Cloudflare R2 bucket (idempotent) ---
+if [ -n "$R2_ENDPOINT" ] && [ -n "$R2_ACCESS_KEY" ] && [ -n "$R2_SECRET_KEY" ] && [ -n "$R2_BUCKET" ]; then
+  echo "==> Ensuring Cloudflare R2 bucket '$R2_BUCKET' exists..."
   # Strip protocol for host:port extraction
-  MINIO_HOST=$(echo "$MINIO_ENDPOINT" | sed 's|https\?://||')
+  MINIO_HOST=$(echo "$R2_ENDPOINT" | sed 's|https\?://||')
 
   # Create bucket via S3 API — returns 200 if created, 409 if exists (both are fine)
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-    -X PUT "http://${MINIO_HOST}/${MINIO_BUCKET}" \
+    -X PUT "http://${MINIO_HOST}/${R2_BUCKET}" \
     -H "Host: ${MINIO_HOST}" \
-    -u "${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}" \
+    -u "${R2_ACCESS_KEY}:${R2_SECRET_KEY}" \
     2>/dev/null || echo "000")
 
   if [ "$STATUS" = "200" ]; then
-    echo "==> Bucket '$MINIO_BUCKET' created."
+    echo "==> Bucket '$R2_BUCKET' created."
   elif [ "$STATUS" = "409" ]; then
-    echo "==> Bucket '$MINIO_BUCKET' already exists."
+    echo "==> Bucket '$R2_BUCKET' already exists."
   else
-    echo "WARN: Could not create MinIO bucket (HTTP $STATUS). File storage may not work until bucket is created manually."
+    echo "WARN: Could not create Cloudflare R2 bucket (HTTP $STATUS). File storage may not work until bucket is created manually."
   fi
 fi
 
@@ -212,7 +212,7 @@ else
 fi
 
 # --- 6. Start the application ---
-echo "==> Starting OrvixCRM..."
+echo "==> Starting OPENALGON CRM..."
 exec node server.js
 ```
 
@@ -323,7 +323,7 @@ ENTRYPOINT ["./docker-entrypoint.sh"]
 
 **Notes on the runner stage:**
 - `postgresql-client` provides `pg_isready` for the entrypoint health check
-- `curl` is needed for MinIO bucket creation
+- `curl` is needed for Cloudflare R2 bucket creation
 - Prisma client, engines, and CLI are copied individually to avoid pulling the entire `node_modules`
 - Seed dependencies (ts-node, tsx, typescript) are needed for `prisma db seed` which runs `ts-node ./prisma/seeds/seed.ts`
 - The `PATH` addition ensures `npx prisma` resolves correctly
@@ -331,14 +331,14 @@ ENTRYPOINT ["./docker-entrypoint.sh"]
 - [ ] **Step 2: Verify the Dockerfile builds**
 
 ```bash
-docker build -t OrvixCRM:test .
+docker build -t OPENALGON CRM:test .
 ```
 
 Expected: Build completes successfully. If Prisma COPY paths don't resolve, inspect the build stage to find exact paths:
 
 ```bash
-docker build --target build -t OrvixCRM:build-debug .
-docker run --rm OrvixCRM:build-debug ls -la node_modules/.pnpm/ | grep prisma
+docker build --target build -t OPENALGON CRM:build-debug .
+docker run --rm OPENALGON CRM:build-debug ls -la node_modules/.pnpm/ | grep prisma
 ```
 
 Adjust the COPY paths in the Dockerfile if the pnpm store paths differ.
@@ -347,7 +347,7 @@ Adjust the COPY paths in the Dockerfile if the pnpm store paths differ.
 
 ```bash
 git add Dockerfile
-git commit -m "feat: add multi-stage Dockerfile for OrvixCRM"
+git commit -m "feat: add multi-stage Dockerfile for OPENALGON CRM"
 ```
 
 ---
@@ -366,15 +366,15 @@ services:
     image: postgres:18-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: OrvixCRM
-      POSTGRES_PASSWORD: OrvixCRM
-      POSTGRES_DB: OrvixCRM
+      POSTGRES_USER: OPENALGON CRM
+      POSTGRES_PASSWORD: OPENALGON CRM
+      POSTGRES_DB: OPENALGON CRM
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - OrvixCRM
+      - OPENALGON CRM
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U OrvixCRM"]
+      test: ["CMD-SHELL", "pg_isready -U OPENALGON CRM"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -382,24 +382,24 @@ services:
     # ports:
     #   - "5432:5432"
 
-  # --- MinIO Object Storage ---
-  minio:
-    image: minio/minio:latest
+  # --- Cloudflare R2 Object Storage ---
+  cloudflare:
+    image: cloudflare/cloudflare:latest
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_ROOT_USER: cloudflareadmin
+      MINIO_ROOT_PASSWORD: cloudflareadmin123
     volumes:
-      - minio_data:/data
+      - cloudflare_data:/data
     networks:
-      - OrvixCRM
+      - OPENALGON CRM
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/cloudflare/health/live"]
       interval: 5s
       timeout: 5s
       retries: 5
-    # Uncomment to expose MinIO to host:
+    # Uncomment to expose Cloudflare R2 to host:
     # ports:
     #   - "9000:9000"
     #   - "9001:9001"
@@ -410,7 +410,7 @@ services:
     restart: unless-stopped
     command: inngest dev -u http://app:3000/api/inngest
     networks:
-      - OrvixCRM
+      - OPENALGON CRM
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8288/health"]
       interval: 5s
@@ -420,7 +420,7 @@ services:
     # ports:
     #   - "8288:8288"
 
-  # --- OrvixCRM Application ---
+  # --- OPENALGON CRM Application ---
   app:
     build:
       context: .
@@ -430,34 +430,34 @@ services:
       - "3000:3000"
     environment:
       # Database
-      DATABASE_URL: postgresql://OrvixCRM:OrvixCRM@postgres:5432/OrvixCRM
+      DATABASE_URL: postgresql://openalgoncrm:OPENALGON CRM@postgres:5432/openalgoncrm
       DB_HOST: postgres
       DB_PORT: "5432"
-      DB_USER: OrvixCRM
+      DB_USER: OPENALGON CRM
 
       # Auth
       BETTER_AUTH_URL: http://localhost:3000
       # BETTER_AUTH_SECRET is auto-generated if not set
 
-      # MinIO
-      NEXT_PUBLIC_MINIO_ENDPOINT: http://minio:9000
-      MINIO_ENDPOINT: http://minio:9000
+      # Cloudflare R2
+      NEXT_PUBLIC_R2_ENDPOINT: http://cloudflare:9000
+      R2_ENDPOINT: http://cloudflare:9000
       MINIO_PORT: "9000"
-      MINIO_BUCKET: OrvixCRM
+      R2_BUCKET: OPENALGON CRM
       MINIO_USE_SSL: "false"
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin123
+      R2_ACCESS_KEY: cloudflareadmin
+      R2_SECRET_KEY: cloudflareadmin123
 
       # Inngest
       INNGEST_DEV: "1"
-      INNGEST_ID: OrvixCRM
-      INNGEST_APP_NAME: OrvixCRM
+      INNGEST_ID: OPENALGON CRM
+      INNGEST_APP_NAME: OPENALGON CRM
       INNGEST_EVENT_KEY: local
       INNGEST_SIGNING_KEY: ""
       INNGEST_BASE_URL: http://inngest:8288
 
       # App
-      NEXT_PUBLIC_APP_NAME: OrvixCRM
+      NEXT_PUBLIC_APP_NAME: OPENALGON CRM
       NEXT_PUBLIC_APP_URL: http://localhost:3000
 
       # Optional — override via .env file or environment:
@@ -469,12 +469,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      minio:
+      cloudflare:
         condition: service_healthy
       inngest:
         condition: service_healthy
     networks:
-      - OrvixCRM
+      - OPENALGON CRM
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 10s
@@ -484,10 +484,10 @@ services:
 
 volumes:
   postgres_data:
-  minio_data:
+  cloudflare_data:
 
 networks:
-  OrvixCRM:
+  OPENALGON CRM:
     driver: bridge
 ```
 
@@ -516,7 +516,7 @@ git commit -m "feat: add docker-compose.yml with all services"
 
 ```bash
 # ===========================================
-# OrvixCRM Docker Environment Configuration
+# OPENALGON CRM Docker Environment Configuration
 # ===========================================
 # Copy this file to .env to customize your deployment.
 # docker-compose.yml already sets sensible defaults for all
@@ -530,7 +530,7 @@ git commit -m "feat: add docker-compose.yml with all services"
 
 # --- Database (default: bundled Postgres) ---
 # Override to use an external database:
-# DATABASE_URL=postgresql://user:pass@your-host:5432/OrvixCRM
+# DATABASE_URL=postgresql://user:pass@your-host:5432/openalgoncrm
 
 # --- Auth ---
 # Auto-generated on first start if not set.
@@ -538,14 +538,14 @@ git commit -m "feat: add docker-compose.yml with all services"
 # BETTER_AUTH_SECRET=your-secret-here
 # BETTER_AUTH_URL=http://localhost:3000
 
-# --- MinIO Object Storage (default: bundled MinIO) ---
+# --- Cloudflare R2 Object Storage (default: bundled Cloudflare R2) ---
 # Override to use external S3-compatible storage:
-# MINIO_ENDPOINT=https://your-s3-host
+# R2_ENDPOINT=https://your-s3-host
 # MINIO_PORT=443
-# MINIO_BUCKET=your-bucket
+# R2_BUCKET=your-bucket
 # MINIO_USE_SSL=true
-# MINIO_ACCESS_KEY=your-key
-# MINIO_SECRET_KEY=your-secret
+# R2_ACCESS_KEY=your-key
+# R2_SECRET_KEY=your-secret
 
 # --- Google OAuth (optional) ---
 # GOOGLE_ID=your-google-client-id
@@ -610,11 +610,11 @@ Expected output sequence:
 3. `==> Generated BETTER_AUTH_SECRET`
 4. `==> Running database migrations...`
 5. `==> Migrations complete.`
-6. `==> Ensuring MinIO bucket 'OrvixCRM' exists...`
-7. `==> Bucket 'OrvixCRM' created.`
+6. `==> Ensuring Cloudflare R2 bucket 'OPENALGON CRM' exists...`
+7. `==> Bucket 'OPENALGON CRM' created.`
 8. `==> No users found, seeding database...`
 9. `==> Seeding complete.`
-10. `==> Starting OrvixCRM...`
+10. `==> Starting OPENALGON CRM...`
 
 - [ ] **Step 2: Verify health checks**
 
@@ -649,7 +649,7 @@ Expected: Entrypoint runs again but:
 
 If any step fails, debug and fix. Common issues:
 - Prisma COPY paths in Dockerfile need adjustment — use `docker build --target build` to inspect
-- MinIO bucket creation auth may need adjustment — test curl command manually
+- Cloudflare R2 bucket creation auth may need adjustment — test curl command manually
 - Seed detection query may need adjustment based on actual Prisma output
 
 - [ ] **Step 6: Clean up test build**
@@ -675,7 +675,7 @@ git commit -m "fix: Docker setup adjustments from e2e verification"
 
 ```bash
 docker-compose down -v
-docker rmi orvixcrm-app 2>/dev/null || true
+docker rmi openalgoncrm-app 2>/dev/null || true
 docker-compose up --build -d
 ```
 

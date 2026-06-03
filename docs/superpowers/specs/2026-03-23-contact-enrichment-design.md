@@ -8,18 +8,18 @@
 
 ## Overview
 
-Integrate the fire-enrich multi-agent enrichment engine into OrvixCRM so users can automatically populate contact fields (company info, LinkedIn, industry, funding stage, tech stack, etc.) using Firecrawl + GPT-4o. Supports both single-contact interactive enrichment and bulk background enrichment.
+Integrate the fire-enrich multi-agent enrichment engine into OPENALGON CRM so users can automatically populate contact fields (company info, LinkedIn, industry, funding stage, tech stack, etc.) using Firecrawl + GPT-4o. Supports both single-contact interactive enrichment and bulk background enrichment.
 
 ---
 
 ## Architecture
 
-### Approach: Copy fire-enrich `lib/` into OrvixCRM
+### Approach: Copy fire-enrich `lib/` into OPENALGON CRM
 
-The fire-enrich library (`lib/enrichment/`) is copied directly into OrvixCRM. No external service dependency. The multi-agent orchestration runs inside the same Next.js process.
+The fire-enrich library (`lib/enrichment/`) is copied directly into OPENALGON CRM. No external service dependency. The multi-agent orchestration runs inside the same Next.js process.
 
 ```
-orvixcrm/
+openalgoncrm/
 ├── lib/
 │   └── enrichment/                      ← copied from fire-enrich/lib/
 │       ├── agent-architecture/
@@ -291,7 +291,7 @@ Table of all `crm_Contact_Enrichment` records:
 ## Dependencies to Add
 
 ```json
-// Already in fire-enrich, need to verify presence in OrvixCRM:
+// Already in fire-enrich, need to verify presence in OPENALGON CRM:
 "@mendable/firecrawl-js": "^1.x",
 "openai": "^4.x",   // likely already present
 "zod": "^3.x"       // likely already present

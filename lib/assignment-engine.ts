@@ -1,5 +1,5 @@
 /**
- * OrvixCRM — Lead Assignment Engine
+ * OPENALGON CRM — Lead Assignment Engine
  *
  * Supports 4 strategies from PRD:
  * - round_robin: cycles through active sales executives in sequence
@@ -7,7 +7,7 @@
  * - team: assigns to all members of a specified role/team
  * - manual: direct assignment to a specific user
  */
-import prisma from "@/lib/prisma";
+import { prismadb as prisma } from "@/lib/prisma";
 
 export type AssignmentStrategy = "round_robin" | "weighted" | "manual" | "team";
 

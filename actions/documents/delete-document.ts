@@ -8,7 +8,7 @@ import {
 
 import { prismadb } from "@/lib/prisma";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { minioClient, MINIO_BUCKET } from "@/lib/minio";
+import { storageClient, R2_BUCKET } from "@/lib/storage";
 
 export async function deleteDocument(documentId: string) {
   let user;
@@ -37,9 +37,9 @@ export async function deleteDocument(documentId: string) {
   await prismadb.documents.delete({ where: { id: documentId } });
 
   if (document.key) {
-    await minioClient.send(
+    await storageClient.send(
       new DeleteObjectCommand({
-        Bucket: MINIO_BUCKET,
+        Bucket: R2_BUCKET,
         Key: document.key,
       })
     );

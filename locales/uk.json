@@ -1,7 +1,7 @@
-﻿{
+{
   "RootLayout": {
-    "title": "OrvixCRM",
-    "description": "OrvixCRM — це CRM з відкритим вихідним кодом, створена на основі NextJS."
+    "title": "OPENALGON CRM",
+    "description": "OPENALGON CRM — це CRM з відкритим вихідним кодом, створена на основі NextJS."
   },
   "ModuleMenu": {
     "dashboard": "Панель приладів",
@@ -27,7 +27,7 @@
   "DashboardPage": {
     "containerTitle": "Панель приладів",
     "totalRevenue": "Загальна виручка",
-    "containerDescription": "Ласкаво просимо до OrvixCRM, тут Ви можете побачити всю важливу інформацію про ваш бізнес.",
+    "containerDescription": "Ласкаво просимо до OPENALGON CRM, тут Ви можете побачити всю важливу інформацію про ваш бізнес.",
     "expectedRevenue": "Очікуваний дохід",
     "activeUsers": "Активні користувачі",
     "accounts": "Компанії",
@@ -39,7 +39,7 @@
     "myTasks": "Мої завдання",
     "documents": "Документи",
     "storage": "Зберігання",
-    "invoices": "Рахунк��",
+    "invoices": "Рахунки",
     "campaigns": "Кампанії",
     "targets": "Цілі"
   },

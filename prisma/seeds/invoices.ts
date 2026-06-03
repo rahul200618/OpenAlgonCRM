@@ -46,14 +46,14 @@ export async function seedInvoices(prisma: PrismaClient) {
   await prisma.invoice_Settings.upsert({
     where: { id: SETTINGS_ID },
     update: {
-      baseCurrency: "USD",
+      baseCurrency: "INR",
       defaultDueDays: 14,
       defaultSeriesId: SERIES_ID,
       defaultTaxRateId: TAX_RATE_21_ID,
     },
     create: {
       id: SETTINGS_ID,
-      baseCurrency: "USD",
+      baseCurrency: "INR",
       defaultDueDays: 14,
       defaultSeriesId: SERIES_ID,
       defaultTaxRateId: TAX_RATE_21_ID,

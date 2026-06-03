@@ -173,17 +173,17 @@ Create `e2b.toml` at repo root:
 ```toml
 [template]
 dockerfile = "e2b.Dockerfile"
-name = "OrvixCRM-enrichment"
+name = "OPENALGON CRM-enrichment"
 ```
 
 - [ ] **Step 3: Install E2B CLI and build template**
 
 ```bash
 npx e2b auth login
-npx e2b template build --name OrvixCRM-enrichment
+npx e2b template build --name OPENALGON CRM-enrichment
 ```
 
-Expected output includes a template ID like `OrvixCRM-enrichment-abc123`. Copy this ID.
+Expected output includes a template ID like `OPENALGON CRM-enrichment-abc123`. Copy this ID.
 
 - [ ] **Step 4: Store template ID in .env**
 
@@ -191,7 +191,7 @@ Add to `.env.local`:
 
 ```
 E2B_API_KEY=e2b_***
-E2B_ENRICHMENT_TEMPLATE=OrvixCRM-enrichment
+E2B_ENRICHMENT_TEMPLATE=OPENALGON CRM-enrichment
 ```
 
 - [ ] **Step 5: Commit**
@@ -690,7 +690,7 @@ export const enrichTarget = inngest.createFunction(
       });
 
       const sandbox = await Sandbox.create({
-        template: process.env.E2B_ENRICHMENT_TEMPLATE ?? "OrvixCRM-enrichment",
+        template: process.env.E2B_ENRICHMENT_TEMPLATE ?? "OPENALGON CRM-enrichment",
         timeoutMs: SANDBOX_TIMEOUT_MS,
         apiKey: process.env.E2B_API_KEY,
       });
@@ -896,7 +896,7 @@ export const enrichTargetContact = inngest.createFunction(
       });
 
       const sandbox = await Sandbox.create({
-        template: process.env.E2B_ENRICHMENT_TEMPLATE ?? "OrvixCRM-enrichment",
+        template: process.env.E2B_ENRICHMENT_TEMPLATE ?? "OPENALGON CRM-enrichment",
         timeoutMs: SANDBOX_TIMEOUT_MS,
         apiKey: process.env.E2B_API_KEY,
       });

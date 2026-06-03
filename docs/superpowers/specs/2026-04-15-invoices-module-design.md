@@ -1,13 +1,13 @@
 ﻿# Invoices Module — Design Spec
 
 - **Date:** 2026-04-15
-- **Project:** orvixcrm
+- **Project:** openalgoncrm
 - **Target branch:** `dev`
 - **Status:** Draft for review
 
 ## 1. Purpose
 
-Add a first-class **Invoices** module to OrvixCRM. Users create invoices linked to a CRM Account, build line items from CRM Products (or free-text), the system generates a PDF, stores it in MinIO/S3, and exposes search, list, payment tracking, and email delivery. The module is **global-ready** (multi-currency, tenant-configurable VAT, configurable numbering series) — not Czech-specific.
+Add a first-class **Invoices** module to OPENALGON CRM. Users create invoices linked to a CRM Account, build line items from CRM Products (or free-text), the system generates a PDF, stores it in Cloudflare R2/S3, and exposes search, list, payment tracking, and email delivery. The module is **global-ready** (multi-currency, tenant-configurable VAT, configurable numbering series) — not Czech-specific.
 
 ## 2. Scope
 
@@ -22,7 +22,7 @@ Add a first-class **Invoices** module to OrvixCRM. Users create invoices linked 
 7. Configurable **Invoice Series** (per-series numbering counter, prefix template, default series).
 8. Manual override of auto-generated invoice number.
 9. PDF generation via `@react-pdf/renderer` (already installed).
-10. PDF storage in MinIO under `invoices/{tenantId}/{invoiceId}.pdf`, downloaded via signed URL.
+10. PDF storage in Cloudflare R2 under `invoices/{tenantId}/{invoiceId}.pdf`, downloaded via signed URL.
 11. Send invoice by email through existing Resend integration (PDF attached, marks `SENT`).
 12. Multiple partial payments per invoice, drives status transitions.
 13. Customer billing snapshot frozen at issue time.
@@ -97,7 +97,7 @@ lib/invoices/
 │   ├── templates/
 │   │   └── default-invoice.tsx
 │   └── i18n.ts             # EN/CZ strings for the PDF
-├── storage.ts              # MinIO put/get/signed URL wrapper around lib/minio.ts
+├── storage.ts              # Cloudflare R2 put/get/signed URL wrapper around lib/storage.ts
 ├── search.ts               # Postgres full-text query builder
 └── permissions.ts          # canEdit / canIssue / canCancel guards
 
@@ -200,7 +200,7 @@ model Invoices {
   creditNotes           Invoices[]       @relation("CreditNoteOf")
 
   // PDF storage
-  pdfStorageKey         String?          // MinIO key
+  pdfStorageKey         String?          // Cloudflare R2 key
   pdfGeneratedAt        DateTime?
 
   // Search
@@ -263,7 +263,7 @@ model Invoice_Attachments {
   id              String   @id @default(uuid()) @db.Uuid
   invoiceId       String   @db.Uuid
   invoice         Invoices @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  storageKey      String   // MinIO key
+  storageKey      String   // Cloudflare R2 key
   filename        String
   mimeType        String
   size            Int
@@ -362,13 +362,13 @@ A Postgres `tsvector` column on `Invoices` populated by a trigger that concatena
    - Recompute totals (server-side, never trust client).
    - Fetch FX rate (base currency from `Invoice_Settings`) → store in `fxRateToBase`.
    - Set `status=ISSUED`, `issueDate=now`, `taxableSupplyDate=now` if null.
-3. **Outside the transaction:** render PDF via `@react-pdf/renderer`, upload to MinIO, write `pdfStorageKey`/`pdfGeneratedAt`, append `Invoice_Activity` row.
+3. **Outside the transaction:** render PDF via `@react-pdf/renderer`, upload to Cloudflare R2, write `pdfStorageKey`/`pdfGeneratedAt`, append `Invoice_Activity` row.
 
 After issue, the invoice is **immutable** except for status transitions, payment additions, and notes.
 
 ### 5.3 Send by email
 
-`POST /api/invoices/{id}/send` → fetches PDF from MinIO, sends via Resend with the React Email template, marks `status=SENT`, logs activity.
+`POST /api/invoices/{id}/send` → fetches PDF from Cloudflare R2, sends via Resend with the React Email template, marks `status=SENT`, logs activity.
 
 ### 5.4 Add payment
 

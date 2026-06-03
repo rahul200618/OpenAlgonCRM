@@ -81,7 +81,7 @@ export function InvoiceSettingsForm({
     });
 
   const [baseCurrency, setBaseCurrency] = useState(
-    settings?.baseCurrency ?? "CZK"
+    settings?.baseCurrency ?? "INR"
   );
   const [defaultSeriesId, setDefaultSeriesId] = useState(
     settings?.defaultSeriesId ?? ""

@@ -8,9 +8,9 @@ jest.mock("@/lib/prisma", () => ({
     },
   },
 }));
-jest.mock("@/lib/minio", () => ({
-  minioClient: { send: jest.fn().mockResolvedValue(undefined) },
-  MINIO_BUCKET: "test-bucket",
+jest.mock("@/lib/storage", () => ({
+  storageClient: { send: jest.fn().mockResolvedValue(undefined) },
+  R2_BUCKET: "test-bucket",
 }));
 jest.mock("@aws-sdk/client-s3", () => ({
   DeleteObjectCommand: jest.fn().mockImplementation((args) => args),

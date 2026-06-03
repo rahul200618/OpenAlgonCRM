@@ -94,7 +94,7 @@ export function displayConsoleReport(report: ValidationReport): void {
     `${colors.bright}${colors.cyan}================================================================${colors.reset}`
   );
   console.log(
-    `${colors.bright}${colors.cyan}         OrvixCRM Migration Validation Report${colors.reset}`
+    `${colors.bright}${colors.cyan}         OPENALGON CRM Migration Validation Report${colors.reset}`
   );
   console.log(
     `${colors.bright}${colors.cyan}================================================================${colors.reset}`

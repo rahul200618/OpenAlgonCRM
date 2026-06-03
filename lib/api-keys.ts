@@ -5,8 +5,6 @@ import type { ApiKeyProvider } from "@prisma/client";
 export type { ApiKeyProvider };
 
 const PROVIDER_ENV_MAP: Record<ApiKeyProvider, string> = {
-  OPENAI: "OPENAI_API_KEY",
-  FIRECRAWL: "FIRECRAWL_API_KEY",
   ANTHROPIC: "ANTHROPIC_API_KEY",
   GROQ: "GROQ_API_KEY",
 };

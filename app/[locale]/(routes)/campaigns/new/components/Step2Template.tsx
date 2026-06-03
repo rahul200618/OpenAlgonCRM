@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TipTapEditor } from "@/components/campaigns/TipTapEditor";
-import { generateTemplate } from "@/actions/campaigns/templates/generate-template";
+
 
 type Template = {
   id: string;
@@ -47,23 +47,7 @@ export function Step2Template({
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return;
-    setIsGenerating(true);
-    setError("");
-    try {
-      const result = await generateTemplate(prompt);
-      setHtml(result.html);
-      setJson(result.json);
-      setSubject(result.subject);
-    } catch (e: unknown) {
-      setError(
-        e instanceof Error ? e.message : "Generation failed"
-      );
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+
 
   const handleSelectTemplate = (t: Template) => {
     setSelectedTemplateId(t.id);
@@ -90,27 +74,10 @@ export function Step2Template({
 
   return (
     <div className="flex flex-col gap-4">
-      <Tabs defaultValue="ai">
+      <Tabs defaultValue="existing">
         <TabsList>
-          <TabsTrigger value="ai">Generate with AI</TabsTrigger>
-          <TabsTrigger value="existing">Choose Existing</TabsTrigger>
+          <TabsTrigger value="existing">Choose Existing Template</TabsTrigger>
         </TabsList>
-        <TabsContent value="ai" className="flex flex-col gap-3 pt-3">
-          <Textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Describe your email campaign..."
-            rows={3}
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleGenerate}
-            disabled={isGenerating || !prompt.trim()}
-          >
-            {isGenerating ? "Generating..." : "Generate"}
-          </Button>
-        </TabsContent>
         <TabsContent value="existing" className="pt-3">
           <div className="flex flex-col gap-1 max-h-48 overflow-y-auto border rounded-md p-2">
             {templates.map((t) => (

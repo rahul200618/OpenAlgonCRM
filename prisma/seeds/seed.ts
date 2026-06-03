@@ -1,4 +1,4 @@
-﻿import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import dotenv from "dotenv";
@@ -119,23 +119,6 @@ async function main() {
   // CRM Lead Types (has @unique on name — can use upsert)
   await upsertByName(prisma.crm_Lead_Types, leadTypesData);
   console.log("Lead Types seeded");
-
-  // Test User for E2E Testing
-  const testUserEmail = process.env.TEST_USER_EMAIL || "test@OrvixCRM.app";
-  await prisma.users.upsert({
-    where: { email: testUserEmail },
-    update: {
-      userStatus: "ACTIVE",
-      role: "admin",
-    },
-    create: {
-      email: testUserEmail,
-      name: "Test User",
-      userStatus: "ACTIVE",
-      role: "admin",
-    },
-  });
-  console.log(`Test user seeded: ${testUserEmail}`);
 
   // Currencies and Exchange Rates
   await seedCurrencies(prisma);

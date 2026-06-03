@@ -1,9 +1,9 @@
 "use server";
-import { getSession } from "@/lib/auth-server";
+import { getUser } from "@/lib/auth-server";
 import resendHelper from "@/lib/resend";
 
 export async function sendFeedback(data: { feedback: string }) {
-  const session = await getSession();
+  const session = await getUser();
   if (!session) return { error: "Unauthorized" };
 
   const { feedback } = data;

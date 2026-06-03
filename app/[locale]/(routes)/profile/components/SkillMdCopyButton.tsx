@@ -5,9 +5,9 @@ import { Copy, Check } from "lucide-react";
 
 const MCP_CONFIG = `{
   "mcpServers": {
-    "nextcrm": {
+    "openalgoncrm": {
       "type": "http",
-      "url": "https://YOUR_NEXTCRM_URL/api/mcp/mcp",
+      "url": "https://YOUR_OPENALGON CRM_URL/api/mcp/mcp",
       "headers": { "Authorization": "Bearer YOUR_API_TOKEN" }
     }
   }

@@ -1,14 +1,14 @@
 ﻿# Permission-Driven Authorization Migration Design Spec
 
 - **Date:** 2026-05-01
-- **Project:** orvixcrm
+- **Project:** openalgoncrm
 - **Target branch:** `dev`
 - **Status:** Draft for review
 - **Related audit:** `docs/2026-05-01-bola-idor-security-audit.md`
 
 ## 1. Purpose
 
-Migrate OrvixCRM from ad hoc authentication checks to a permission-driven authorization model with three roles:
+Migrate OPENALGON CRM from ad hoc authentication checks to a permission-driven authorization model with three roles:
 
 1. **user**
 2. **manager**

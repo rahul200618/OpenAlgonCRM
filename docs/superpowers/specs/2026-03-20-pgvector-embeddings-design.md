@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-20
 **Status:** Approved
-**Project:** orvixcrm
+**Project:** openalgoncrm
 
 ---
 

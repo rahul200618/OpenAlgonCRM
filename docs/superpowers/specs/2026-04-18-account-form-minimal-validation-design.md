@@ -1,7 +1,7 @@
 ﻿# Account Form — Minimal Validation Refactor
 
 **Date:** 2026-04-18
-**Scope:** `orvixcrm` — CRM Accounts module
+**Scope:** `openalgoncrm` — CRM Accounts module
 **Status:** Design approved
 
 ## Problem

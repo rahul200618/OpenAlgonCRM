@@ -1,4 +1,4 @@
-# OrvixCRM
+# OPENALGON CRM
 
 <p align="center">
   <strong>AI-powered CRM platform built on Next.js</strong><br/>
@@ -6,23 +6,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/rahul200618/orvixcrm/blob/main/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/rahul200618/orvixcrm">
+  <a href="https://github.com/rahul200618/openalgoncrm/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/rahul200618/openalgoncrm">
   </a>
 </p>
 
 ---
 
-## About OrvixCRM
+## About OPENALGON CRM
 
-OrvixCRM is an open-source, AI-powered CRM platform that solves the core problem businesses face with leads:
+OPENALGON CRM is an open-source, AI-powered CRM platform that solves the core problem businesses face with leads:
 
 - **Leads are lost** — centralize everything in one place
 - **Uneven distribution** — automated round-robin, weighted, and team-based assignment
 - **No accountability** — full audit trail, activity logs, and performance dashboards
 - **Poor reporting** — real-time KPIs, conversion funnels, and employee analytics
 
-Built with **Next.js 16**, **React 19**, **TypeScript**, **PostgreSQL** (Prisma 7), **Supabase Auth**, and **shadcn/ui**.
+Built with **Next.js 16**, **React 19**, **TypeScript**, **PostgreSQL** (Prisma 7), **Better Auth**, and **shadcn/ui**, and cross-compiled for Web, Mobile (**Capacitor**), and Desktop (**Tauri**).
 
 ---
 
@@ -68,14 +68,17 @@ Built with **Next.js 16**, **React 19**, **TypeScript**, **PostgreSQL** (Prisma 
 |-------|-----------|
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
-| Auth | Supabase Auth |
+| Auth | Better Auth |
 | Database | PostgreSQL 17+ with pgvector |
 | ORM | Prisma 7 |
-| UI | Tailwind CSS v4, shadcn/ui |
+| UI | Tailwind CSS v4, shadcn/ui, Radix UI, Framer Motion |
+| State / Fetching | Jotai, SWR |
+| Mobile App | Capacitor |
+| Desktop App | Tauri |
 | Background Jobs | Inngest |
-| AI | OpenAI, Anthropic Claude |
-| File Storage | S3-compatible (DigitalOcean Spaces / Supabase Storage) |
-| Email | Resend + React Email |
+| AI | Anthropic Claude, E2B |
+| File Storage | S3-compatible (Cloudflare R2 / AWS S3) |
+| Email | Resend + React Email + Nodemailer |
 | Package Manager | pnpm |
 
 ---
@@ -87,14 +90,13 @@ Built with **Next.js 16**, **React 19**, **TypeScript**, **PostgreSQL** (Prisma 
 - Node.js >= 22.12.0
 - pnpm >= 9.0.0
 - PostgreSQL 17+ with pgvector extension
-- Supabase project
 
 ### Setup
 
 1. **Clone the repository**
    ```sh
-   git clone https://github.com/rahul200618/orvixcrm.git
-   cd orvixcrm
+   git clone https://github.com/rahul200618/openalgoncrm.git
+   cd openalgoncrm
    ```
 
 2. **Install dependencies**
@@ -109,11 +111,9 @@ Built with **Next.js 16**, **React 19**, **TypeScript**, **PostgreSQL** (Prisma 
 
    Required variables:
    ```env
-   DATABASE_URL="postgresql://user:pass@localhost:5432/orvixcrm?schema=public"
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   DATABASE_URL="postgresql://user:pass@localhost:5432/openalgoncrm?schema=public"
+   BETTER_AUTH_SECRET="your-better-auth-secret"
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
    ```
 
 4. **Initialize database**
@@ -135,10 +135,10 @@ Built with **Next.js 16**, **React 19**, **TypeScript**, **PostgreSQL** (Prisma 
 ## Docker Installation
 
 ```sh
-git clone https://github.com/rahul200618/orvixcrm.git
-cd orvixcrm
+git clone https://github.com/rahul200618/openalgoncrm.git
+cd openalgoncrm
 cp .env.docker .env
-# Edit .env — set ADMIN_EMAIL and Supabase credentials
+# Edit .env — set ADMIN_EMAIL and Auth credentials
 docker compose up -d
 ```
 
@@ -146,7 +146,7 @@ docker compose up -d
 
 ## Webhook Endpoints
 
-OrvixCRM provides webhook endpoints for multi-channel lead capture:
+OPENALGON CRM provides webhook endpoints for multi-channel lead capture:
 
 | Endpoint | Source |
 |----------|--------|
@@ -160,14 +160,14 @@ OrvixCRM provides webhook endpoints for multi-channel lead capture:
 
 ## MCP Server (AI Agent Access)
 
-OrvixCRM ships with a built-in MCP server for AI agent access:
+OPENALGON CRM ships with a built-in MCP server for AI agent access:
 
 ```json
 {
   "mcpServers": {
-    "orvixcrm": {
+    "openalgoncrm": {
       "type": "http",
-      "url": "https://your-orvixcrm.com/api/mcp/mcp",
+      "url": "https://your-openalgoncrm.com/api/mcp/mcp",
       "headers": { "Authorization": "Bearer your_token_here" }
     }
   }

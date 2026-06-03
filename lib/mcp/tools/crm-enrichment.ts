@@ -24,11 +24,11 @@ export const crmEnrichmentTools = [
       args: { contactId: string; fields: Array<{ name: string; description?: string }> },
       userId: string
     ) {
-      const firecrawlKey = await getApiKey("FIRECRAWL", userId);
-      const openaiKey = await getApiKey("OPENAI", userId);
-      if (!firecrawlKey || !openaiKey) {
+      const anthropicKey = await getApiKey("ANTHROPIC", userId);
+      const groqKey = await getApiKey("GROQ", userId);
+      if (!anthropicKey || !groqKey) {
         externalError(
-          "Missing required API keys (FIRECRAWL and/or OPENAI). Configure them in Settings > API Keys."
+          "Missing required API keys (ANTHROPIC and/or GROQ). Configure them in Settings > API Keys."
         );
       }
 
@@ -81,10 +81,10 @@ export const crmEnrichmentTools = [
       args: { contactIds: string[]; fields: Array<{ name: string; description?: string }> },
       userId: string
     ) {
-      const firecrawlKey = await getApiKey("FIRECRAWL", userId);
-      const openaiKey = await getApiKey("OPENAI", userId);
-      if (!firecrawlKey || !openaiKey) {
-        externalError("Missing required API keys (FIRECRAWL and/or OPENAI).");
+      const anthropicKey = await getApiKey("ANTHROPIC", userId);
+      const groqKey = await getApiKey("GROQ", userId);
+      if (!anthropicKey || !groqKey) {
+        externalError("Missing required API keys (ANTHROPIC and/or GROQ).");
       }
 
       await inngest.send({
@@ -114,10 +114,10 @@ export const crmEnrichmentTools = [
       args: { targetId: string; fields: Array<{ name: string; description?: string }> },
       userId: string
     ) {
-      const firecrawlKey = await getApiKey("FIRECRAWL", userId);
-      const openaiKey = await getApiKey("OPENAI", userId);
-      if (!firecrawlKey || !openaiKey) {
-        externalError("Missing required API keys (FIRECRAWL and/or OPENAI).");
+      const anthropicKey = await getApiKey("ANTHROPIC", userId);
+      const groqKey = await getApiKey("GROQ", userId);
+      if (!anthropicKey || !groqKey) {
+        externalError("Missing required API keys (ANTHROPIC and/or GROQ).");
       }
 
       const target = await prismadb.crm_Targets.findUnique({
@@ -169,10 +169,10 @@ export const crmEnrichmentTools = [
       args: { targetIds: string[]; fields: Array<{ name: string; description?: string }> },
       userId: string
     ) {
-      const firecrawlKey = await getApiKey("FIRECRAWL", userId);
-      const openaiKey = await getApiKey("OPENAI", userId);
-      if (!firecrawlKey || !openaiKey) {
-        externalError("Missing required API keys (FIRECRAWL and/or OPENAI).");
+      const anthropicKey = await getApiKey("ANTHROPIC", userId);
+      const groqKey = await getApiKey("GROQ", userId);
+      if (!anthropicKey || !groqKey) {
+        externalError("Missing required API keys (ANTHROPIC and/or GROQ).");
       }
 
       await inngest.send({

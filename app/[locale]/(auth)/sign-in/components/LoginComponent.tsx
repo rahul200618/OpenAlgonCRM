@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-
 import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,45 +14,17 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { MailIcon, PhoneIcon } from "lucide-react";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-
-type Step = "input" | "otp";
-type AuthTab = "email" | "phone";
-
-// Indian country code prefix selector — extend for other countries as needed
-const COUNTRY_CODES = [
-  { code: "+91", flag: "🇮🇳", label: "IN" },
-  { code: "+1",  flag: "🇺🇸", label: "US" },
-  { code: "+44", flag: "🇬🇧", label: "UK" },
-  { code: "+971", flag: "🇦🇪", label: "UAE" },
-  { code: "+65", flag: "🇸🇬", label: "SG" },
-];
+import { MailIcon, KeyIcon, PhoneIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function LoginComponent() {
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<Step>("input");
-  const [activeTab, setActiveTab] = useState<AuthTab>("email");
-
-  // Email state
   const [email, setEmail] = useState("");
-
-  // Phone state
-  const [countryCode, setCountryCode] = useState("+91");
-  const [phoneNumber, setPhoneNumber] = useState("");
-
-  // Shared OTP state
-  const [otp, setOtp] = useState("");
-
+  const [password, setPassword] = useState("");
+  
+  const router = useRouter();
   const supabase = createClient();
-
-  // ─── Google OAuth ──────────────────────────────────────────────────────────
 
   const loginWithGoogle = async () => {
     setIsLoading(true);
@@ -60,7 +32,7 @@ export function LoginComponent() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/api/auth/callback`,
         },
       });
       if (error) {
@@ -73,318 +45,105 @@ export function LoginComponent() {
     }
   };
 
-  // ─── Email OTP ────────────────────────────────────────────────────────────
-
-  const sendEmailOtp = async () => {
-    if (!email) {
-      toast.error("Please enter your email address.");
+  const loginWithEmail = async () => {
+    if (!email || !password) {
+      toast.error("Please enter your email and password.");
       return;
     }
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        options: { shouldCreateUser: true },
+        password,
       });
       if (error) {
-        toast.error(error.message || "Failed to send verification code.");
-        return;
+        toast.error(error.message || "Failed to sign in.");
+      } else {
+        toast.success("Login successful.");
+        router.push("/");
+        router.refresh();
       }
-      setStep("otp");
-      toast.success("Verification code sent to your email.");
     } catch {
-      toast.error("Failed to send verification code.");
+      toast.error("Failed to sign in.");
     } finally {
       setIsLoading(false);
     }
   };
-
-  const verifyEmailOtp = async () => {
-    if (otp.length !== 6) {
-      toast.error("Please enter the 6-digit code.");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        email,
-        token: otp,
-        type: "email",
-      });
-      if (error) {
-        toast.error(error.message || "Invalid or expired code.");
-        return;
-      }
-      toast.success("Login successful.");
-      window.location.href = "/";
-    } catch {
-      toast.error("Verification failed.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ─── Phone OTP ────────────────────────────────────────────────────────────
-
-  const fullPhone = `${countryCode}${phoneNumber.replace(/\D/g, "")}`;
-
-  const sendPhoneOtp = async () => {
-    if (!phoneNumber || phoneNumber.replace(/\D/g, "").length < 7) {
-      toast.error("Please enter a valid phone number.");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: fullPhone,
-      });
-      if (error) {
-        toast.error(error.message || "Failed to send SMS code.");
-        return;
-      }
-      setStep("otp");
-      toast.success(`OTP sent to ${fullPhone}`);
-    } catch {
-      toast.error("Failed to send SMS code.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const verifyPhoneOtp = async () => {
-    if (otp.length !== 6) {
-      toast.error("Please enter the 6-digit code.");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: fullPhone,
-        token: otp,
-        type: "sms",
-      });
-      if (error) {
-        toast.error(error.message || "Invalid or expired code.");
-        return;
-      }
-      toast.success("Login successful.");
-      window.location.href = "/";
-    } catch {
-      toast.error("Verification failed.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ─── Shared reset ─────────────────────────────────────────────────────────
-
-  const handleBack = () => {
-    setStep("input");
-    setOtp("");
-  };
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab as AuthTab);
-    setStep("input");
-    setOtp("");
-  };
-
-  // ─── OTP step (shared for email & phone) ─────────────────────────────────
-
-  if (step === "otp") {
-    const isPhone = activeTab === "phone";
-    const destination = isPhone ? fullPhone : email;
-    const handleVerify = isPhone ? verifyPhoneOtp : verifyEmailOtp;
-
-    return (
-      <Card className="shadow-lg my-5">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Enter your code</CardTitle>
-          <CardDescription>
-            We sent a 6-digit code to{" "}
-            <span className="font-semibold text-foreground">{destination}</span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="flex justify-center py-2">
-            <InputOTP
-              maxLength={6}
-              value={otp}
-              onChange={setOtp}
-              disabled={isLoading}
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-          </div>
-
-          <Button
-            onClick={handleVerify}
-            disabled={isLoading || otp.length !== 6}
-            className="w-full"
-          >
-            {isLoading ? "Verifying..." : "Verify & Sign In"}
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBack}
-            disabled={isLoading}
-            className="w-full"
-          >
-            ← Use a different {isPhone ? "number" : "email"}
-          </Button>
-
-          <p className="text-xs text-center text-muted-foreground">
-            Didn&apos;t receive it? Check spam, or{" "}
-            <button
-              className="underline hover:text-foreground transition-colors"
-              onClick={handleBack}
-              disabled={isLoading}
-            >
-              try again
-            </button>
-            .
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // ─── Input step ───────────────────────────────────────────────────────────
 
   return (
-    <Card className="shadow-lg my-5">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl">Sign in to OrvixCRM</CardTitle>
-        <CardDescription>Choose your preferred sign-in method</CardDescription>
+    <Card className="shadow-lg my-5 w-full max-w-md mx-auto glass-card">
+      <CardHeader className="space-y-1 text-center">
+        <CardTitle className="text-3xl font-bold tracking-tight">Sign In</CardTitle>
+        <CardDescription>Enter your credentials to access the CRM</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4">
+      <CardContent className="grid gap-6">
 
         {/* Google */}
         <Button
           variant="outline"
           onClick={loginWithGoogle}
           disabled={isLoading}
-          className="w-full"
+          className="w-full h-11"
         >
-          <Icons.google className="mr-2 h-4 w-4" />
+          <Icons.google className="mr-2 h-5 w-5" />
           Continue with Google
         </Button>
 
         {/* Divider */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+            <span className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
+            <span className="bg-card px-2 text-muted-foreground">
               or continue with
             </span>
           </div>
         </div>
 
-        {/* Email / Phone tabs */}
-        <Tabs
-          value={activeTab}
-          onValueChange={handleTabChange}
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="email" className="flex items-center gap-1.5">
-              <MailIcon className="h-3.5 w-3.5" />
-              Email OTP
-            </TabsTrigger>
-            <TabsTrigger value="phone" className="flex items-center gap-1.5">
-              <PhoneIcon className="h-3.5 w-3.5" />
-              Phone OTP
-            </TabsTrigger>
-          </TabsList>
-
-          {/* ── Email Tab ── */}
-          <TabsContent value="email" className="mt-4">
-            <div className="grid gap-3">
-              <div className="grid gap-1.5">
-                <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="name@company.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                  onKeyDown={(e) => e.key === "Enter" && sendEmailOtp()}
-                />
-              </div>
-              <Button
-                onClick={sendEmailOtp}
-                disabled={isLoading || !email}
-                className="w-full"
-              >
-                <MailIcon className="mr-2 h-4 w-4" />
-                {isLoading ? "Sending..." : "Send verification code"}
-              </Button>
+        <div className="space-y-4 mt-4">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email address</Label>
+            <div className="relative">
+              <MailIcon className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="pl-10"
+              />
             </div>
-          </TabsContent>
-
-          {/* ── Phone Tab ── */}
-          <TabsContent value="phone" className="mt-4">
-            <div className="grid gap-3">
-              <div className="grid gap-1.5">
-                <Label htmlFor="phone">Phone number</Label>
-                <div className="flex gap-2">
-                  {/* Country code picker */}
-                  <select
-                    value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
-                    disabled={isLoading}
-                    className="flex h-9 rounded-md border border-input bg-background px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 w-[90px] shrink-0"
-                  >
-                    {COUNTRY_CODES.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.flag} {c.code}
-                      </option>
-                    ))}
-                  </select>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="98765 43210"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    disabled={isLoading}
-                    onKeyDown={(e) => e.key === "Enter" && sendPhoneOtp()}
-                    className="flex-1"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  A one-time SMS code will be sent to this number.
-                </p>
-              </div>
-              <Button
-                onClick={sendPhoneOtp}
-                disabled={isLoading || phoneNumber.replace(/\D/g, "").length < 7}
-                className="w-full"
-              >
-                <PhoneIcon className="mr-2 h-4 w-4" />
-                {isLoading ? "Sending SMS..." : "Send OTP via SMS"}
-              </Button>
+          </div>
+          
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <KeyIcon className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                onKeyDown={(e) => e.key === "Enter" && loginWithEmail()}
+                className="pl-10"
+              />
             </div>
+          </div>
+          
+          <Button
+            onClick={loginWithEmail}
+            disabled={isLoading || !email || !password}
+            className="w-full h-11"
+          >
+            {isLoading ? "Signing in..." : "Sign In with Email"}
+          </Button>
+        </div>
 
-            {/* India DLT notice */}
-            <p className="text-xs text-muted-foreground mt-3 p-2 bg-muted/50 rounded-md">
-              🇮🇳 For Indian numbers, ensure your Supabase SMS provider is
-              DLT-registered per TRAI guidelines.
-            </p>
-          </TabsContent>
-        </Tabs>
       </CardContent>
     </Card>
   );

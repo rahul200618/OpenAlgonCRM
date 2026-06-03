@@ -29,7 +29,7 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { PanelTopClose, PanelTopOpen, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BulkEnrichModal } from "../components/BulkEnrichModal";
+// import { BulkEnrichModal } from "../components/BulkEnrichModal";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -114,11 +114,11 @@ export function ContactsDataTable<TData, TValue>({
                   Enrich {table.getSelectedRowModel().rows.length} contacts
                 </Button>
               </div>
-              <BulkEnrichModal
+              {/* <BulkEnrichModal
                 contactIds={table.getSelectedRowModel().rows.map((row) => (row.original as { id: string }).id)}
                 open={bulkEnrichOpen}
                 onOpenChange={setBulkEnrichOpen}
-              />
+              /> */}
             </>
           )}
           <div className="rounded-md border overflow-x-auto w-full">

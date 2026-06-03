@@ -632,7 +632,7 @@ test.describe.serial("Sales Flow", () => {
 Make sure the dev server is running first (`pnpm dev` in the project directory), then:
 
 ```bash
-cd /Users/rahul200618/development/orvixcrm
+cd /Users/rahul200618/development/openalgoncrm
 pnpm exec playwright test tests/e2e/sales-flow.spec.ts --project=chromium --reporter=list
 ```
 

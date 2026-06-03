@@ -53,7 +53,7 @@ export const InvoiceEmail = ({
                 {isEn
                   ? "This email was sent from "
                   : "Tento e-mail byl odeslan z "}
-                <strong>{process.env.NEXT_PUBLIC_APP_NAME ?? "OrvixCRM"}</strong>
+                <strong>{process.env.NEXT_PUBLIC_APP_NAME ?? "OPENALGON CRM"}</strong>
                 {baseUrl ? ` (${baseUrl})` : ""}
               </Text>
             </Section>
