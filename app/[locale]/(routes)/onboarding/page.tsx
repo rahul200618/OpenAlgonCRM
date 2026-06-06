@@ -9,24 +9,24 @@ import { revalidatePath } from "next/cache";
 
 export default async function OnboardingPage() {
   const session = await getSession();
-  if (!session || !session.user || !session.organization_id) {
+  if (!session || !session.user || !session.user.organization_id) {
     redirect("/sign-in");
   }
 
   const organization = await prismadb.organization.findUnique({
-    where: { id: session.organization_id }
+    where: { id: session.user.organization_id }
   });
 
   // Server action to update organization name and complete onboarding
   const completeOnboarding = async (formData: FormData) => {
     "use server";
     const session = await getSession();
-    if (!session || !session.organization_id) return;
+    if (!session || !session.user.organization_id) return;
     
     const companyName = formData.get("companyName") as string;
     if (companyName) {
       await prismadb.organization.update({
-        where: { id: session.organization_id },
+        where: { id: session.user.organization_id },
         data: { name: companyName }
       });
     }
@@ -41,7 +41,7 @@ export default async function OnboardingPage() {
       <Card className="w-[500px]">
         <CardHeader>
           <CardTitle>Welcome to OpenAlgon CRM!</CardTitle>
-          <CardDescription>Let's set up your workspace before we get started.</CardDescription>
+          <CardDescription>Let&apos;s set up your workspace before we get started.</CardDescription>
         </CardHeader>
         <form action={completeOnboarding}>
           <CardContent className="space-y-4">

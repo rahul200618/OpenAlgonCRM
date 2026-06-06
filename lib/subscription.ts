@@ -5,7 +5,7 @@ const DAY_IN_MS = 86_400_000;
 
 export const checkSubscription = async () => {
   const session = await getSession();
-  const organizationId = session?.organization_id;
+  const organizationId = session?.user?.organization_id;
 
   if (!organizationId) {
     return false;

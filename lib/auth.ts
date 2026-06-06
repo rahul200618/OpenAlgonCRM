@@ -1,10 +1,75 @@
-import { prismadb as prisma } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
+import NextAuth from "next-auth"
+import Google from "next-auth/providers/google"
+import Credentials from "next-auth/providers/credentials"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prismadb as prisma } from "@/lib/prisma"
+import bcrypt from "bcryptjs"
+
+// NextAuth's PrismaAdapter expects a 'user' model, but ours is 'Users'
+const adaptedPrisma = prisma as any;
+adaptedPrisma.user = prisma.users;
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(adaptedPrisma),
+  session: { strategy: "jwt" },
+  secret: process.env.AUTH_SECRET || "fK3h9X8mP2vL5nQ1wZ4yB7cR6tJ0xM9r",
+  trustHost: true,
+  debug: true,
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
+    Credentials({
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+        const user = await prisma.users.findUnique({
+          where: { email: credentials.email as string }
+        });
+        if (!user || !user.password) return null;
+        
+        const isValid = await bcrypt.compare(credentials.password as string, user.password);
+        if (!isValid) return null;
+        
+        return user;
+      }
+    })
+  ],
+  callbacks: {
+    async session({ session, token }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+        
+        const dbUser = await prisma.users.findUnique({
+          where: { id: token.sub }
+        });
+        
+        if (dbUser) {
+          (session.user as any).role = dbUser.role;
+          (session.user as any).organization_id = dbUser.organization_id;
+          (session.user as any).userStatus = dbUser.userStatus;
+          (session.user as any).userLanguage = dbUser.userLanguage;
+          (session.user as any).avatar = dbUser.avatar;
+        }
+      }
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
+    }
+  }
+})
 
 export type AppUser = {
   id: string;
   email: string;
-  supabase_uid: string;
   name: string;
   role: string;
   avatar: string | null;
@@ -13,121 +78,22 @@ export type AppUser = {
   userLanguage: string;
 };
 
-/**
- * Returns the current auth user + their OPENALGON CRM profile.
- * Returns null if not authenticated.
- */
 export async function getUser(): Promise<AppUser | null> {
-  try {
-    const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
-
-    if (error || !user) return null;
-
-    // Supabase auth user found, now fetch profile from our Users table
-    let profile = await prisma.users.findFirst({
-      where: { supabase_uid: user.id },
-      select: {
-        id: true,
-        email: true,
-        supabase_uid: true,
-        name: true,
-        role: true,
-        avatar: true,
-        organization_id: true,
-        userStatus: true,
-        userLanguage: true,
-      },
-    });
-
-    if (!profile) {
-      try {
-        // Check if user already exists by email (to link account instead of crashing on unique constraint)
-        if (user.email) {
-          const existingUser = await prisma.users.findUnique({
-            where: { email: user.email },
-          });
-
-          if (existingUser) {
-            const updatedProfile = await prisma.users.update({
-              where: { id: existingUser.id },
-              data: {
-                supabase_uid: user.id,
-                name: existingUser.name || user.user_metadata?.full_name || user.email.split("@")[0],
-                avatar: existingUser.avatar || user.user_metadata?.avatar_url || null,
-              },
-            });
-            profile = {
-              id: updatedProfile.id,
-              email: updatedProfile.email,
-              supabase_uid: updatedProfile.supabase_uid,
-              name: updatedProfile.name,
-              role: updatedProfile.role,
-              avatar: updatedProfile.avatar,
-              organization_id: updatedProfile.organization_id,
-              userStatus: updatedProfile.userStatus,
-              userLanguage: updatedProfile.userLanguage,
-            };
-          }
-        }
-
-        // If still no profile, create a new one
-        if (!profile) {
-          const userName = user.user_metadata?.full_name || user.email?.split("@")[0] || "New User";
-          const newProfile = await prisma.users.create({
-            data: {
-              supabase_uid: user.id,
-              email: user.email || "",
-              name: userName,
-              avatar: user.user_metadata?.avatar_url || null,
-              userStatus: "ACTIVE",
-              organization: {
-                create: {
-                  name: `${userName}'s Workspace`,
-                  plan: "free",
-                }
-              }
-            },
-          });
-          profile = {
-            id: newProfile.id,
-            email: newProfile.email,
-            supabase_uid: newProfile.supabase_uid,
-            name: newProfile.name,
-            role: newProfile.role,
-            avatar: newProfile.avatar,
-            organization_id: newProfile.organization_id,
-            userStatus: newProfile.userStatus,
-            userLanguage: newProfile.userLanguage,
-          };
-        }
-      } catch (err) {
-        console.error("Failed to auto-create user profile", err);
-        return null;
-      }
-    }
-
-    return {
-      id: profile.id,
-      email: profile.email ?? user.email ?? "",
-      supabase_uid: profile.supabase_uid ?? user.id,
-      name: profile.name ?? "",
-      role: profile.role ?? "user",
-      avatar: profile.avatar,
-      organization_id: profile.organization_id,
-      userStatus: profile.userStatus,
-      userLanguage: profile.userLanguage,
-    };
-  } catch (error) {
-    console.error("Auth error:", error);
-    return null;
-  }
+  const session = await auth();
+  if (!session?.user) return null;
+  
+  return {
+    id: session.user.id as string,
+    email: session.user.email as string,
+    name: session.user.name as string,
+    role: (session.user as any).role as string || "user",
+    avatar: (session.user as any).avatar || null,
+    organization_id: (session.user as any).organization_id as string | null,
+    userStatus: (session.user as any).userStatus as string || "ACTIVE",
+    userLanguage: (session.user as any).userLanguage as string || "en",
+  };
 }
 
-/**
- * Like getUser() but throws a redirect to /sign-in if not authenticated.
- * Use in Server Components that require authentication.
- */
 export async function requireUser(): Promise<AppUser> {
   const user = await getUser();
   if (!user) {
@@ -138,29 +104,17 @@ export async function requireUser(): Promise<AppUser> {
   return user;
 }
 
-/**
- * Checks if the current user has one of the specified roles.
- */
-export async function hasRole(
-  roles: string | string[]
-): Promise<boolean> {
+export async function hasRole(roles: string | string[]): Promise<boolean> {
   const user = await getUser();
   if (!user) return false;
   const allowed = Array.isArray(roles) ? roles : [roles];
   return allowed.includes(user.role);
 }
 
-/**
- * Returns true if the current user is an admin.
- */
 export async function isAdmin(): Promise<boolean> {
   return hasRole(["admin", "superAdmin"]);
 }
 
-/**
- * Backward compatibility wrapper for getSession() 
- * which many existing files still import.
- */
 export async function getSession(): Promise<{ user: AppUser } | null> {
   const user = await getUser();
   if (!user) return null;

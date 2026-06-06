@@ -5,11 +5,11 @@ import AnalyticsCharts from "./_components/AnalyticsCharts";
 
 export default async function AnalyticsPage() {
   const session = await getSession();
-  if (!session || !session.user || !session.organization_id) {
+  if (!session || !session.user || !session.user.organization_id) {
     redirect("/sign-in");
   }
 
-  const data = await getLeadAnalytics(session.organization_id);
+  const data = await getLeadAnalytics(session.user.organization_id);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { signOut } from "@/lib/supabase/client"
+import { signOut } from "next-auth/react"
 import {
   ChevronsUpDown,
   LogOut,
@@ -140,7 +140,7 @@ export function NavUser({ user }: NavUserProps) {
               Organization Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={async () => { await signOut(); window.location.href = "/sign-in"; }}>
+            <DropdownMenuItem onClick={async () => { await signOut({ callbackUrl: "/sign-in" }); }}>
               <LogOut className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>

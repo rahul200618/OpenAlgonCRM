@@ -5,6 +5,7 @@ const withNextIntl = require("next-intl/plugin")(
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  allowedDevOrigins: ['prepared-george-citysearch-proprietary.trycloudflare.com'],
   serverExternalPackages: ["pdf-parse", "pdfjs-dist", "kysely"],
   images: {
     remotePatterns: [
@@ -26,6 +27,11 @@ const nextConfig = {
         source: "/:locale/crm/target-lists/:path*",
         destination: "/:locale/campaigns/target-lists/:path*",
         permanent: true,
+      },
+      {
+        source: "/auth/auth-code-error",
+        destination: "/en/sign-in?error=auth-code-error",
+        permanent: false,
       },
     ];
   },

@@ -35,16 +35,20 @@ const Header = ({ id, lang }: Props) => {
   return (
     <>
       <div className="flex h-16 shrink-0 items-center justify-between gap-2 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <FulltextSearch />
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <SidebarTrigger className="-ml-1 shrink-0" />
+          <Separator orientation="vertical" className="mr-2 h-4 shrink-0 hidden sm:block" />
+          <div className="flex-1 min-w-0 max-w-[300px]">
+            <FulltextSearch />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <CommandComponent />
-          <SetLanguage userId={id} />
-          <Feedback />
-          <CurrencySwitcher />
+          <div className="hidden md:flex items-center gap-2">
+            <SetLanguage userId={id} />
+            <Feedback />
+            <CurrencySwitcher />
+          </div>
           <ThemeToggle />
         </div>
       </div>

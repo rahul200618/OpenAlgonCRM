@@ -16,7 +16,7 @@ const Container = ({
   children,
 }: ContainerProps) => {
   return (
-    <div className="flex flex-col flex-1 h-full w-full">
+    <div className="flex flex-col flex-1 h-full w-full p-4 md:p-6 lg:p-8">
       <Heading
         title={title}
         description={description}

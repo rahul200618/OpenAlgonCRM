@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({
         </DropdownMenu>
         {/* Visibility */}
       </div>
-      <div className="rounded-md border overflow-x-auto">
+      <div className="rounded-xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl overflow-x-auto shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

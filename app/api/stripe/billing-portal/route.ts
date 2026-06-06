@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     }
 
     const organization = await prismadb.organization.findUnique({
-      where: { id: session.organization_id },
+      where: { id: session.user.organization_id },
     });
 
     if (!organization || !organization.stripeCustomerId) {

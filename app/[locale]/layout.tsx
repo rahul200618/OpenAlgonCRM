@@ -1,6 +1,6 @@
 import "./globals.css";
 
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
 import { ReactNode } from "react";
 
@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/app/providers/ThemeProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const font = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 type Props = {
   children: ReactNode;
@@ -60,12 +60,24 @@ export default async function RootLayout(props: Props) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={inter.className + " min-h-screen"}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <body className={font.className} suppressHydrationWarning>
+        {/* Dark Mode Aurora Orbs */}
+        <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none hidden dark:block">
+          <div className="aurora-orb-1" />
+          <div className="aurora-orb-2" />
+          <div className="aurora-orb-3" />
+        </div>
+        {/* Light Mode Prismatic Orbs */}
+        <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none block dark:hidden">
+          <div className="prismatic-orb-1" />
+          <div className="prismatic-orb-2" />
+          <div className="prismatic-orb-3" />
+        </div>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
-          </ThemeProvider>
-        </NextIntlClientProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
         <Toaster />
         <SonnerToaster />
       </body>

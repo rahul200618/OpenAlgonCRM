@@ -52,9 +52,9 @@ const DashboardPage = async () => {
 
   if (!session) return null;
 
-  if (session.organization_id) {
+  if (session.user.organization_id) {
     const org = await prismadb.organization.findUnique({
-      where: { id: session.organization_id }
+      where: { id: session.user.organization_id }
     });
     if (org?.name.endsWith("'s Workspace")) {
       const { redirect } = await import("next/navigation");

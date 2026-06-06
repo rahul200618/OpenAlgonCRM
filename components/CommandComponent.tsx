@@ -26,7 +26,7 @@ import {
 import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
 
-import { signOut } from "@/lib/supabase/client";
+import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 
 export function CommandComponent() {
@@ -64,7 +64,7 @@ export function CommandComponent() {
         setOpen(false);
       }
       if (e.key === "k" && e.metaKey) {
-        signOut().then(() => { window.location.href = "/sign-in"; });
+        signOut({ callbackUrl: "/sign-in" });
       }
     };
 
@@ -136,7 +136,7 @@ export function CommandComponent() {
               <span>{t("profileSettings")}</span>
               <CommandShortcut>Shift + ⌘ + P</CommandShortcut>
             </CommandItem>
-            <CommandItem onClick={async () => { await signOut(); window.location.href = "/sign-in"; }}>
+            <CommandItem onClick={async () => { await signOut({ callbackUrl: "/sign-in" }); }}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>{t("logout")}</span>
               <CommandShortcut>⌘k</CommandShortcut>

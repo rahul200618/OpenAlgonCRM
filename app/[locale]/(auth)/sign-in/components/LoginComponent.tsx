@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { signIn } from "next-auth/react";
 import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,29 +15,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { MailIcon, KeyIcon, PhoneIcon } from "lucide-react";
+import { MailIcon, KeyIcon, UserIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
 
 export function LoginComponent() {
   const [isLoading, setIsLoading] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
   const router = useRouter();
-  const supabase = createClient();
 
   const loginWithGoogle = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/api/auth/callback`,
-        },
-      });
-      if (error) {
-        toast.error(error.message || "Something went wrong with Google sign-in.");
-      }
+      await signIn("google", { callbackUrl: "/" });
     } catch {
       toast.error("Something went wrong with Google sign-in.");
     } finally {
@@ -45,21 +38,27 @@ export function LoginComponent() {
     }
   };
 
-  const loginWithEmail = async () => {
-    if (!email || !password) {
+  const handleEmailSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const currentEmail = formData.get("email") as string || email;
+    const currentPassword = formData.get("password") as string || password;
+
+    if (!currentEmail || !currentPassword) {
       toast.error("Please enter your email and password.");
       return;
     }
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: currentEmail,
+        password: currentPassword,
       });
-      if (error) {
-        toast.error(error.message || "Failed to sign in.");
+      if (res?.error) {
+        toast.error("Invalid email or password.");
       } else {
-        toast.success("Login successful.");
+        toast.success("Welcome back!");
         router.push("/");
         router.refresh();
       }
@@ -70,81 +69,215 @@ export function LoginComponent() {
     }
   };
 
+  const handleEmailSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const currentName = formData.get("name") as string || name;
+    const currentEmail = formData.get("email") as string || email;
+    const currentPassword = formData.get("password") as string || password;
+
+    if (!currentName || !currentEmail || !currentPassword) {
+      toast.error("Please fill out all fields.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: currentName, email: currentEmail, password: currentPassword }),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to create account.");
+      }
+      toast.success("Account created successfully! Logging you in...");
+      // Auto-login after successful registration
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: currentEmail,
+        password: currentPassword,
+      });
+      if (res?.error) {
+        toast.error("Please log in with your new account.");
+      } else {
+        router.push("/");
+        router.refresh();
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create account.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <Card className="shadow-lg my-5 w-full max-w-md mx-auto glass-card">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-3xl font-bold tracking-tight">Sign In</CardTitle>
-        <CardDescription>Enter your credentials to access the CRM</CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-6">
-
-        {/* Google */}
-        <Button
-          variant="outline"
-          onClick={loginWithGoogle}
-          disabled={isLoading}
-          className="w-full h-11"
-        >
-          <Icons.google className="mr-2 h-5 w-5" />
-          Continue with Google
-        </Button>
-
-        {/* Divider */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              or continue with
-            </span>
-          </div>
+    <div className="flex items-center justify-center w-full h-full bg-background relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
+      
+      <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            OpenAlgon CRM
+          </h1>
+          <p className="text-muted-foreground mt-2 font-medium">Your workspace awaits.</p>
         </div>
 
-        <div className="space-y-4 mt-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email address</Label>
-            <div className="relative">
-              <MailIcon className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-                className="pl-10"
-              />
-            </div>
-          </div>
+        <Card className="shadow-2xl w-full glass-card border-white/10 dark:border-white/5 bg-background/60 backdrop-blur-xl">
+          <CardHeader className="space-y-1 text-center pb-2">
+            <CardTitle className="text-2xl font-bold tracking-tight">Welcome</CardTitle>
+            <CardDescription>Login or create an account</CardDescription>
+          </CardHeader>
           
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <KeyIcon className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                onKeyDown={(e) => e.key === "Enter" && loginWithEmail()}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          
-          <Button
-            onClick={loginWithEmail}
-            disabled={isLoading || !email || !password}
-            className="w-full h-11"
-          >
-            {isLoading ? "Signing in..." : "Sign In with Email"}
-          </Button>
-        </div>
+          <CardContent className="grid gap-6 pt-4">
+            {/* Google */}
+            <Button
+              variant="outline"
+              onClick={loginWithGoogle}
+              disabled={isLoading}
+              className="w-full h-12 relative overflow-hidden border-white/10 bg-background/50 hover:bg-background/80 transition-all font-medium text-md"
+            >
+              <Icons.google className="mr-3 h-5 w-5" />
+              Continue with Google
+            </Button>
 
-      </CardContent>
-    </Card>
+            {/* Divider */}
+            <div className="relative flex items-center py-2">
+              <div className="flex-grow border-t border-border/50"></div>
+              <span className="flex-shrink-0 mx-4 text-xs font-medium text-muted-foreground uppercase tracking-widest">
+                Or
+              </span>
+              <div className="flex-grow border-t border-border/50"></div>
+            </div>
+
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6 h-12 p-1 bg-muted/50 rounded-lg">
+                <TabsTrigger value="signin" className="rounded-md transition-all data-[state=active]:bg-background data-[state=active]:shadow-sm">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="rounded-md transition-all data-[state=active]:bg-background data-[state=active]:shadow-sm">Sign Up</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="signin" className="space-y-5 animate-in fade-in zoom-in-95 duration-200">
+                <form onSubmit={handleEmailSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email" className="font-medium text-sm ml-1">Email address</Label>
+                    <div className="relative group">
+                      <MailIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        id="signin-email"
+                        name="email"
+                        type="email"
+                        placeholder="name@company.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                        className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between ml-1">
+                      <Label htmlFor="signin-password" className="font-medium text-sm">Password</Label>
+                      <Link href="/forgot-password" className="text-xs font-medium text-primary hover:underline transition-all">
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <div className="relative group">
+                      <KeyIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        id="signin-password"
+                        name="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-12 text-md font-semibold mt-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {isLoading ? "Signing in..." : "Sign In"}
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="signup" className="space-y-5 animate-in fade-in zoom-in-95 duration-200">
+                <form onSubmit={handleEmailSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name" className="font-medium text-sm ml-1">Full Name</Label>
+                    <div className="relative group">
+                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        id="signup-name"
+                        name="name"
+                        type="text"
+                        placeholder="John Doe"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        disabled={isLoading}
+                        className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email" className="font-medium text-sm ml-1">Email address</Label>
+                    <div className="relative group">
+                      <MailIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        id="signup-email"
+                        name="email"
+                        type="email"
+                        placeholder="name@company.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                        className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password" className="font-medium text-sm ml-1">Password</Label>
+                    <div className="relative group">
+                      <KeyIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        id="signup-password"
+                        name="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                        minLength={8}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground ml-1 mt-1">Must be at least 8 characters</p>
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-12 text-md font-semibold mt-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {isLoading ? "Creating account..." : "Create Account"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

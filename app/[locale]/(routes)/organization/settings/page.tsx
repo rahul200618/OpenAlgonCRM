@@ -18,7 +18,7 @@ export default async function OrganizationSettingsPage() {
   }
 
   const org = await prismadb.organization.findUnique({
-    where: { id: session.organization_id },
+    where: { id: session.user.organization_id },
     include: {
       users: true,
     }
@@ -40,7 +40,7 @@ export default async function OrganizationSettingsPage() {
       <div className="flex flex-col space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">Organization Settings</h1>
         <p className="text-muted-foreground">
-          Manage your workspace, billing, and team members.
+          Manage your organization&apos;s settings and members here.
         </p>
       </div>
 

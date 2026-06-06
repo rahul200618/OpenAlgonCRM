@@ -18,7 +18,7 @@ export const toggleOrganizationStatus = async (organizationId: string, status: "
     }
 
     // Prevent an admin from suspending their own organization
-    if (session.organization_id === organizationId) {
+    if (session.user.organization_id === organizationId) {
       return { error: "You cannot suspend your own organization" };
     }
 
