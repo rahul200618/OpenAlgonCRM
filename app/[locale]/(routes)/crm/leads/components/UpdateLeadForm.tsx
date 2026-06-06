@@ -38,9 +38,10 @@ type NewTaskFormProps = {
   leadSources: ConfigItem[];
   leadStatuses: ConfigItem[];
   leadTypes: ConfigItem[];
+  isUser?: boolean;
 };
 
-export function UpdateLeadForm({ initialData, setOpen, leadSources, leadStatuses, leadTypes }: NewTaskFormProps) {
+export function UpdateLeadForm({ initialData, setOpen, leadSources, leadStatuses, leadTypes, isUser }: NewTaskFormProps) {
   const t = useTranslations("CrmLeadForm");
   const c = useTranslations("Common");
 
@@ -302,24 +303,26 @@ export function UpdateLeadForm({ initialData, setOpen, leadSources, leadStatuses
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="assigned_to"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{c("assignedTo")}</FormLabel>
-                    <FormControl>
-                      <UserSearchCombobox
-                        value={field.value ?? ""}
-                        onChange={field.onChange}
-                        placeholder={c("selectUser")}
-                        disabled={form.formState.isSubmitting}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {!isUser && (
+                <FormField
+                  control={form.control}
+                  name="assigned_to"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{c("assignedTo")}</FormLabel>
+                      <FormControl>
+                        <UserSearchCombobox
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          placeholder={c("selectUser")}
+                          disabled={form.formState.isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <FormField
                 control={form.control}
                 name="lead_status_id"

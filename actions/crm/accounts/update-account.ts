@@ -39,12 +39,19 @@ export const updateAccount = async (data: {
 
   try {
     const before = await prismadb.crm_Accounts.findUnique({ where: { id, deletedAt: null } });
+    
+    let finalAssignedTo = rest.assigned_to;
+    if (session.user.role === "user") {
+      finalAssignedTo = before?.assigned_to || undefined;
+    }
+
     const account = await prismadb.crm_Accounts.update({
       where: { id },
       data: {
         v: 0,
         updatedBy: session.user.id,
         ...rest,
+        assigned_to: finalAssignedTo,
       },
     });
     const changes = before ? diffObjects(

@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   leadSources?: ConfigItem[];
   leadStatuses?: ConfigItem[];
   leadTypes?: ConfigItem[];
+  isUser?: boolean;
 }
 
 export function LeadDataTable<TData, TValue>({
@@ -45,11 +46,14 @@ export function LeadDataTable<TData, TValue>({
   leadSources = [],
   leadStatuses = [],
   leadTypes = [],
+  isUser,
 }: DataTableProps<TData, TValue>) {
   const columns = createColumns(leadSources, leadStatuses, leadTypes) as ColumnDef<TData, TValue>[];
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<VisibilityState>({
+      assigned_to_user: !isUser,
+    });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );

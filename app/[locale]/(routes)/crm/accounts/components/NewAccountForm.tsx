@@ -31,9 +31,10 @@ import { createAccount } from "@/actions/crm/accounts/create-account";
 type Props = {
   industries: any[];
   onFinish: () => void;
+  isUser?: boolean;
 };
 
-export function NewAccountForm({ industries, onFinish }: Props) {
+export function NewAccountForm({ industries, onFinish, isUser }: Props) {
   const t = useTranslations("CrmAccountForm");
   const c = useTranslations("Common");
 
@@ -68,6 +69,31 @@ export function NewAccountForm({ industries, onFinish }: Props) {
   const form = useForm<NewAccountFormValues>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
+    defaultValues: {
+      name: "",
+      office_phone: "",
+      website: "",
+      fax: "",
+      company_id: "",
+      vat: "",
+      email: "",
+      billing_street: "",
+      billing_postal_code: "",
+      billing_city: "",
+      billing_state: "",
+      billing_country: "",
+      shipping_street: "",
+      shipping_postal_code: "",
+      shipping_city: "",
+      shipping_state: "",
+      shipping_country: "",
+      description: "",
+      assigned_to: "",
+      status: "",
+      annual_revenue: "",
+      member_of: "",
+      industry: "",
+    },
   });
 
   const onSubmit = async (data: NewAccountFormValues) => {
@@ -441,24 +467,26 @@ export function NewAccountForm({ industries, onFinish }: Props) {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="assigned_to"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{c("assignedTo")}</FormLabel>
-                    <FormControl>
-                      <UserSearchCombobox
-                        value={field.value ?? ""}
-                        onChange={field.onChange}
-                        placeholder={c("selectUser")}
-                        disabled={form.formState.isSubmitting}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {!isUser && (
+                <FormField
+                  control={form.control}
+                  name="assigned_to"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{c("assignedTo")}</FormLabel>
+                      <FormControl>
+                        <UserSearchCombobox
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          placeholder={c("selectUser")}
+                          disabled={form.formState.isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </div>
         </div>

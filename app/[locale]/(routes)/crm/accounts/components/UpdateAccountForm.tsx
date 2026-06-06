@@ -37,11 +37,13 @@ interface UpdateAccountFormProps {
   //TODO: fix this any
   initialData: any;
   open: (value: boolean) => void;
+  isUser?: boolean;
 }
 
 export function UpdateAccountForm({
   initialData,
   open,
+  isUser,
 }: UpdateAccountFormProps) {
   const t = useTranslations("CrmAccountForm");
   const c = useTranslations("Common");
@@ -509,24 +511,26 @@ export function UpdateAccountForm({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="assigned_to"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{c("assignedTo")}</FormLabel>
-                    <FormControl>
-                      <UserSearchCombobox
-                        value={field.value ?? ""}
-                        onChange={field.onChange}
-                        placeholder={c("selectUser")}
-                        disabled={form.formState.isSubmitting}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {!isUser && (
+                <FormField
+                  control={form.control}
+                  name="assigned_to"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{c("assignedTo")}</FormLabel>
+                      <FormControl>
+                        <UserSearchCombobox
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          placeholder={c("selectUser")}
+                          disabled={form.formState.isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </div>
         </div>

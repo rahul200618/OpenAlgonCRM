@@ -36,9 +36,10 @@ type NewTaskFormProps = {
   leadStatuses: ConfigItem[];
   leadTypes: ConfigItem[];
   onFinish?: () => void;
+  isUser?: boolean;
 };
 
-export function NewLeadForm({ accounts, leadSources, leadStatuses, leadTypes, onFinish }: NewTaskFormProps) {
+export function NewLeadForm({ accounts, leadSources, leadStatuses, leadTypes, onFinish, isUser }: NewTaskFormProps) {
   const t = useTranslations("CrmLeadForm");
   const c = useTranslations("Common");
 
@@ -318,24 +319,26 @@ export function NewLeadForm({ accounts, leadSources, leadStatuses, leadTypes, on
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="assigned_to"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{c("assignedTo")}</FormLabel>
-                    <FormControl>
-                      <UserSearchCombobox
-                        value={field.value ?? ""}
-                        onChange={field.onChange}
-                        placeholder={c("selectUser")}
-                        disabled={form.formState.isSubmitting}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {!isUser && (
+                <FormField
+                  control={form.control}
+                  name="assigned_to"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{c("assignedTo")}</FormLabel>
+                      <FormControl>
+                        <UserSearchCombobox
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          placeholder={c("selectUser")}
+                          disabled={form.formState.isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
             <FormField
               control={form.control}

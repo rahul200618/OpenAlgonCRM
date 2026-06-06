@@ -33,9 +33,10 @@ interface ContactsViewProps {
   data: any[];
   crmData: CrmData;
   accountId?: string;
+  isUser?: boolean;
 }
 
-const ContactsView = ({ data, crmData }: ContactsViewProps) => {
+const ContactsView = ({ data, crmData, isUser }: ContactsViewProps) => {
   const [open, setOpen] = useState(false);
   const t = useTranslations("CrmPage");
 
@@ -68,6 +69,7 @@ const ContactsView = ({ data, crmData }: ContactsViewProps) => {
                   <NewContactForm
                     accounts={accounts}
                     onFinish={() => setOpen(false)}
+                    isUser={isUser}
                   />
                 </div>
               </SheetContent>
@@ -84,6 +86,7 @@ const ContactsView = ({ data, crmData }: ContactsViewProps) => {
           <ContactsDataTable
             data={data}
             columns={createColumns(contactTypes)}
+            isUser={isUser}
           />
         )}
       </CardContent>

@@ -37,12 +37,14 @@ type UpdateContactFormProps = {
   initialData: any;
   setOpen: (value: boolean) => void;
   contactTypes: ConfigItem[];
+  isUser?: boolean;
 };
 
 export function UpdateContactForm({
   initialData,
   setOpen,
   contactTypes,
+  isUser,
 }: UpdateContactFormProps) {
   const t = useTranslations("CrmContactForm");
   const c = useTranslations("Common");
@@ -355,24 +357,26 @@ export function UpdateContactForm({
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="assigned_to"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("assignedUser")}</FormLabel>
-                      <FormControl>
-                        <UserSearchCombobox
-                          value={field.value ?? ""}
-                          onChange={field.onChange}
-                          placeholder={t("assignedUserPlaceholder")}
-                          disabled={form.formState.isSubmitting}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!isUser && (
+                  <FormField
+                    control={form.control}
+                    name="assigned_to"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("assignedUser")}</FormLabel>
+                        <FormControl>
+                          <UserSearchCombobox
+                            value={field.value ?? ""}
+                            onChange={field.onChange}
+                            placeholder={t("assignedUserPlaceholder")}
+                            disabled={form.formState.isSubmitting}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <FormField
                   control={form.control}
                   name="assigned_account"

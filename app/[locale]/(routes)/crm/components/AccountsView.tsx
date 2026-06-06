@@ -32,9 +32,10 @@ type CrmData = Awaited<ReturnType<typeof getAllCrmData>>;
 interface AccountsViewProps {
   data: any[];
   crmData: CrmData;
+  isUser?: boolean;
 }
 
-const AccountsView = ({ data, crmData }: AccountsViewProps) => {
+const AccountsView = ({ data, crmData, isUser }: AccountsViewProps) => {
   const [open, setOpen] = useState(false);
   const t = useTranslations("CrmPage");
 
@@ -67,6 +68,7 @@ const AccountsView = ({ data, crmData }: AccountsViewProps) => {
                   <NewAccountForm
                     industries={industries}
                     onFinish={() => setOpen(false)}
+                    isUser={isUser}
                   />
                 </div>
               </SheetContent>
@@ -84,6 +86,7 @@ const AccountsView = ({ data, crmData }: AccountsViewProps) => {
               data={data}
               columns={columns}
               industries={industries}
+              isUser={isUser}
             />
           </CardContent>
         ))}

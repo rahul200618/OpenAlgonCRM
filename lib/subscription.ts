@@ -2,6 +2,7 @@ import { prismadb } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 
 const DAY_IN_MS = 86_400_000;
+const TRIAL_DAYS = 3;
 
 export const checkSubscription = async () => {
   const session = await getSession();
@@ -20,6 +21,7 @@ export const checkSubscription = async () => {
       stripeCurrentPeriodEnd: true,
       stripeCustomerId: true,
       stripePriceId: true,
+      createdAt: true,
     },
   });
 
@@ -27,11 +29,15 @@ export const checkSubscription = async () => {
     return false;
   }
 
-  const isValid =
+  // Check if still in 3-day free trial
+  const trialEnd = new Date(org.createdAt).getTime() + (TRIAL_DAYS * DAY_IN_MS);
+  const isTrialValid = trialEnd > Date.now();
+
+  const isSubValid =
     org.stripePriceId &&
     org.stripeCurrentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now();
 
-  return !!isValid;
+  return !!isSubValid || isTrialValid;
 };
 
 // You can use these constants later when generating the pricing page UI
@@ -46,6 +52,12 @@ export const PRICING_TIERS = {
     maxUsers: 5,
     maxLeads: 1000,
     priceId: process.env.STRIPE_PRO_PRICE_ID,
+  },
+  PROMAX: {
+    name: "Pro Max",
+    maxUsers: 20,
+    maxLeads: 10000,
+    priceId: process.env.STRIPE_PROMAX_PRICE_ID,
   },
   ENTERPRISE: {
     name: "Enterprise",

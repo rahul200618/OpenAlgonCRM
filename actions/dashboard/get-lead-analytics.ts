@@ -1,9 +1,11 @@
 "use server";
 
 import { prismadb as prisma } from "@/lib/prisma";
+import { AppUser } from "@/lib/auth";
+import { buildCrmFilter } from "@/lib/dashboard-filters";
 
-export async function getLeadAnalytics(organizationId?: string) {
-  const orgFilter = organizationId ? { organization_id: organizationId } : {};
+export async function getLeadAnalytics(user: AppUser) {
+  const crmFilter = buildCrmFilter(user);
 
   // 1. Fetch Lead statuses
   const statuses = await prisma.crm_Lead_Statuses.findMany({
@@ -15,12 +17,12 @@ export async function getLeadAnalytics(organizationId?: string) {
 
   // 2. Fetch Lead counts
   const totalLeads = await prisma.crm_Leads.count({
-    where: { deletedAt: null, ...orgFilter },
+    where: crmFilter,
   });
 
   const leadsGroupedByStatus = await prisma.crm_Leads.groupBy({
     by: ["lead_status_id"],
-    where: { deletedAt: null, ...orgFilter },
+    where: crmFilter,
     _count: { id: true },
   });
 
@@ -50,7 +52,7 @@ export async function getLeadAnalytics(organizationId?: string) {
   // 3. Leads by Source (Channel)
   const leadsByChannel = await prisma.crm_Leads.groupBy({
     by: ["channel"],
-    where: { deletedAt: null, ...orgFilter },
+    where: crmFilter,
     _count: { id: true },
   });
 
@@ -62,11 +64,7 @@ export async function getLeadAnalytics(organizationId?: string) {
   // 4. Sales Leaderboard
   const leaderBoardRaw = await prisma.crm_Leads.groupBy({
     by: ["assigned_to"],
-    where: {
-      deletedAt: null,
-      assigned_to: { not: null },
-      ...orgFilter,
-    },
+    where: crmFilter,
     _count: { id: true },
   });
 
@@ -91,7 +89,7 @@ export async function getLeadAnalytics(organizationId?: string) {
   const funnelData = await Promise.all(
     statuses.map(async (s: { id: string; name: string }) => {
       const count = await prisma.crm_Leads.count({
-        where: { lead_status_id: s.id, deletedAt: null, ...orgFilter },
+        where: { lead_status_id: s.id, ...crmFilter },
       });
       return {
         name: s.name,

@@ -25,6 +25,12 @@ export function LoginComponent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
+  // New tenant fields
+  const [companyName, setCompanyName] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [companySize, setCompanySize] = useState("");
+  const [phone, setPhone] = useState("");
+  
   const router = useRouter();
 
   const loginWithGoogle = async () => {
@@ -75,9 +81,14 @@ export function LoginComponent() {
     const currentName = formData.get("name") as string || name;
     const currentEmail = formData.get("email") as string || email;
     const currentPassword = formData.get("password") as string || password;
+    
+    const currentCompany = formData.get("companyName") as string || companyName;
+    const currentIndustry = formData.get("industry") as string || industry;
+    const currentCompanySize = formData.get("companySize") as string || companySize;
+    const currentPhone = formData.get("phone") as string || phone;
 
-    if (!currentName || !currentEmail || !currentPassword) {
-      toast.error("Please fill out all fields.");
+    if (!currentName || !currentEmail || !currentPassword || !currentCompany || !currentIndustry || !currentCompanySize) {
+      toast.error("Please fill out all required fields.");
       return;
     }
     setIsLoading(true);
@@ -85,7 +96,15 @@ export function LoginComponent() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: currentName, email: currentEmail, password: currentPassword }),
+        body: JSON.stringify({ 
+          name: currentName, 
+          email: currentEmail, 
+          password: currentPassword,
+          companyName: currentCompany,
+          industry: currentIndustry,
+          companySize: currentCompanySize,
+          phone: currentPhone
+        }),
       });
       if (!response.ok) {
         const errorText = await response.text();
@@ -226,6 +245,65 @@ export function LoginComponent() {
                         className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-company" className="font-medium text-sm ml-1">Company Name</Label>
+                    <div className="relative group">
+                      <Input
+                        id="signup-company"
+                        name="companyName"
+                        type="text"
+                        placeholder="Acme Corp"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-industry" className="font-medium text-sm ml-1">Industry</Label>
+                      <Input
+                        id="signup-industry"
+                        name="industry"
+                        type="text"
+                        placeholder="Software"
+                        value={industry}
+                        onChange={(e) => setIndustry(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-size" className="font-medium text-sm ml-1">Company Size</Label>
+                      <Input
+                        id="signup-size"
+                        name="companySize"
+                        type="text"
+                        placeholder="1-10"
+                        value={companySize}
+                        onChange={(e) => setCompanySize(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone" className="font-medium text-sm ml-1">Phone Number (Optional)</Label>
+                    <Input
+                      id="signup-phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      disabled={isLoading}
+                      className="h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                    />
                   </div>
 
                   <div className="space-y-2">

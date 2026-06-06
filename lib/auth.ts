@@ -9,16 +9,38 @@ import bcrypt from "bcryptjs"
 const adaptedPrisma = prisma as any;
 adaptedPrisma.user = prisma.users;
 
+// Wrap PrismaAdapter to handle emailVerified boolean type mismatch
+const baseAdapter = PrismaAdapter(adaptedPrisma);
+const customAdapter = {
+  ...baseAdapter,
+  createUser: async (data: any) => {
+    const userCount = await adaptedPrisma.user.count();
+    const isFirstUser = userCount === 0;
+
+    return adaptedPrisma.user.create({
+      data: {
+        ...data,
+        // Convert Date to boolean since our schema expects Boolean
+        emailVerified: !!data.emailVerified,
+        // Auto-activate all Google users. Make the first one an admin.
+        userStatus: "ACTIVE",
+        role: isFirstUser ? "admin" : "user",
+      }
+    });
+  }
+};
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(adaptedPrisma),
+  adapter: customAdapter as any,
   session: { strategy: "jwt" },
   secret: process.env.AUTH_SECRET || "fK3h9X8mP2vL5nQ1wZ4yB7cR6tJ0xM9r",
   trustHost: true,
   debug: true,
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     Credentials({
       credentials: {
@@ -44,13 +66,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token.sub && session.user) {
         session.user.id = token.sub;
         
-        const dbUser = await prisma.users.findUnique({
+        let dbUser = await prisma.users.findUnique({
           where: { id: token.sub }
         });
+
+        // Automatically activate ALL users who are stuck in PENDING status
+        if (dbUser && dbUser.userStatus === "PENDING") {
+          const totalUsers = await prisma.users.count();
+          dbUser = await prisma.users.update({
+            where: { id: dbUser.id },
+            // If they are the first user, also give them admin rights
+            data: { 
+              userStatus: "ACTIVE", 
+              role: totalUsers === 1 ? "admin" : dbUser.role 
+            }
+          });
+        }
         
         if (dbUser) {
           (session.user as any).role = dbUser.role;
           (session.user as any).organization_id = dbUser.organization_id;
+          (session.user as any).managerId = dbUser.managerId;
           (session.user as any).userStatus = dbUser.userStatus;
           (session.user as any).userLanguage = dbUser.userLanguage;
           (session.user as any).avatar = dbUser.avatar;
@@ -74,6 +110,7 @@ export type AppUser = {
   role: string;
   avatar: string | null;
   organization_id: string | null;
+  managerId: string | null;
   userStatus: string;
   userLanguage: string;
 };
@@ -89,6 +126,7 @@ export async function getUser(): Promise<AppUser | null> {
     role: (session.user as any).role as string || "user",
     avatar: (session.user as any).avatar || null,
     organization_id: (session.user as any).organization_id as string | null,
+    managerId: (session.user as any).managerId as string | null,
     userStatus: (session.user as any).userStatus as string || "ACTIVE",
     userLanguage: (session.user as any).userLanguage as string || "en",
   };

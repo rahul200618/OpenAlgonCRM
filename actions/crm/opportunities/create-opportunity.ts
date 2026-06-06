@@ -43,6 +43,11 @@ export const createOpportunity = async (data: {
   } = data;
 
   try {
+    let finalAssignedTo = assigned_to || userId;
+    if (session.user.role === "user") {
+      finalAssignedTo = userId;
+    }
+
     const defaultCurrency = await getDefaultCurrency();
     const snapshotRate = currency
       ? await getSnapshotRate(currency, defaultCurrency)
@@ -50,7 +55,7 @@ export const createOpportunity = async (data: {
     const opportunity = await prismadb.crm_Opportunities.create({
       data: {
         account: account || undefined,
-        assigned_to: assigned_to || userId,
+        assigned_to: finalAssignedTo,
         budget: budget ? parseFloat(budget) : undefined,
         campaign: campaign || undefined,
         close_date,

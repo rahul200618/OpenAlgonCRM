@@ -29,18 +29,6 @@ export const getCrmMenuItem = ({ localizations }: Props): NavItem => {
     icon: Coins,
     items: [
       {
-        title: "Dashboard",
-        url: "/crm/dashboard",
-      },
-      {
-        title: "My Dashboard",
-        url: "/crm/dashboard/user",
-      },
-      {
-        title: "Overview",
-        url: "/crm",
-      },
-      {
         title: localizations.accounts,
         url: "/crm/accounts",
       },
@@ -55,14 +43,6 @@ export const getCrmMenuItem = ({ localizations }: Props): NavItem => {
       {
         title: localizations.opportunities,
         url: "/crm/opportunities",
-      },
-      {
-        title: localizations.contracts,
-        url: "/crm/contracts",
-      },
-      {
-        title: localizations.products,
-        url: "/crm/products",
       },
     ],
   };

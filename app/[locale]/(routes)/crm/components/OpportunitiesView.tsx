@@ -35,12 +35,14 @@ interface OpportunitiesViewProps {
   data: any[];
   crmData: CrmData;
   accountId?: string;
+  isUser?: boolean;
 }
 
 const OpportunitiesView = ({
   data,
   crmData,
   accountId,
+  isUser,
 }: OpportunitiesViewProps) => {
   const [open, setOpen] = useState(false);
   const t = useTranslations("CrmPage");
@@ -93,9 +95,10 @@ const OpportunitiesView = ({
                     salesType={saleTypes}
                     saleStages={saleStages}
                     campaigns={campaigns}
-                    currencies={currencies.map((c) => ({ code: c.code, name: c.name, symbol: c.symbol }))}
+                    currencies={currencies.map((c: any) => ({ code: c.code, name: c.name, symbol: c.symbol }))}
                     accountId={accountId}
                     onDialogClose={() => setOpen(false)}
+                    isUser={isUser}
                   />
                 </div>
               </SheetContent>
@@ -109,7 +112,7 @@ const OpportunitiesView = ({
           (data.length === 0 ? (
             t("opportunities.empty")
           ) : (
-            <OpportunitiesDataTable data={data} columns={opportunityColumns} />
+            <OpportunitiesDataTable data={data} columns={opportunityColumns} isUser={isUser} />
           ))}
       </CardContent>
     </Card>

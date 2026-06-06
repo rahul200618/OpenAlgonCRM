@@ -31,9 +31,10 @@ type CrmData = Awaited<ReturnType<typeof getAllCrmData>>;
 interface LeadsViewProps {
   data: any[];
   crmData: CrmData;
+  isUser?: boolean;
 }
 
-const LeadsView = ({ data, crmData }: LeadsViewProps) => {
+const LeadsView = ({ data, crmData, isUser }: LeadsViewProps) => {
   const { accounts, leadSources, leadStatuses, leadTypes } = crmData;
   const [open, setOpen] = useState(false);
   const t = useTranslations("CrmPage");
@@ -66,6 +67,7 @@ const LeadsView = ({ data, crmData }: LeadsViewProps) => {
                     leadStatuses={leadStatuses}
                     leadTypes={leadTypes}
                     onFinish={() => setOpen(false)}
+                    isUser={isUser}
                   />
                 </div>
               </SheetContent>
@@ -85,6 +87,7 @@ const LeadsView = ({ data, crmData }: LeadsViewProps) => {
               leadSources={leadSources}
               leadStatuses={leadStatuses}
               leadTypes={leadTypes}
+              isUser={isUser}
             />
           ))}
       </CardContent>

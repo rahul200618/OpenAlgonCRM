@@ -816,6 +816,7 @@ model Users {
   name                         String?
   password                     String?
   username                     String?
+  phone                        String?
   userStatus                   ActiveStatus             @default(PENDING)
   userLanguage                 Language                 @default(en)
   role                         AppRole                  @default(user)
@@ -826,6 +827,7 @@ model Users {
   banReason                    String?
   banExpires                   DateTime?
   organization_id              String?                  @db.Uuid
+  managerId                    String?                  @db.Uuid
   round_robin_index            Int                      @default(0)
   supabase_uid                 String?                  @unique
   weight                       Int                      @default(1)
@@ -844,6 +846,8 @@ model Users {
   createdInvoices              Invoices[]               @relation("InvoiceCreatedBy")
   tasks                        Tasks[]
   organization                 Organization?            @relation(fields: [organization_id], references: [id])
+  manager                      Users?                   @relation("UserManager", fields: [managerId], references: [id])
+  subordinates                 Users[]                  @relation("UserManager")
   accounts                     crm_Accounts[]           @relation("AccountAssignedTo")
   crm_accounts_tasks           crm_Accounts_Tasks[]
   activities_created           crm_Activities[]         @relation("activity_created_by")
@@ -1635,6 +1639,8 @@ model Organization {
   name          String
   plan          String              @default("free")
   status        String              @default("active")
+  industry      String?
+  companySize   String?
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
   boards        Boards[]
@@ -1834,6 +1840,7 @@ enum AppRole {
   user
   manager
   admin
+  developer
 }
 
 enum Language {

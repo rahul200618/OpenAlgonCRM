@@ -38,35 +38,19 @@ export async function getSnapshotRate(
 }
 
 export async function getDefaultCurrency(): Promise<string> {
-  try {
-    const setting = await prismadb.crm_SystemSettings.findUnique({
-      where: { key: "default_currency" },
-    });
-    return setting?.value || "INR";
-  } catch (error) {
-    console.warn("[Currency Service] Failed to fetch default currency, returning INR.", error);
-    return "INR";
-  }
+  return "INR";
 }
 
 export async function getEnabledCurrencies() {
-  try {
-    return await prismadb.currency.findMany({
-      where: { isEnabled: true },
-      orderBy: { code: "asc" },
-    });
-  } catch (error) {
-    console.warn("[Currency Service] Failed to fetch enabled currencies, returning offline defaults.", error);
-    return [
-      {
-        code: "INR",
-        name: "Indian Rupee",
-        symbol: "₹",
-        isEnabled: true,
-        isDefault: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
-  }
+  return [
+    {
+      code: "INR",
+      name: "Indian Rupee",
+      symbol: "₹",
+      isEnabled: true,
+      isDefault: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
 }

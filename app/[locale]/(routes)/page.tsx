@@ -5,17 +5,11 @@ import {
   CoinsIcon,
   Contact,
   DollarSignIcon,
-  FilePenLine,
-  FileText,
-  FolderKanban,
   HeartHandshakeIcon,
   LandmarkIcon,
-  Megaphone,
-  Target,
   UserIcon,
-  ListTodo,
-  Files,
   CheckSquare,
+  Database
 } from "lucide-react";
 import Link from "next/link";
 
@@ -23,29 +17,15 @@ import Container from "./components/ui/Container";
 import LoadingBox from "./components/dasboard/loading-box";
 import StorageQuota from "./components/dasboard/storage-quota";
 
-import {
-  getTasksCount,
-  getUsersTasksCount,
-} from "@/actions/dashboard/get-tasks-count";
-import { getInvoicesCount } from "@/actions/dashboard/get-invoices-count";
-import { getCampaignsCount } from "@/actions/dashboard/get-campaigns-count";
-import { getTargetsCount } from "@/actions/dashboard/get-targets-count";
-import { getLeadsCount } from "@/actions/dashboard/get-leads-count";
-import { getBoardsCount } from "@/actions/dashboard/get-boards-count";
 import { getStorageSize } from "@/actions/documents/get-storage-size";
-import { getContactCount } from "@/actions/dashboard/get-contacts-count";
-import { getAccountsCount } from "@/actions/dashboard/get-accounts-count";
-import { getContractsCount } from "@/actions/dashboard/get-contracts-count";
-import { getDocumentsCount } from "@/actions/dashboard/get-documents-count";
 import { getActiveUsersCount } from "@/actions/dashboard/get-active-users-count";
-import { getOpportunitiesCount } from "@/actions/dashboard/get-opportunities-count";
-import { getExpectedRevenue } from "@/actions/crm/opportunity/get-expected-revenue";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import { getDefaultCurrency, formatCurrency as formatCurrencyUtil } from "@/lib/currency";
 import { Decimal } from "@prisma/client/runtime/client";
-import { getLeadAnalytics } from "@/actions/dashboard/get-lead-analytics";
 import { DashboardKpis } from "./components/DashboardKpis";
+
+import { buildCrmFilter, buildTaskFilter } from "@/lib/dashboard-filters";
 
 const DashboardPage = async () => {
   const session = await getSession();
@@ -62,33 +42,28 @@ const DashboardPage = async () => {
     }
   }
 
-  const userId = session?.user?.id;
-
+  const appUser = session.user as any;
   const cookieStore = await cookies();
   const defaultCurrency = await getDefaultCurrency();
   const displayCurrency = cookieStore.get("display_currency")?.value || defaultCurrency;
-
-  //Get user language
-  const lang = session?.user?.userLanguage;
-
-  //Fetch translations from dictionary
   const dict = await getTranslations("DashboardPage");
 
+  const crmFilter = buildCrmFilter(appUser);
+  const taskFilter = buildTaskFilter(appUser);
+  const isAdminOrDev = appUser.role === "admin" || appUser.role === "developer";
+  const isManager = appUser.role === "manager";
+  const isUser = appUser.role === "user";
+
   let leads = 0;
-  let tasks = 0;
-  let invoices = 0;
-  let campaigns = 0;
-  let targets = 0;
-  let storage = 0;
-  let projects = 0;
   let contacts = 0;
-  let contracts = 0;
-  let users = 0;
   let accounts = 0;
-  let revenue = 0;
-  let documents = 0;
   let opportunities = 0;
-  let usersTasks = 0;
+  let revenue = 0;
+  let myTasks = 0;
+  
+  let users = 0;
+  let storage = 0;
+
   let leadAnalytics: any = {
     totalLeads: 0,
     activeCount: 0,
@@ -100,54 +75,73 @@ const DashboardPage = async () => {
     funnelData: [],
     avgResponseTimeHours: 0,
   };
+  
   let isDbOffline = false;
 
   try {
-    [
-      leads,
-      tasks,
-      invoices,
-      campaigns,
-      targets,
-      storage,
-      projects,
-      contacts,
-      contracts,
-      users,
-      accounts,
-      revenue,
-      documents,
-      opportunities,
-      usersTasks,
-      leadAnalytics,
-    ] = await Promise.all([
-      getLeadsCount(),
-      getTasksCount(),
-      getInvoicesCount(),
-      getCampaignsCount(),
-      getTargetsCount(),
-      getStorageSize(),
-      getBoardsCount(),
-      getContactCount(),
-      getContractsCount(),
-      getActiveUsersCount(),
-      getAccountsCount(),
-      getExpectedRevenue(displayCurrency),
-      getDocumentsCount(),
-      getOpportunitiesCount(),
-      getUsersTasksCount(userId),
-      getLeadAnalytics(session.user.organization_id ?? undefined),
+    // 1. Fetch CRM Metrics using filters
+    const [leadsCount, contactsCount, accountsCount, opps, taskCount] = await Promise.all([
+      prismadb.crm_Leads.count({ where: crmFilter }),
+      prismadb.crm_Contacts.count({ where: crmFilter }),
+      prismadb.crm_Accounts.count({ where: crmFilter }),
+      prismadb.crm_Opportunities.findMany({
+        where: { ...crmFilter, status: "ACTIVE" },
+        select: { budget: true, currency: true }
+      }),
+      prismadb.tasks.count({ where: taskFilter })
     ]);
+
+    leads = leadsCount;
+    contacts = contactsCount;
+    accounts = accountsCount;
+    opportunities = opps.length;
+    myTasks = taskCount;
+
+    // Calculate expected revenue based on filtered opportunities
+    const { getExchangeRates, convertAmount } = await import("@/lib/currency");
+    const rates = await getExchangeRates();
+    let totalRev = new Decimal(0);
+    for (const opp of opps) {
+      const budget = new Decimal(opp.budget?.toString() ?? "0");
+      const from = opp.currency || displayCurrency;
+      const converted = convertAmount(budget, from, displayCurrency, rates);
+      totalRev = totalRev.add(converted ?? budget);
+    }
+    revenue = totalRev.toNumber();
+
+    // 2. Fetch Admin Metrics
+    if (isAdminOrDev) {
+      [users, storage] = await Promise.all([
+        getActiveUsersCount(),
+        getStorageSize(),
+      ]);
+    }
+
+    // 3. Fetch Analytics (TODO: update getLeadAnalytics to accept appUser instead of just org_id)
+    const { getLeadAnalytics } = await import("@/actions/dashboard/get-lead-analytics");
+    leadAnalytics = await getLeadAnalytics(appUser);
+
   } catch (error) {
-    console.warn("[DashboardPage] Database is offline, loading fallback default metrics:", error);
+    console.warn("[DashboardPage] Database error:", error);
     isDbOffline = true;
   }
 
+  const roleLabels: Record<string, string> = {
+    developer: "Developer Dashboard",
+    admin: "Admin Dashboard",
+    manager: "Team Manager Dashboard",
+    user: "My Dashboard"
+  };
+
   return (
     <Container
-      title={dict("containerTitle")}
+      title={roleLabels[appUser.role] || dict("containerTitle")}
       description={
-        "Welcome to OpenAlgon CRM cockpit, here you can see your company overview"
+        appUser.role === "user" 
+          ? "Welcome! Here is an overview of your assigned pipeline and tasks." 
+          : appUser.role === "manager" 
+            ? "Welcome! Here is an overview of your team's pipeline and tasks."
+            : "Welcome to OpenAlgon CRM cockpit, here you can see the global overview."
       }
     >
       {isDbOffline && (
@@ -157,29 +151,21 @@ const DashboardPage = async () => {
             <span>Database Offline</span>
           </div>
           <p className="text-muted-foreground text-xs">
-            Could not connect to the local PostgreSQL database server (ECONNREFUSED). Please make sure your database server is running and `DATABASE_URL` in `.env` is configured correctly, then run `pnpm prisma migrate dev` to initialize your schema.
+            Could not connect to the local PostgreSQL database server (ECONNREFUSED).
           </p>
         </div>
       )}
 
       {/* Stats Grid */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        
         {/* Revenue cards */}
         <Suspense fallback={<LoadingBox />}>
           <div className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-medium text-muted-foreground">{dict("totalRevenue")}</p>
-              <span className="icon-bg-indigo p-2 rounded-lg">
-                <DollarSignIcon className="w-4 h-4" />
-              </span>
-            </div>
-            <p className="text-2xl font-bold text-foreground">0</p>
-          </div>
-        </Suspense>
-        <Suspense fallback={<LoadingBox />}>
-          <div className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-medium text-muted-foreground">{dict("expectedRevenue")}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                {isAdminOrDev ? "Global Expected Revenue" : isManager ? "Team Expected Revenue" : "My Expected Revenue"}
+              </p>
               <span className="icon-bg-emerald p-2 rounded-lg">
                 <DollarSignIcon className="w-4 h-4" />
               </span>
@@ -191,21 +177,26 @@ const DashboardPage = async () => {
         </Suspense>
 
         {/* Module stat cards */}
-        <DashboardCard href="/admin/users"    title={dict("activeUsers")}    IconComponent={UserIcon}          content={users}       colorClass="icon-bg-indigo" />
-        <DashboardCard href="/invoices"        title={dict("invoices")}       IconComponent={FileText}          content={invoices}    colorClass="icon-bg-blue" />
-        <DashboardCard href="/campaigns"       title={dict("campaigns")}      IconComponent={Megaphone}         content={campaigns}   colorClass="icon-bg-violet" />
-        <DashboardCard href="/crm/targets"     title={dict("targets")}        IconComponent={Target}            content={targets}     colorClass="icon-bg-rose" />
-        <DashboardCard href="/crm/accounts"    title={dict("accounts")}       IconComponent={LandmarkIcon}      content={accounts}    colorClass="icon-bg-amber" />
-        <DashboardCard href="/crm/opportunities" title={dict("opportunities")} IconComponent={HeartHandshakeIcon} content={opportunities} colorClass="icon-bg-emerald" />
-        <DashboardCard href="/crm/contacts"    title={dict("contacts")}       IconComponent={Contact}           content={contacts}    colorClass="icon-bg-blue" />
-        <DashboardCard href="/crm/leads"       title={dict("leads")}          IconComponent={CoinsIcon}         content={leads}       colorClass="icon-bg-indigo" />
-        <DashboardCard href="/crm/contracts"   title={dict("contracts")}      IconComponent={FilePenLine}       content={contracts}   colorClass="icon-bg-amber" />
-        <DashboardCard href="/projects"         title={dict("projects")}       IconComponent={FolderKanban}      content={projects}    colorClass="icon-bg-violet" />
-        <DashboardCard href="/projects/tasks"   title={dict("tasks")}          IconComponent={ListTodo}          content={tasks}       colorClass="icon-bg-rose" />
-        <DashboardCard href={`/projects/tasks/${userId}`} title={dict("myTasks")} IconComponent={CheckSquare} content={usersTasks} colorClass="icon-bg-emerald" />
-        <DashboardCard href="/documents"        title={dict("documents")}      IconComponent={Files}             content={documents}   colorClass="icon-bg-blue" />
+        <DashboardCard href="/crm/opportunities" title={isAdminOrDev ? dict("opportunities") : isManager ? "Team Opportunities" : "My Opportunities"} IconComponent={HeartHandshakeIcon} content={opportunities} colorClass="icon-bg-emerald" />
+        <DashboardCard href="/crm/leads"       title={isAdminOrDev ? dict("leads") : isManager ? "Team Leads" : "My Leads"}          IconComponent={CoinsIcon}         content={leads}       colorClass="icon-bg-indigo" />
+        
+        {/* Only Managers and Admins need quick access to Contacts and Accounts aggregate counts */}
+        {!isUser && (
+          <>
+            <DashboardCard href="/crm/contacts"    title={isAdminOrDev ? dict("contacts") : "Team Contacts"}       IconComponent={Contact}           content={contacts}    colorClass="icon-bg-blue" />
+            <DashboardCard href="/crm/accounts"    title={isAdminOrDev ? dict("accounts") : "Team Accounts"}       IconComponent={LandmarkIcon}      content={accounts}    colorClass="icon-bg-amber" />
+          </>
+        )}
+        
+        <DashboardCard href={`/projects/tasks/${appUser.id}`} title={isAdminOrDev ? "Total Tasks" : isManager ? "Team Tasks" : dict("myTasks")} IconComponent={CheckSquare} content={myTasks} colorClass="icon-bg-rose" />
 
-        <StorageQuota actual={storage} title={dict("storage")} />
+        {/* Admin Only Cards */}
+        {isAdminOrDev && (
+          <>
+            <DashboardCard href="/admin/users"    title={dict("activeUsers")}    IconComponent={UserIcon}          content={users}       colorClass="icon-bg-indigo" />
+            <StorageQuota actual={storage} title={dict("storage")} />
+          </>
+        )}
       </div>
 
       <DashboardKpis data={leadAnalytics} />

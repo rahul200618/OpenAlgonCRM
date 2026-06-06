@@ -47,6 +47,7 @@ type UpdateOpportunityFormProps = {
   saleStages: ConfigItem[];
   campaigns: ConfigItem[];
   currencies: { code: string; name: string; symbol: string }[];
+  isUser?: boolean;
 };
 
 export function UpdateOpportunityForm({
@@ -56,6 +57,7 @@ export function UpdateOpportunityForm({
   saleStages,
   campaigns,
   currencies,
+  isUser,
 }: UpdateOpportunityFormProps) {
   const t = useTranslations("CrmOpportunityForm");
   const c = useTranslations("Common");
@@ -331,24 +333,26 @@ export function UpdateOpportunityForm({
                 />
               </div>
               <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="assigned_to"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{c("assignedTo")}</FormLabel>
-                      <FormControl>
-                        <UserSearchCombobox
-                          value={field.value ?? ""}
-                          onChange={field.onChange}
-                          placeholder={c("selectUser")}
-                          disabled={form.formState.isSubmitting}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!isUser && (
+                  <FormField
+                    control={form.control}
+                    name="assigned_to"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{c("assignedTo")}</FormLabel>
+                        <FormControl>
+                          <UserSearchCombobox
+                            value={field.value ?? ""}
+                            onChange={field.onChange}
+                            placeholder={c("selectUser")}
+                            disabled={form.formState.isSubmitting}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <FormField
                   control={form.control}
                   name="account"

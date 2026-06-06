@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { prismadb as prisma } from "@/lib/prisma";
+import { checkSubscription } from "@/lib/subscription";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -64,6 +65,16 @@ export default async function AppLayout({
 
   if (user?.userStatus === "INACTIVE") {
     return redirect("/inactive");
+  }
+
+  // Check subscription access
+  const hasAccess = await checkSubscription();
+  if (!hasAccess && user?.role === "admin") {
+    return redirect("/pricing");
+  } else if (!hasAccess) {
+    // Regular users shouldn't see the pricing page, they should just get blocked
+    // For now we can redirect them to a generic access denied or they just see pricing but can't buy
+    return redirect("/pricing");
   }
 
   // Fetch localization dictionary

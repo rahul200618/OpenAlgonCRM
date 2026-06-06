@@ -49,6 +49,12 @@ export const updateLead = async (data: {
 
   try {
     const before = await prismadb.crm_Leads.findUnique({ where: { id, deletedAt: null } });
+    
+    let finalAssignedTo = assigned_to || userId;
+    if (session.user.role === "user") {
+      finalAssignedTo = before?.assigned_to || userId;
+    }
+
     const lead = await prismadb.crm_Leads.update({
       where: { id },
       data: {
@@ -66,7 +72,7 @@ export const updateLead = async (data: {
         lead_type_id: lead_type_id || undefined,
         refered_by,
         campaign,
-        assigned_to: assigned_to || userId,
+        assigned_to: finalAssignedTo,
         accountsIDs: accountIDs,
       },
     });

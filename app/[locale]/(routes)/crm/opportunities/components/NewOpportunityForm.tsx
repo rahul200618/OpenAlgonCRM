@@ -56,6 +56,7 @@ type NewTaskFormProps = {
   selectedStage?: string;
   accountId?: string;
   onDialogClose: () => void;
+  isUser?: boolean;
 };
 
 export function NewOpportunityForm({
@@ -68,6 +69,7 @@ export function NewOpportunityForm({
   selectedStage,
   accountId,
   onDialogClose,
+  isUser,
 }: NewTaskFormProps) {
   const t = useTranslations("CrmOpportunityForm");
   const c = useTranslations("Common");
@@ -380,24 +382,26 @@ export function NewOpportunityForm({
                 />
               </div>
               <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="assigned_to"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{c("assignedTo")}</FormLabel>
-                      <FormControl>
-                        <UserSearchCombobox
-                          value={field.value ?? ""}
-                          onChange={field.onChange}
-                          placeholder={c("selectUser")}
-                          disabled={form.formState.isSubmitting}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!isUser && (
+                  <FormField
+                    control={form.control}
+                    name="assigned_to"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{c("assignedTo")}</FormLabel>
+                        <FormControl>
+                          <UserSearchCombobox
+                            value={field.value ?? ""}
+                            onChange={field.onChange}
+                            placeholder={c("selectUser")}
+                            disabled={form.formState.isSubmitting}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <FormField
                   control={form.control}
                   name="account"

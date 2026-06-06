@@ -51,11 +51,17 @@ export const updateOpportunity = async (data: {
       ? await getSnapshotRate(currency, defaultCurrency)
       : null;
     const before = await prismadb.crm_Opportunities.findUnique({ where: { id, deletedAt: null } });
+    
+    let finalAssignedTo = assigned_to || undefined;
+    if (session.user.role === "user") {
+      finalAssignedTo = before?.assigned_to || undefined;
+    }
+
     const opportunity = await prismadb.crm_Opportunities.update({
       where: { id },
       data: {
         account: account || undefined,
-        assigned_to: assigned_to || undefined,
+        assigned_to: finalAssignedTo,
         budget: budget ? parseFloat(budget) : undefined,
         campaign: campaign || undefined,
         close_date,

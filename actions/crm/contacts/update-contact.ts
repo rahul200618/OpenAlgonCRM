@@ -49,13 +49,19 @@ export const updateContact = async (data: {
 
   try {
     const before = await prismadb.crm_Contacts.findUnique({ where: { id, deletedAt: null } });
+    
+    let finalAssignedTo = assigned_to || undefined;
+    if (session.user.role === "user") {
+      finalAssignedTo = before?.assigned_to || undefined;
+    }
+
     const contact = await prismadb.crm_Contacts.update({
       where: { id },
       data: {
         v: 0,
         updatedBy: userId,
         accountsIDs: assigned_account || undefined,
-        assigned_to: assigned_to || undefined,
+        assigned_to: finalAssignedTo,
         contact_type_id: contact_type_id || undefined,
         birthday:
           birthday_day && birthday_month && birthday_year

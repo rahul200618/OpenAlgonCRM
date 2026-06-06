@@ -69,7 +69,14 @@ export const createLead = async (data: {
 
     let finalAssignedTo = userId;
     try {
-      if (assigned_to) {
+      if (session.user.role === "user") {
+        // A regular user cannot assign to anyone else, nor trigger round_robin
+        finalAssignedTo = userId;
+        await prismadb.crm_Leads.update({
+          where: { id: lead.id },
+          data: { assigned_to: userId },
+        });
+      } else if (assigned_to) {
         const result = await assignLead(lead.id, "manual", {
           targetUserId: assigned_to,
           assignedById: userId,

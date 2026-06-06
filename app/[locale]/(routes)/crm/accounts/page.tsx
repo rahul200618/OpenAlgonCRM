@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import { getSession } from "@/lib/auth-server";
 
 import AccountsView from "../components/AccountsView";
 import Container from "../../components/ui/Container";
@@ -11,6 +12,8 @@ const AccountsPage = async () => {
   const t = await getTranslations("CrmPage");
   const crmData = await getAllCrmData();
   const accounts = await getAccounts();
+  const session = await getSession();
+  const isUser = session?.user?.role === "user";
 
   return (
     <Container
@@ -18,7 +21,7 @@ const AccountsPage = async () => {
       description={t("accounts.pageDescription")}
     >
       <Suspense fallback={<CrmAccountsSkeleton />}>
-        <AccountsView crmData={crmData} data={accounts} />
+        <AccountsView crmData={crmData} data={accounts} isUser={isUser} />
       </Suspense>
     </Container>
   );

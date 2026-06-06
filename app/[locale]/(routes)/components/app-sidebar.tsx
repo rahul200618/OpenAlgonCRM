@@ -95,50 +95,19 @@ export function AppSidebar({
 
   const navItems = [
     getDashboardMenuItem({ title: dict?.dashboard || "Dashboard" }),
-    getAnalyticsMenuItem({ title: "Analytics" }),
     getCrmMenuItem({ localizations: dict.crm }),
   ];
+
+  if (session?.user?.role !== "user") {
+    navItems.splice(1, 0, getAnalyticsMenuItem({ title: "Analytics" }));
+  }
 
   if (featureFlags.module_followups !== false) {
     navItems.push(getFollowupsMenuItem({ title: dict?.followups || "Follow-ups" }));
   }
 
-  if (featureFlags.module_campaigns !== false) {
-    navItems.push(
-      getCampaignsMenuItem({
-        localizations: {
-          title: "Campaigns",
-          campaigns: "All Campaigns",
-          templates: "Templates",
-          targets: "Targets",
-          targetLists: "Target Lists",
-        },
-      })
-    );
-  }
-
-  if (featureFlags.module_projects !== false) {
-    navItems.push(getProjectsMenuItem({ title: dict?.projects || "Projects" }));
-  }
-
-  if (featureFlags.module_emails !== false) {
-    navItems.push(getEmailsMenuItem({ title: dict?.emails || "Emails" }));
-  }
-
-  if (featureFlags.module_reports !== false) {
-    navItems.push(getReportsMenuItem({ title: dict?.reports || "Reports" }));
-  }
-
-  if (featureFlags.module_documents !== false) {
-    navItems.push(getDocumentsMenuItem({ title: dict?.documents || "Documents" }));
-  }
-
-  if (featureFlags.module_invoices !== false) {
-    navItems.push(getInvoicesMenuItem({ title: dict?.invoices || "Invoices" }));
-  }
-
-  // Administration: admin users only
-  if (session?.user?.role === "admin") {
+  // Administration: admin and developer users only
+  if (session?.user?.role === "admin" || session?.user?.role === "developer") {
     navItems.push(
       getAdministrationMenuItem({ title: dict?.settings || "Administration" }),
     );
