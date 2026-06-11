@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PRICING_TIERS } from "@/lib/subscription";
+import { PRICING_TIERS } from "@/lib/constants";
 import { toast } from "sonner";
 
 interface SubscribeButtonProps {

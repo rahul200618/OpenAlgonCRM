@@ -82,12 +82,14 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   dict: any;
   session: Session;
   featureFlags?: Record<string, boolean>;
+  hasAccess?: boolean;
 }
 
 export function AppSidebar({
   dict,
   session,
   featureFlags = {},
+  hasAccess = true,
   ...props
 }: AppSidebarProps) {
   const { state } = useSidebar();
@@ -104,6 +106,34 @@ export function AppSidebar({
 
   if (featureFlags.module_followups !== false) {
     navItems.push(getFollowupsMenuItem({ title: dict?.followups || "Follow-ups" }));
+  }
+
+  if (featureFlags.projects !== false) {
+    navItems.push(getProjectsMenuItem({ title: dict?.projects || "Projects" }));
+  }
+  
+  if (featureFlags.campaigns !== false) {
+    navItems.push(getCampaignsMenuItem({ 
+      localizations: dict?.campaigns || { 
+        title: "Campaigns", 
+        campaigns: "Campaigns", 
+        templates: "Templates", 
+        targets: "Targets", 
+        targetLists: "Target Lists" 
+      } 
+    }));
+  }
+
+  if (featureFlags.reports !== false) {
+    navItems.push(getReportsMenuItem({ title: dict?.reports || "Reports" }));
+  }
+
+  if (featureFlags.documents !== false) {
+    navItems.push(getDocumentsMenuItem({ title: dict?.documents || "Documents" }));
+  }
+
+  if (featureFlags.invoices !== false) {
+    navItems.push(getInvoicesMenuItem({ title: dict?.invoices || "Invoices" }));
   }
 
   // Administration: admin and developer users only
@@ -155,7 +185,7 @@ export function AppSidebar({
       {/* Main Content - Navigation */}
       <SidebarContent>
         {/* NavMain component with all enabled module navigation items */}
-        <NavMain items={navItems} dict={dict} />
+        <NavMain items={navItems} dict={dict} hasAccess={hasAccess} />
       </SidebarContent>
 
       {/* Footer with NavUser and Build Version */}

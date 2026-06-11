@@ -12,5 +12,6 @@ export default function getInvoicesMenuItem({
     title,
     url: "/invoices",
     icon: Receipt,
+    isPremium: true,
   }
 }

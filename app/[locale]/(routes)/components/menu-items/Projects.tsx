@@ -23,6 +23,7 @@ export const getProjectsMenuItem = ({ title }: Props): NavItem => {
     title,
     url: "/projects",
     icon: ServerIcon,
+    isPremium: true,
   };
 };
 

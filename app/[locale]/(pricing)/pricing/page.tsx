@@ -5,7 +5,7 @@ import Script from "next/script";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { PRICING_TIERS } from "@/lib/subscription";
+import { PRICING_TIERS } from "@/lib/constants";
 import { SubscribeButton } from "./components/SubscribeButton";
 
 export default function PricingPage() {

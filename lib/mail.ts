@@ -3,6 +3,7 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const domain = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
 export const sendTwoFactorTokenEmail = async (
   email: string,
@@ -14,7 +15,7 @@ export const sendTwoFactorTokenEmail = async (
   }
 
   await resend.emails.send({
-    from: "OpenAlgon CRM <onboarding@resend.dev>",
+    from: `OpenAlgon CRM <${fromEmail}>`,
     to: email,
     subject: "2FA Code",
     html: `<p>Your 2FA code: ${token}</p>`
@@ -32,10 +33,8 @@ export const sendPasswordResetEmail = async (
     return;
   }
 
-  const resetLink = `${domain}/new-password?token=${token}`
-
   await resend.emails.send({
-    from: "OpenAlgon CRM <onboarding@resend.dev>",
+    from: `OpenAlgon CRM <${fromEmail}>`,
     to: email,
     subject: "Reset your password",
     html: `<p>Click <a href="${resetLink}">here</a> to reset password.</p>`
@@ -53,10 +52,8 @@ export const sendVerificationEmail = async (
     return;
   }
 
-  const confirmLink = `${domain}/new-verification?token=${token}`;
-
   await resend.emails.send({
-    from: "OpenAlgon CRM <onboarding@resend.dev>",
+    from: `OpenAlgon CRM <${fromEmail}>`,
     to: email,
     subject: "Confirm your email",
     html: `<p>Click <a href="${confirmLink}">here</a> to confirm email.</p>`
@@ -75,10 +72,8 @@ export const sendInviteEmail = async (
     return;
   }
 
-  const inviteLink = `${domain}/invite/${token}`;
-
   await resend.emails.send({
-    from: "OpenAlgon CRM <onboarding@resend.dev>",
+    from: `OpenAlgon CRM <${fromEmail}>`,
     to: email,
     subject: `You have been invited to join ${orgName}`,
     html: `

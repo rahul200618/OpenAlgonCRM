@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         phone: phone || null,
-        userStatus: "PENDING",
+        userStatus: "ACTIVE",
         role: "admin",
         organization_id: organization.id,
       },

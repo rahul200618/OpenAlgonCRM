@@ -121,12 +121,12 @@ export function LoginComponent() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full h-full bg-background relative overflow-hidden">
+    <div className="flex flex-col items-center min-h-[100dvh] w-full bg-background relative overflow-y-auto overflow-x-hidden p-4 py-8 md:p-8">
       {/* Background gradients */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
       
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-md relative z-10 my-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
             OpenAlgon CRM
@@ -168,7 +168,7 @@ export function LoginComponent() {
               </TabsList>
               
               <TabsContent value="signin" className="space-y-5 animate-in fade-in zoom-in-95 duration-200">
-                <form onSubmit={handleEmailSignIn} className="space-y-4">
+                <form onSubmit={handleEmailSignIn} className="space-y-4" autoComplete="off">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email" className="font-medium text-sm ml-1">Email address</Label>
                     <div className="relative group">
@@ -182,6 +182,7 @@ export function LoginComponent() {
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isLoading}
                         className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                        autoComplete="off"
                       />
                     </div>
                   </div>
@@ -204,6 +205,7 @@ export function LoginComponent() {
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={isLoading}
                         className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
+                        autoComplete="new-password"
                       />
                     </div>
                   </div>
@@ -219,7 +221,7 @@ export function LoginComponent() {
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-5 animate-in fade-in zoom-in-95 duration-200">
-                <form onSubmit={handleEmailSignUp} className="space-y-4">
+                <form onSubmit={handleEmailSignUp} className="space-y-4" autoComplete="off">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name" className="font-medium text-sm ml-1">Full Name</Label>
                     <div className="relative group">
@@ -327,6 +329,7 @@ export function LoginComponent() {
                         disabled={isLoading}
                         className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-primary/50 transition-all"
                         minLength={8}
+                        autoComplete="new-password"
                       />
                     </div>
                     <p className="text-xs text-muted-foreground ml-1 mt-1">Must be at least 8 characters</p>

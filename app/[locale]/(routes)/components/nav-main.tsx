@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { type LucideIcon, ChevronRight } from "lucide-react"
+import { type LucideIcon, ChevronRight, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   SidebarGroup,
@@ -46,6 +46,7 @@ export interface NavItem {
   icon?: LucideIcon
   isActive?: boolean
   items?: NavSubItem[] // For collapsible groups
+  isPremium?: boolean
 }
 
 export interface NavSubItem {
@@ -58,9 +59,10 @@ export interface NavSubItem {
 interface NavMainProps {
   items: NavItem[]
   dict?: any
+  hasAccess?: boolean
 }
 
-export function NavMain({ items, dict }: NavMainProps) {
+export function NavMain({ items, dict, hasAccess = true }: NavMainProps) {
   const pathname = usePathname()
 
   // Helper function to check if a route is active
@@ -104,7 +106,11 @@ export function NavMain({ items, dict }: NavMainProps) {
                     >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                      <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                      {item.isPremium && !hasAccess ? (
+                        <Lock className="ml-auto w-4 h-4 text-muted-foreground/70" />
+                      ) : (
+                        <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                      )}
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
@@ -144,6 +150,9 @@ export function NavMain({ items, dict }: NavMainProps) {
                 <Link href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
+                  {item.isPremium && !hasAccess && (
+                    <Lock className="ml-auto w-4 h-4 text-muted-foreground/70" />
+                  )}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

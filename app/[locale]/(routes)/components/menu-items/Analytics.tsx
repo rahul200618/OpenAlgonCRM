@@ -6,5 +6,6 @@ export function getAnalyticsMenuItem({ title }: { title: string }): NavItem {
     title,
     url: "/analytics",
     icon: PieChart,
+    isPremium: true,
   };
 }

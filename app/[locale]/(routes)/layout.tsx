@@ -128,6 +128,9 @@ export default async function AppLayout({
     };
   }
 
+  // Check user subscription to lock premium features in the UI
+  const hasAccess = await checkSubscription();
+
   //console.log(typeof build, "build");
   return (
     <AvatarProvider initialAvatar={user?.avatar}>
@@ -137,6 +140,7 @@ export default async function AppLayout({
         dict={translations}
         session={session}
         featureFlags={featureFlags}
+        hasAccess={hasAccess}
       />
       <SidebarInset>
         <Header

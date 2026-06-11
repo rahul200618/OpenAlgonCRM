@@ -29,5 +29,6 @@ export default function getDocumentsMenuItem({
     title,
     url: "/documents",
     icon: FileText,
+    isPremium: true,
   }
 }

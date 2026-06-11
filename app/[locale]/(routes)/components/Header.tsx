@@ -1,12 +1,12 @@
 import Feedback from "./Feedback";
 import FulltextSearch from "./FulltextSearch";
-
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SetLanguage } from "@/components/SetLanguage";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CommandComponent } from "@/components/CommandComponent";
 import { CurrencySwitcher } from "@/components/CurrencySwitcher";
+import { BackButton } from "@/components/ui/back-button";
 
 type Props = {
   id: string;
@@ -19,7 +19,7 @@ type Props = {
  * Reorganized header for new layout with shadcn dashboard-01 pattern.
  *
  * Layout Structure:
- * - Left side: SidebarTrigger (mobile menu), FulltextSearch
+ * - Left side: BackButton, SidebarTrigger (mobile menu), FulltextSearch
  * - Right side: CommandComponent, SetLanguage, Feedback, ThemeToggle, SupportComponent
  *
  * Changes from previous version:
@@ -36,6 +36,7 @@ const Header = ({ id, lang }: Props) => {
     <>
       <div className="flex h-16 shrink-0 items-center justify-between gap-2 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 flex-1 min-w-0">
+          <BackButton />
           <SidebarTrigger className="-ml-1 shrink-0" />
           <Separator orientation="vertical" className="mr-2 h-4 shrink-0 hidden sm:block" />
           <div className="flex-1 min-w-0 max-w-[300px]">

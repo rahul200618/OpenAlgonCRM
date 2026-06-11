@@ -15,6 +15,7 @@ export const getCampaignsMenuItem = ({ localizations }: Props): NavItem => {
   return {
     title: localizations.title,
     icon: Megaphone,
+    isPremium: true,
     items: [
       { title: localizations.campaigns, url: "/campaigns" },
       { title: localizations.templates, url: "/campaigns/templates" },
