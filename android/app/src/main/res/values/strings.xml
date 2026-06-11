@@ -2,6 +2,4 @@
 <resources>
     <string name="app_name">OrvixCRM</string>
     <string name="title_activity_main">OrvixCRM</string>
-    <string name="package_name">com.openalgon.orvixcrm</string>
-    <string name="custom_url_scheme">com.openalgon.orvixcrm</string>
 </resources>

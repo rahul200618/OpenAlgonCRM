@@ -76,3 +76,30 @@ v8-compile-cache-*/
 
 #superpowers plugin
 .superpowers/
+
+# Android Studio / IntelliJ IDEA / Gradle
+android/.idea/
+android/*.iml
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
+
+# Tauri / Rust build output
+src-tauri/target/
+
+# OS-specific files
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ESLint cache
+.eslintcache
+
+# AI Agent / Skill configuration files
+skills-lock.json
+.gemini/
+.antigravity/
+
+
+

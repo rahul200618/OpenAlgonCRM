@@ -67,15 +67,8 @@ export default async function AppLayout({
     return redirect("/inactive");
   }
 
-  // Check subscription access
-  const hasAccess = await checkSubscription();
-  if (!hasAccess && user?.role === "admin") {
-    return redirect("/pricing");
-  } else if (!hasAccess) {
-    // Regular users shouldn't see the pricing page, they should just get blocked
-    // For now we can redirect them to a generic access denied or they just see pricing but can't buy
-    return redirect("/pricing");
-  }
+  // Removed global subscription access check
+  // Feature-specific guards will handle premium features instead
 
   // Fetch localization dictionary
   const dict = await getTranslations("ModuleMenu");

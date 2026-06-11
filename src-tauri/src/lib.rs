@@ -1,3 +1,5 @@
+mod tray;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
@@ -9,6 +11,7 @@ pub fn run() {
             .build(),
         )?;
       }
+      tray::setup_tray(app).expect("Failed to setup tray");
       Ok(())
     })
     .run(tauri::generate_context!())

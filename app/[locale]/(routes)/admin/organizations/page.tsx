@@ -52,7 +52,7 @@ export default async function AdminOrganizationsPage() {
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Plan</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Users</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Stripe ID</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Razorpay ID</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Joined</th>
                     <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Actions</th>
                   </tr>
@@ -71,7 +71,7 @@ export default async function AdminOrganizationsPage() {
                       </td>
                       <td className="p-4 align-middle">{org.usersCount}</td>
                       <td className="p-4 align-middle font-mono text-xs text-muted-foreground">
-                        {org.stripeCustomerId || "N/A"}
+                        {org.razorpayCustomerId || "N/A"}
                       </td>
                       <td className="p-4 align-middle text-muted-foreground">
                         {new Date(org.createdAt).toLocaleDateString()}

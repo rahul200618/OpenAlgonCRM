@@ -25,6 +25,11 @@ export const createOpportunity = async (data: {
   const session = await getSession();
   if (!session) return { error: "Unauthorized" };
 
+  const { checkPermission } = await import("@/lib/auth-permissions");
+  if (!checkPermission(session.user.role, "crm", "create")) {
+    return { error: "Forbidden: You do not have permission to create opportunities." };
+  }
+
   const userId = session.user.id;
   const {
     account,

@@ -70,18 +70,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { id: token.sub }
         });
 
-        // Automatically activate ALL users who are stuck in PENDING status
-        if (dbUser && dbUser.userStatus === "PENDING") {
-          const totalUsers = await prisma.users.count();
-          dbUser = await prisma.users.update({
-            where: { id: dbUser.id },
-            // If they are the first user, also give them admin rights
-            data: { 
-              userStatus: "ACTIVE", 
-              role: totalUsers === 1 ? "admin" : dbUser.role 
-            }
-          });
-        }
+        // Removed development auto-activation hack. Users must verify their email.
         
         if (dbUser) {
           (session.user as any).role = dbUser.role;

@@ -9,12 +9,12 @@ export const createInvite = async (email?: string) => {
   try {
     const session = await getSession();
     
-    if (!session || !session.organization_id) {
+    if (!session?.user || !session.user.organization_id) {
       return { error: "Unauthorized" };
     }
 
     const org = await prismadb.organization.findUnique({
-      where: { id: session.organization_id },
+      where: { id: session.user.organization_id },
       include: { users: true },
     });
 
@@ -39,7 +39,7 @@ export const createInvite = async (email?: string) => {
 
     const invite = await prismadb.organizationInvite.create({
       data: {
-        organizationId: session.organization_id,
+        organizationId: session.user.organization_id,
         token,
         email: email || null,
         expiresAt,

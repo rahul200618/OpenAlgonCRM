@@ -107,6 +107,33 @@ export function DataTable<TData, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button 
+          variant="outline" 
+          className="ml-2"
+          onClick={() => {
+            const rows = table.getRowModel().rows;
+            const headers = table.getAllColumns().filter(c => c.getIsVisible() && c.id !== "actions").map(c => c.id);
+            const csv = [
+              headers.join(","),
+              ...rows.map(row => 
+                headers.map(header => {
+                  const val = row.getValue(header);
+                  // Escape quotes and wrap in quotes
+                  return typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val;
+                }).join(",")
+              )
+            ].join("\n");
+            
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "export.csv";
+            a.click();
+          }}
+        >
+          Export CSV
+        </Button>
         {/* Visibility */}
       </div>
       <div className="rounded-xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl overflow-x-auto shadow-sm">

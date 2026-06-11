@@ -13,7 +13,7 @@ import { InviteUserForm } from "./_components/InviteUserForm";
 export default async function OrganizationSettingsPage() {
   const session = await getSession();
   
-  if (!session?.organization_id) {
+  if (!session?.user?.organization_id) {
     redirect("/");
   }
 
@@ -32,7 +32,7 @@ export default async function OrganizationSettingsPage() {
   const isEnterprise = org.plan === "enterprise";
   
   const planName = org.plan.charAt(0).toUpperCase() + org.plan.slice(1);
-  const seatsUsed = org.users.length;
+  const seatsUsed = org.users?.length || 0;
   const maxSeats = isEnterprise ? "Unlimited" : (isPro ? 5 : 1);
 
   return (
@@ -115,7 +115,7 @@ export default async function OrganizationSettingsPage() {
                 <div>Role</div>
                 <div>Status</div>
               </div>
-              {org.users.map((u) => (
+              {org.users?.map((u: any) => (
                 <div key={u.id} className="p-4 text-sm grid grid-cols-4 items-center border-b last:border-0 hover:bg-muted/30 transition-colors">
                   <div className="col-span-2 font-medium">{u.name} <span className="text-muted-foreground ml-1 font-normal">({u.email})</span></div>
                   <div><Badge variant="secondary">{u.role}</Badge></div>

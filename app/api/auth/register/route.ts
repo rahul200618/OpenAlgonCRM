@@ -34,18 +34,34 @@ export async function POST(req: Request) {
       },
     });
 
-    // Create the user as admin for this organization
+    // Create the user as admin for this organization with PENDING status
     const user = await prisma.users.create({
       data: {
         name,
         email,
         password: hashedPassword,
         phone: phone || null,
-        userStatus: "ACTIVE",
+        userStatus: "PENDING",
         role: "admin",
         organization_id: organization.id,
       },
     });
+
+    // Generate verification token
+    const token = require("crypto").randomBytes(32).toString("hex");
+    const expires = new Date(new Date().getTime() + 3600 * 1000); // 1 hour
+
+    await prisma.verificationToken.create({
+      data: {
+        identifier: email,
+        token,
+        expires,
+      },
+    });
+
+    // Send verification email
+    const { sendVerificationEmail } = require("@/lib/mail");
+    await sendVerificationEmail(email, token);
 
     return NextResponse.json({ message: "User and Organization created successfully" });
   } catch (error) {

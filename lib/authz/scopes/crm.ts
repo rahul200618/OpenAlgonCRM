@@ -10,12 +10,14 @@ type TargetWhere = NonNullable<
 >["where"];
 
 function contactScopedWhere(user: AuthzUser, contactId: string): ContactWhere {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { id: contactId };
+    return { id: contactId, ...orgFilter };
   }
   // user role: own contact (assigned or creator).
   return {
     id: contactId,
+    ...orgFilter,
     OR: [
       { assigned_to: user.id },
       { createdBy: user.id },
@@ -24,10 +26,11 @@ function contactScopedWhere(user: AuthzUser, contactId: string): ContactWhere {
 }
 
 function targetScopedWhere(user: AuthzUser, targetId: string): TargetWhere {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { id: targetId };
+    return { id: targetId, ...orgFilter };
   }
-  return { id: targetId, created_by: user.id };
+  return { id: targetId, created_by: user.id, ...orgFilter };
 }
 
 export async function tryScopedUpdateContact(
@@ -227,11 +230,13 @@ export function accountUserScopeOR(userId: string) {
 // Manager/admin: { deletedAt: null }
 // User:           { deletedAt: null, OR: accountUserScopeOR(user.id) }
 export function accountReadScopeWhere(user: AuthzUser) {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { deletedAt: null };
+    return { deletedAt: null, ...orgFilter };
   }
   return {
     deletedAt: null,
+    ...orgFilter,
     OR: accountUserScopeOR(user.id),
   };
 }
@@ -273,11 +278,13 @@ export async function assertCanWriteAccount(
 
 // crm_Leads → crm_Accounts via `assigned_accounts` (FK accountsIDs).
 export function leadReadScopeWhere(user: AuthzUser) {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { deletedAt: null };
+    return { deletedAt: null, ...orgFilter };
   }
   return {
     deletedAt: null,
+    ...orgFilter,
     OR: [
       { assigned_to: user.id },
       { createdBy: user.id },
@@ -288,11 +295,13 @@ export function leadReadScopeWhere(user: AuthzUser) {
 
 // crm_Contacts → crm_Accounts via `assigned_accounts` (FK accountsIDs).
 export function contactReadScopeWhere(user: AuthzUser) {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { deletedAt: null };
+    return { deletedAt: null, ...orgFilter };
   }
   return {
     deletedAt: null,
+    ...orgFilter,
     OR: [
       { assigned_to: user.id },
       { createdBy: user.id },
@@ -303,11 +312,13 @@ export function contactReadScopeWhere(user: AuthzUser) {
 
 // crm_Opportunities → crm_Accounts via `assigned_account` (FK account).
 export function opportunityReadScopeWhere(user: AuthzUser) {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { deletedAt: null };
+    return { deletedAt: null, ...orgFilter };
   }
   return {
     deletedAt: null,
+    ...orgFilter,
     OR: [
       { assigned_to: user.id },
       { createdBy: user.id },
@@ -318,11 +329,13 @@ export function opportunityReadScopeWhere(user: AuthzUser) {
 
 // crm_Contracts → crm_Accounts via `assigned_account` (FK account).
 export function contractReadScopeWhere(user: AuthzUser) {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { deletedAt: null };
+    return { deletedAt: null, ...orgFilter };
   }
   return {
     deletedAt: null,
+    ...orgFilter,
     OR: [
       { assigned_to: user.id },
       { createdBy: user.id },
@@ -371,13 +384,15 @@ export async function assertCanReadContract(
 // ---------------------------------------------------------------------------
 
 export function targetReadScopeWhere(user: AuthzUser) {
-  if (user.role === "admin" || user.role === "manager") return { deletedAt: null };
-  return { deletedAt: null, created_by: user.id };
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
+  if (user.role === "admin" || user.role === "manager") return { deletedAt: null, ...orgFilter };
+  return { deletedAt: null, created_by: user.id, ...orgFilter };
 }
 
 export function targetListReadScopeWhere(user: AuthzUser) {
-  if (user.role === "admin" || user.role === "manager") return { deletedAt: null };
-  return { deletedAt: null, created_by: user.id };
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
+  if (user.role === "admin" || user.role === "manager") return { deletedAt: null, ...orgFilter };
+  return { deletedAt: null, created_by: user.id, ...orgFilter };
 }
 
 export async function assertCanReadTargetList(
@@ -518,10 +533,11 @@ export async function assertCanReadActivityForEntity(
 // ---------------------------------------------------------------------------
 
 export function campaignReadScopeWhere(user: AuthzUser) {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { status: { not: "deleted" } };
+    return { status: { not: "deleted" }, ...orgFilter };
   }
-  return { status: { not: "deleted" }, created_by: user.id };
+  return { status: { not: "deleted" }, created_by: user.id, ...orgFilter };
 }
 
 export function campaignTemplateReadScopeWhere(user: AuthzUser) {
@@ -576,11 +592,13 @@ export async function assertCanWriteTemplate(
 // ---------------------------------------------------------------------------
 
 export function boardReadScopeWhere(user: AuthzUser) {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { deletedAt: null };
+    return { deletedAt: null, ...orgFilter };
   }
   return {
     deletedAt: null,
+    ...orgFilter,
     OR: [
       { user: user.id },
       { sharedWith: { has: user.id } },
@@ -591,10 +609,11 @@ export function boardReadScopeWhere(user: AuthzUser) {
 }
 
 export function boardWriteScopeWhere(user: AuthzUser) {
+  const orgFilter = user.organization_id ? { organization_id: user.organization_id } : {};
   if (user.role === "admin" || user.role === "manager") {
-    return { deletedAt: null };
+    return { deletedAt: null, ...orgFilter };
   }
-  return { deletedAt: null, user: user.id };
+  return { deletedAt: null, user: user.id, ...orgFilter };
 }
 
 export async function assertCanReadBoard(

@@ -110,19 +110,9 @@ export function LoginComponent() {
         const errorText = await response.text();
         throw new Error(errorText || "Failed to create account.");
       }
-      toast.success("Account created successfully! Logging you in...");
-      // Auto-login after successful registration
-      const res = await signIn("credentials", {
-        redirect: false,
-        email: currentEmail,
-        password: currentPassword,
-      });
-      if (res?.error) {
-        toast.error("Please log in with your new account.");
-      } else {
-        router.push("/");
-        router.refresh();
-      }
+      toast.success("Account created! Please check your email (or terminal) to verify your account before logging in.");
+      // Clear the form or switch tabs to sign in
+      // Do not auto-login because the user must verify their email first
     } catch (error: any) {
       toast.error(error.message || "Failed to create account.");
     } finally {

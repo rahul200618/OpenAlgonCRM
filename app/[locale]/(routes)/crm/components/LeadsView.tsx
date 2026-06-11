@@ -24,6 +24,8 @@ import {
 import { NewLeadForm } from "../leads/components/NewLeadForm";
 import { LeadDataTable } from "../leads/table-components/data-table";
 
+import ImportLeadsModal from "@/components/modals/ImportLeadsModal";
+
 import type { getAllCrmData } from "@/actions/crm/get-crm-data";
 
 type CrmData = Awaited<ReturnType<typeof getAllCrmData>>;
@@ -51,27 +53,30 @@ const LeadsView = ({ data, crmData, isUser }: LeadsViewProps) => {
             </CardTitle>
           </div>
           <div className="flex space-x-2">
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild>
-                <Button size="sm" aria-label={t("leads.addNew")} data-testid="add-lead-btn">+</Button>
-              </SheetTrigger>
-              <SheetContent className="w-full md:max-w-[771px] overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>{t("leads.sheetTitle")}</SheetTitle>
-                  <SheetDescription>{t("leads.sheetDescription")}</SheetDescription>
-                </SheetHeader>
-                <div className="mt-6 space-y-4">
-                  <NewLeadForm
-                    accounts={accounts}
-                    leadSources={leadSources}
-                    leadStatuses={leadStatuses}
-                    leadTypes={leadTypes}
-                    onFinish={() => setOpen(false)}
-                    isUser={isUser}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
+            {!isUser && <ImportLeadsModal />}
+            {!isUser && (
+              <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild>
+                  <Button size="sm" aria-label={t("leads.addNew")} data-testid="add-lead-btn">+</Button>
+                </SheetTrigger>
+                <SheetContent className="w-full md:max-w-[771px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>{t("leads.sheetTitle")}</SheetTitle>
+                    <SheetDescription>{t("leads.sheetDescription")}</SheetDescription>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-4">
+                    <NewLeadForm
+                      accounts={accounts}
+                      leadSources={leadSources}
+                      leadStatuses={leadStatuses}
+                      leadTypes={leadTypes}
+                      onFinish={() => setOpen(false)}
+                      isUser={isUser}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
         </div>
         <Separator />

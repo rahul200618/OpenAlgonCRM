@@ -6,7 +6,7 @@ const withNextIntl = require("next-intl/plugin")(
 const nextConfig = {
   output: "standalone",
   allowedDevOrigins: ['prepared-george-citysearch-proprietary.trycloudflare.com'],
-  serverExternalPackages: ["pdf-parse", "pdfjs-dist", "kysely"],
+  serverExternalPackages: ["pdf-parse", "pdfjs-dist", "kysely", "pg", "pg-native", "@prisma/client", "@prisma/adapter-pg", "prisma"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "localhost" },

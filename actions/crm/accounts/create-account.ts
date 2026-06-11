@@ -33,6 +33,11 @@ export const createAccount = async (data: {
   const session = await getSession();
   if (!session) return { error: "Unauthorized" };
 
+  const { checkPermission } = await import("@/lib/auth-permissions");
+  if (!checkPermission(session.user.role, "crm", "create")) {
+    return { error: "Forbidden: You do not have permission to create accounts." };
+  }
+
   const { name } = data;
   if (!name) return { error: "name is required" };
 

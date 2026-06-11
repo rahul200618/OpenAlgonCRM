@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
+import ImportContactsModal from "@/components/modals/ImportContactsModal";
+
 import type { getAllCrmData } from "@/actions/crm/get-crm-data";
 
 type CrmData = Awaited<ReturnType<typeof getAllCrmData>>;
@@ -54,26 +56,29 @@ const ContactsView = ({ data, crmData, isUser }: ContactsViewProps) => {
             </CardTitle>
           </div>
           <div className="flex space-x-2">
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild>
-                <Button size="sm" aria-label={t("contacts.addNew")} data-testid="add-contact-btn">+</Button>
-              </SheetTrigger>
-              <SheetContent className="w-full md:max-w-[771px] overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>{t("contacts.sheetTitle")}</SheetTitle>
-                  <SheetDescription>
-                    {t("contacts.sheetDescription")}
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="mt-6 space-y-4">
-                  <NewContactForm
-                    accounts={accounts}
-                    onFinish={() => setOpen(false)}
-                    isUser={isUser}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
+            {!isUser && <ImportContactsModal />}
+            {!isUser && (
+              <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild>
+                  <Button size="sm" aria-label={t("contacts.addNew")} data-testid="add-contact-btn">+</Button>
+                </SheetTrigger>
+                <SheetContent className="w-full md:max-w-[771px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>{t("contacts.sheetTitle")}</SheetTitle>
+                    <SheetDescription>
+                      {t("contacts.sheetDescription")}
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-4">
+                    <NewContactForm
+                      accounts={accounts}
+                      onFinish={() => setOpen(false)}
+                      isUser={isUser}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
         </div>
         <Separator />

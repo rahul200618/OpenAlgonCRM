@@ -1653,13 +1653,14 @@ model Organization {
   opportunities crm_Opportunities[]
   campaigns     crm_campaigns[]
 
-  // Stripe Billing
-  stripeCustomerId       String?   @unique
-  stripeSubscriptionId   String?   @unique
-  stripePriceId          String?
-  stripeCurrentPeriodEnd DateTime?
+  // Razorpay Billing
+  razorpayCustomerId       String?   @unique
+  razorpaySubscriptionId   String?   @unique
+  razorpayPlanId           String?
+  razorpayCurrentPeriodEnd DateTime?
 
   invites OrganizationInvite[]
+  workflows Workflow[]
 
   @@index([status])
   @@index([createdAt])
@@ -1911,10 +1912,28 @@ model Session {
   user         Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
  
+model Workflow {
+  id              String        @id @default(uuid()) @db.Uuid
+  name            String
+  description     String?
+  isActive        Boolean       @default(true)
+  trigger         String        // e.g., "LEAD_CREATED"
+  conditions      Json?         // array of conditions
+  actions         Json          // array of actions
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  organization_id String?       @db.Uuid
+  organization    Organization? @relation(fields: [organization_id], references: [id])
+
+  @@index([organization_id])
+  @@index([trigger])
+  @@index([isActive])
+}
+
 model VerificationToken {
   identifier String
-  token      String
+  token      String   @unique
   expires    DateTime
- 
+
   @@unique([identifier, token])
 }

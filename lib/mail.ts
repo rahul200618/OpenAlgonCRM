@@ -25,8 +25,10 @@ export const sendPasswordResetEmail = async (
   email: string,
   token: string,
 ) => {
+  const resetLink = `${domain}/new-password?token=${token}`
+
   if (!process.env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY not found. Skipping reset email:", token);
+    console.warn("RESEND_API_KEY not found. Skipping reset email. LOCAL TESTING LINK:", resetLink);
     return;
   }
 
@@ -44,8 +46,10 @@ export const sendVerificationEmail = async (
   email: string, 
   token: string
 ) => {
+  const confirmLink = `${domain}/new-verification?token=${token}`;
+
   if (!process.env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY not found. Skipping verification email:", token);
+    console.warn("RESEND_API_KEY not found. Skipping verification email. LOCAL TESTING LINK:", confirmLink);
     return;
   }
 
@@ -64,8 +68,10 @@ export const sendInviteEmail = async (
   token: string,
   orgName: string
 ) => {
+  const inviteLink = `${domain}/invite/${token}`;
+
   if (!process.env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY not found. Skipping invite email to:", email);
+    console.warn("RESEND_API_KEY not found. Skipping invite email. LOCAL TESTING LINK:", inviteLink);
     return;
   }
 

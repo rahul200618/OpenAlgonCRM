@@ -6,6 +6,7 @@ import { AuthenticationError, AuthorizationError } from "./errors";
 export interface AuthzUser {
   id: string;
   role: AppRole;
+  organization_id?: string | null;
 }
 
 export async function requireAuthenticated(): Promise<AuthzUser> {
@@ -15,11 +16,11 @@ export async function requireAuthenticated(): Promise<AuthzUser> {
 
   const dbUser = await prismadb.users.findUnique({
     where: { id: userId },
-    select: { id: true, role: true },
+    select: { id: true, role: true, organization_id: true },
   });
   if (!dbUser) throw new AuthenticationError();
 
-  return { id: dbUser.id, role: mapLegacyRole(dbUser.role) };
+  return { id: dbUser.id, role: mapLegacyRole(dbUser.role), organization_id: dbUser.organization_id };
 }
 
 export async function requireRole(

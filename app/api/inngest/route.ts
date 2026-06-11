@@ -13,6 +13,7 @@ import { reportSendScheduled } from "@/inngest/functions/reports/send-scheduled"
 import { generateDocumentThumbnail } from "@/inngest/functions/documents/generate-thumbnail";
 import { syncExchangeRates } from "@/inngest/functions/ecb/sync-exchange-rates";
 import { followupReminder } from "@/inngest/functions/followup-reminder";
+import { evaluateWorkflows } from "@/inngest/functions/workflows/evaluate";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
@@ -30,5 +31,6 @@ export const { GET, POST, PUT } = serve({
     generateDocumentThumbnail,
     syncExchangeRates,
     followupReminder,
+    evaluateWorkflows,
   ],
 });

@@ -17,10 +17,10 @@ export const checkSubscription = async () => {
       id: organizationId,
     },
     select: {
-      stripeSubscriptionId: true,
-      stripeCurrentPeriodEnd: true,
-      stripeCustomerId: true,
-      stripePriceId: true,
+      razorpaySubscriptionId: true,
+      razorpayCurrentPeriodEnd: true,
+      razorpayCustomerId: true,
+      razorpayPlanId: true,
       createdAt: true,
     },
   });
@@ -34,8 +34,8 @@ export const checkSubscription = async () => {
   const isTrialValid = trialEnd > Date.now();
 
   const isSubValid =
-    org.stripePriceId &&
-    org.stripeCurrentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now();
+    org.razorpayPlanId &&
+    org.razorpayCurrentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now();
 
   return !!isSubValid || isTrialValid;
 };
@@ -51,18 +51,17 @@ export const PRICING_TIERS = {
     name: "Pro",
     maxUsers: 5,
     maxLeads: 1000,
-    priceId: process.env.STRIPE_PRO_PRICE_ID,
+    planId: process.env.NEXT_PUBLIC_RAZORPAY_PRO_PLAN_ID,
   },
   PROMAX: {
     name: "Pro Max",
     maxUsers: 20,
     maxLeads: 10000,
-    priceId: process.env.STRIPE_PROMAX_PRICE_ID,
+    planId: process.env.NEXT_PUBLIC_RAZORPAY_PROMAX_PLAN_ID,
   },
   ENTERPRISE: {
     name: "Enterprise",
     maxUsers: 9999, // Unlimited
     maxLeads: 999999, // Unlimited
-    priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID,
   },
 };

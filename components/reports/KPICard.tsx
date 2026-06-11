@@ -26,7 +26,7 @@ const itemVariants: Variants = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
-export function KPICard({ kpi, dateParams, displayCurrency = "USD" }: { kpi: KPIData; dateParams: string; displayCurrency?: string }) {
+export function KPICard({ kpi, dateParams, displayCurrency = "INR" }: { kpi: KPIData; dateParams: string; displayCurrency?: string }) {
   const t = useTranslations("ReportsPage.kpi");
   const isPositive = kpi.changePercent > 0;
   const isZero = kpi.changePercent === 0;
