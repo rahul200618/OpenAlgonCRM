@@ -81,9 +81,16 @@ v8-compile-cache-*/
 android/.idea/
 android/*.iml
 android/local.properties
+android/local.properties
 android/.gradle/
 android/build/
 android/app/build/
+
+# Android Studio Flash VS Code extension redirections
+app/build/
+app/src/
+app/build.gradle
+
 
 # Tauri / Rust build output
 src-tauri/target/
